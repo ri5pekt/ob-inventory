@@ -1,0 +1,410 @@
+{
+  "timestamp": "2026-02-20T23:56:29.921Z",
+  "salesPage": {
+    "url": "http://localhost:5173/sales",
+    "title": "OB Inventory",
+    "buttons": [
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "nav-item",
+          "nav-group"
+        ],
+        "text": "Settings",
+        "visible": true,
+        "rect": {
+          "x": 10,
+          "y": 202,
+          "width": 220,
+          "height": 34,
+          "top": 202,
+          "right": 230,
+          "bottom": 236,
+          "left": 10
+        },
+        "type": "submit",
+        "disabled": false
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "p-button",
+          "p-component",
+          "p-button-sm"
+        ],
+        "text": "New Sale",
+        "visible": true,
+        "rect": {
+          "x": 1767.1875,
+          "y": 115.5,
+          "width": 104.8125,
+          "height": 33,
+          "top": 115.5,
+          "right": 1872,
+          "bottom": 148.5,
+          "left": 1767.1875
+        },
+        "type": "button",
+        "disabled": false
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "chip",
+          "active"
+        ],
+        "text": "All",
+        "visible": true,
+        "rect": {
+          "x": 288,
+          "y": 270.5,
+          "width": 65.453125,
+          "height": 28,
+          "top": 270.5,
+          "right": 353.453125,
+          "bottom": 298.5,
+          "left": 288
+        },
+        "type": "submit",
+        "disabled": false
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "chip"
+        ],
+        "text": "WooCommerce",
+        "visible": true,
+        "rect": {
+          "x": 361.453125,
+          "y": 270.5,
+          "width": 141.0625,
+          "height": 28,
+          "top": 270.5,
+          "right": 502.515625,
+          "bottom": 298.5,
+          "left": 361.453125
+        },
+        "type": "submit",
+        "disabled": false
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "chip"
+        ],
+        "text": "Direct",
+        "visible": true,
+        "rect": {
+          "x": 510.515625,
+          "y": 270.5,
+          "width": 84.953125,
+          "height": 28,
+          "top": 270.5,
+          "right": 595.46875,
+          "bottom": 298.5,
+          "left": 510.515625
+        },
+        "type": "submit",
+        "disabled": false
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "chip"
+        ],
+        "text": "Partner",
+        "visible": true,
+        "rect": {
+          "x": 603.46875,
+          "y": 270.5,
+          "width": 93.640625,
+          "height": 28,
+          "top": 270.5,
+          "right": 697.109375,
+          "bottom": 298.5,
+          "left": 603.46875
+        },
+        "type": "submit",
+        "disabled": false
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "p-paginator-first",
+          "p-disabled"
+        ],
+        "text": "",
+        "visible": true,
+        "rect": {
+          "x": 947.84375,
+          "y": 982,
+          "width": 40,
+          "height": 40,
+          "top": 982,
+          "right": 987.84375,
+          "bottom": 1022,
+          "left": 947.84375
+        },
+        "type": "button",
+        "disabled": true
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "p-paginator-prev",
+          "p-disabled"
+        ],
+        "text": "",
+        "visible": true,
+        "rect": {
+          "x": 991.84375,
+          "y": 982,
+          "width": 40,
+          "height": 40,
+          "top": 982,
+          "right": 1031.84375,
+          "bottom": 1022,
+          "left": 991.84375
+        },
+        "type": "button",
+        "disabled": true
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "p-paginator-next",
+          "p-disabled"
+        ],
+        "text": "",
+        "visible": true,
+        "rect": {
+          "x": 1039.84375,
+          "y": 982,
+          "width": 40,
+          "height": 40,
+          "top": 982,
+          "right": 1079.84375,
+          "bottom": 1022,
+          "left": 1039.84375
+        },
+        "type": "button",
+        "disabled": true
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "p-paginator-last",
+          "p-disabled"
+        ],
+        "text": "",
+        "visible": true,
+        "rect": {
+          "x": 1083.84375,
+          "y": 982,
+          "width": 40,
+          "height": 40,
+          "top": 982,
+          "right": 1123.84375,
+          "bottom": 1022,
+          "left": 1083.84375
+        },
+        "type": "button",
+        "disabled": true
+      }
+    ],
+    "clickables": [],
+    "mainContent": {
+      "tag": "main",
+      "id": null,
+      "classes": [
+        "page-content"
+      ],
+      "text": "SalesAll sales across all channelsNew SaleTotal Sales0WooCommerce0Direct0Partner0 All WooCommerce Di",
+      "visible": true,
+      "rect": {
+        "x": 240,
+        "y": 58,
+        "width": 1680,
+        "height": 1022,
+        "top": 58,
+        "right": 1920,
+        "bottom": 1080,
+        "left": 240
+      }
+    },
+    "bodyText": "OB Inventory\nInventory\nStock Transfers\nSales\nSettings\nSales\nActive Brands\nWoocommerce\nA\nAdmin\nadmin@local\nSales\nAll sales across all channels\nNew Sale\nTOTAL SALES\n0\nWOOCOMMERCE\n0\nDIRECT\n0\nPARTNER\n0\nAll\nWooCommerce\nDirect\nPartner\nDate\n\t\nType\n\t\nCustomer\n\t\nWarehouse\n\t\nOrder #\n\t\nItems\n\t\nTotal\n\t\nStatus\n\n\n\nNo sales found\n\n50"
+  },
+  "transfersPage": {
+    "url": "http://localhost:5173/transfers",
+    "title": "OB Inventory",
+    "buttons": [
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "nav-item",
+          "nav-group"
+        ],
+        "text": "Settings",
+        "visible": true,
+        "rect": {
+          "x": 10,
+          "y": 202,
+          "width": 220,
+          "height": 34,
+          "top": 202,
+          "right": 230,
+          "bottom": 236,
+          "left": 10
+        },
+        "type": "submit",
+        "disabled": false
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "p-button",
+          "p-component",
+          "p-button-sm"
+        ],
+        "text": "New Transfer",
+        "visible": true,
+        "rect": {
+          "x": 1738.640625,
+          "y": 115.5,
+          "width": 133.359375,
+          "height": 33,
+          "top": 115.5,
+          "right": 1872,
+          "bottom": 148.5,
+          "left": 1738.640625
+        },
+        "type": "button",
+        "disabled": false
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "p-paginator-first",
+          "p-disabled"
+        ],
+        "text": "",
+        "visible": true,
+        "rect": {
+          "x": 947.84375,
+          "y": 982,
+          "width": 40,
+          "height": 40,
+          "top": 982,
+          "right": 987.84375,
+          "bottom": 1022,
+          "left": 947.84375
+        },
+        "type": "button",
+        "disabled": true
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "p-paginator-prev",
+          "p-disabled"
+        ],
+        "text": "",
+        "visible": true,
+        "rect": {
+          "x": 991.84375,
+          "y": 982,
+          "width": 40,
+          "height": 40,
+          "top": 982,
+          "right": 1031.84375,
+          "bottom": 1022,
+          "left": 991.84375
+        },
+        "type": "button",
+        "disabled": true
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "p-paginator-next",
+          "p-disabled"
+        ],
+        "text": "",
+        "visible": true,
+        "rect": {
+          "x": 1039.84375,
+          "y": 982,
+          "width": 40,
+          "height": 40,
+          "top": 982,
+          "right": 1079.84375,
+          "bottom": 1022,
+          "left": 1039.84375
+        },
+        "type": "button",
+        "disabled": true
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "classes": [
+          "p-paginator-last",
+          "p-disabled"
+        ],
+        "text": "",
+        "visible": true,
+        "rect": {
+          "x": 1083.84375,
+          "y": 982,
+          "width": 40,
+          "height": 40,
+          "top": 982,
+          "right": 1123.84375,
+          "bottom": 1022,
+          "left": 1083.84375
+        },
+        "type": "button",
+        "disabled": true
+      }
+    ],
+    "clickables": [],
+    "mainContent": {
+      "tag": "main",
+      "id": null,
+      "classes": [
+        "page-content"
+      ],
+      "text": "Stock TransfersMove inventory between warehousesNew TransferTotal Transfers0Units Moved0DateRouteRef",
+      "visible": true,
+      "rect": {
+        "x": 240,
+        "y": 58,
+        "width": 1680,
+        "height": 1022,
+        "top": 58,
+        "right": 1920,
+        "bottom": 1080,
+        "left": 240
+      }
+    },
+    "bodyText": "OB Inventory\nInventory\nStock Transfers\nSales\nSettings\nStock Transfers\nActive Brands\nWoocommerce\nA\nAdmin\nadmin@local\nStock Transfers\nMove inventory between warehouses\nNew Transfer\nTOTAL TRANSFERS\n0\nUNITS MOVED\n0\nDate\n\t\nRoute\n\t\nReference\n\t\nProducts\n\t\nNotes\n\t\nStatus\n\n\n\nNo transfers yet\n\nClick \"New Transfer\" to move stock between warehouses\n\n50"
+  },
+  "consoleErrors": [],
+  "consoleWarnings": []
+}

@@ -1,0 +1,41 @@
+{
+  "name": "ob-inventory",
+  "private": true,
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev:api": "pnpm --filter @ob-inventory/api dev",
+    "dev:worker": "pnpm --filter @ob-inventory/worker dev",
+    "dev:web": "pnpm --filter @ob-inventory/web dev",
+    "build": "pnpm --filter @ob-inventory/types build && pnpm --filter @ob-inventory/db build && pnpm --filter './apps/*' build",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "db:generate": "pnpm --filter @ob-inventory/db generate",
+    "db:migrate": "pnpm --filter @ob-inventory/db migrate",
+    "db:studio": "pnpm --filter @ob-inventory/db studio",
+    "import:csv": "tsx scripts/import-csv.ts",
+    "db:seed": "tsx --env-file=.env scripts/seed.ts",
+    "db:seed-data": "tsx --env-file=.env scripts/seed-data.ts"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "argon2",
+      "esbuild",
+      "msgpackr-extract",
+      "vue-demi"
+    ]
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "argon2": "^0.43.1",
+    "eslint": "^9.0.0",
+    "playwright": "^1.58.2",
+    "prettier": "^3.4.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

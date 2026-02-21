@@ -1,0 +1,43 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  color: #0f172a;
+  background: #f1f5f9;
+  -webkit-font-smoothing: antialiased;
+  /* Prevent horizontal overflow on mobile */
+  overflow-x: hidden;
+}
+
+/* Proper mobile viewport */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+#app {
+  height: 100vh;
+  height: 100dvh; /* dynamic viewport on mobile browsers */
+}
+
+/* Smaller base font on mobile */
+@media (max-width: 480px) {
+  html, body {
+    font-size: 15px;
+  }
+}
+
+/* ── Global DataTable header style ── */
+.p-datatable .p-datatable-thead > tr > th,
+.p-datatable .p-datatable-thead .p-column-header-content,
+.p-datatable .p-datatable-thead .p-column-title {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

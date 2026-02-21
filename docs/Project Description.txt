@@ -1,0 +1,316 @@
+Project Description
+
+Inventory & Sales Management System with WooCommerce Integration
+Overview
+
+The system is a web-based inventory and sales management platform designed to manage stock across multiple warehouses and synchronize availability with a connected WooCommerce store.
+
+The system serves as the single source of truth for inventory. WooCommerce functions as a connected sales channel, not as the authoritative stock manager.
+
+The platform supports multi-user access with audit tracking and role-based permissions.
+
+Core Objectives
+
+Maintain accurate stock levels across warehouses
+
+Track all inventory changes through a ledger system
+
+Support multiple sales channels (direct, partner, WooCommerce)
+
+Provide structured product catalog management
+
+Synchronize stock with WooCommerce
+
+Maintain full auditability of user actions
+
+Support multiple users with authentication and profile management
+
+Architecture Principles
+1. Inventory as a Ledger
+
+Stock quantities are never edited directly.
+
+All stock changes occur through explicit actions:
+
+Receive stock
+
+Transfer between warehouses
+
+Sale
+
+Return
+
+Adjustment
+
+Each action writes an immutable ledger entry.
+Current stock is calculated (or materialized) from these movements.
+
+2. Separation of Concerns
+
+The system separates:
+
+Catalog (what a product is)
+
+Inventory (where it is and how much exists)
+
+Sales (how stock leaves inventory)
+
+Transfers (movement between warehouses)
+
+Integrations (WooCommerce adapter)
+
+Core Domain Model
+Products
+
+Each product contains structured core fields:
+
+SKU (required, unique)
+
+Name
+
+Brand (required, relational)
+
+Category/Class (required, relational)
+
+Base price
+
+Optional barcode
+
+Optional WooCommerce mapping
+
+Option Fields (Controlled Select)
+
+Certain attributes use controlled value lists:
+
+Size
+
+Color
+
+These are stored as selectable values (not free text) to allow:
+
+Clean filtering
+
+Consistent reporting
+
+Reliable querying
+
+Free Text Fields
+
+The system also supports open text fields for:
+
+Notes
+
+Internal comments
+
+Descriptions
+
+Optional metadata
+
+Additional Product Data
+
+Date received (per receive action, not per product)
+
+Optional custom attributes (extensible system)
+
+Warehouses
+
+Main Warehouse (drives WooCommerce availability)
+
+Partner / Reseller Warehouses
+
+Future warehouse types supported
+
+Inventory Actions
+Receive
+
+Adds stock to a warehouse.
+Includes:
+
+Quantity
+
+Supplier reference (optional)
+
+Date received
+
+Notes
+
+Transfer
+
+Moves stock from one warehouse to another.
+Reduces source warehouse and increases destination warehouse.
+
+Sale
+
+Represents stock leaving a warehouse.
+
+Sale types:
+
+Direct sale
+
+Partner report sale
+
+WooCommerce sale
+
+Return
+
+Adds stock back to warehouse (from customer or partner).
+
+Adjustment
+
+Manual correction with:
+
+Required reason
+
+User attribution
+
+Timestamp
+
+Notes
+
+Sales Model
+
+Each sale contains three independent state fields:
+
+Fulfillment State
+
+draft
+
+prepared
+
+shipped
+
+delivered
+
+cancelled
+
+returned
+
+Payment State
+
+unpaid
+
+paid
+
+refunded
+
+Invoice State
+
+pending
+
+invoice_created
+
+tax_invoice_created
+
+credited
+
+not_required
+
+WooCommerce Integration
+Inbound
+
+WooCommerce order events create internal Woo-type sales.
+
+Outbound
+
+Main warehouse stock changes trigger asynchronous Woo stock updates.
+
+The system never blocks on Woo responses.
+
+User Management
+
+The system supports multiple users.
+
+Features:
+
+User creation
+
+Profile editing
+
+Password change
+
+Role-based permissions (extensible)
+
+Full action audit trail (user_id + timestamp recorded on all actions)
+
+Although initially used by a single administrator, the system is designed for multi-user operation.
+
+Technology Stack
+Frontend
+
+Vue 3
+
+Vite
+
+TypeScript
+
+Pinia
+
+PrimeVue
+
+Optional: TanStack Query (for server-state handling)
+
+Backend
+
+Node.js
+
+TypeScript
+
+Fastify
+
+Database
+
+PostgreSQL
+
+Asynchronous Processing
+
+Redis
+
+BullMQ (job queue)
+
+Woo event processing
+
+Stock synchronization
+
+Retry handling
+
+Authentication
+
+JWT-based auth
+
+Password hashing (bcrypt or argon2)
+
+Refresh token support
+
+Role system (extensible)
+
+Reverse Proxy
+
+Caddy
+
+Deployment
+
+Docker Compose
+
+api
+
+worker
+
+postgres
+
+redis
+
+Non-Functional Requirements
+
+Strong data integrity
+
+Transactional safety
+
+Immutable inventory history
+
+High auditability
+
+Clear domain separation
+
+Scalable architecture for future SaaS expansion
+
+Clean UI optimized for daily operational use

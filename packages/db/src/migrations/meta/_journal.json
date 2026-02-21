@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1771606943865,
+      "tag": "0000_slimy_lethal_legion",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1740082800000,
+      "tag": "0001_rename_bin_to_box",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1740086400000,
+      "tag": "0002_add_stores",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1740090000000,
+      "tag": "0003_add_date_added_picture",
+      "breakpoints": true
+    }
+  ]
+}
