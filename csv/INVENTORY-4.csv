@@ -1,0 +1,747 @@
+﻿Box#,product,brand,class,MODEL,SIZE ,Color,SKU,UNIT,date added,PICTURE,QTY,image,title
+101,HATS,TKB,CLOTHING,HATS,F,F,HATS-F-F,PIECE,,,0,,
+102,SHORTS,TKB,ELASTICS,Ratro,4L,BKBU,SHORTSRatro-BKBU-4L,PIECE,,,1,https://activebrands.co.il/wp-content/uploads-new/2023/01/IMG_5083-01-scaled.jpeg,THAI SHORTS black blue
+102,SHORTS,TKB,ELASTICS,Ratro,XL,BKYW,SHORTSRatro-BKYW-XL,PIECE,,,7,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG_5082-01-scaled.jpeg,THAI SHORTS black yellow
+102,SHORTS,TKB,ELASTICS,Ratro,4L,BKYW,SHORTSRatro-BKYW-4L,PIECE,,,0,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG_5082-01-scaled.jpeg,THAI SHORTS black yellow
+102,SHORTS,TKB,ELASTICS,Ratro,4L,BKWH,SHORTSRatro-BKWH-4L,PIECE,,,0,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1216.jpg,THAI SHORTS black white
+102,SHORTS,TKB,ELASTICS,Ratro,4L,BKRD,SHORTSRatro-BKRD-4L,PIECE,,,1,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1214.jpg,THAI SHORTS black red
+102,SHORTS,TKB,ELASTICS,Ratro,4L,BKBK,SHORTSRatro-BKBK-4L,PIECE,,,0,https://activebrands.co.il/wp-content/uploads-new/2023/05/DSCF1206.jpg,THAI SHORTS black
+102,SHORTS,TKB,ELASTICS,Ratro,L,BKWH,SHORTSRatro-BKWH-L,PIECE,,,8,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1216.jpg,THAI SHORTS black white
+102,SHORTS,TKB,ELASTICS,Ratro,L,BKBK,SHORTSRatro-BKBK-L,PIECE,,,5,https://activebrands.co.il/wp-content/uploads-new/2023/05/DSCF1206.jpg,THAI SHORTS black
+102,SHORTS,TKB,ELASTICS,Ratro,L,BKYW,SHORTSRatro-BKYW-L,PIECE,,,6,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG_5082-01-scaled.jpeg,THAI SHORTS black yellow
+102,SHORTS,TKB,ELASTICS,Ratro,L,BKRD,SHORTSRatro-BKRD-L,PIECE,,,12,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1214.jpg,THAI SHORTS black red
+102,SHORTS,TKB,ELASTICS,Ratro,L,BKBU,SHORTSRatro-BKBU-L,PIECE,,,10,https://activebrands.co.il/wp-content/uploads-new/2023/01/IMG_5083-01-scaled.jpeg,THAI SHORTS black blue
+102,SHORTS,TKB,ELASTICS,Ratro,XL,BKWH,SHORTSRatro-BKWH-XL,PIECE,,,9,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1216.jpg,THAI SHORTS black white
+102,SHORTS,TKB,ELASTICS,Ratro,XL,BKRD,SHORTSRatro-BKRD-XL,PIECE,,,9,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1214.jpg,THAI SHORTS black red
+102,SHORTS,TKB,ELASTICS,Ratro,XL,BKBU,SHORTSRatro-BKBU-XL,PIECE,,,11,https://activebrands.co.il/wp-content/uploads-new/2023/01/IMG_5083-01-scaled.jpeg,THAI SHORTS black blue
+102,SHORTS,TKB,ELASTICS,RATRO,XL,BKBK,SHORTSRATRO-BKBK-XL,PIECE,,,14,https://activebrands.co.il/wp-content/uploads-new/2023/05/DSCF1206.jpg,THAI SHORTS black
+102,SHORTS,TKB,ELASTICS,Ratro,XXL,BKWH,SHORTSRatro-BKWH-XXL,PIECE,,,7,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1216.jpg,THAI SHORTS black white
+102,SHORTS,TKB,ELASTICS,Ratro,XXL,BKYW,SHORTSRatro-BKYW-XXL,PIECE,,,2,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG_5082-01-scaled.jpeg,THAI SHORTS black yellow
+102,SHORTS,TKB,ELASTICS,Ratro,XXL,BKBU,SHORTSRatro-BKBU-XXL,PIECE,,,10,https://activebrands.co.il/wp-content/uploads-new/2023/01/IMG_5083-01-scaled.jpeg,THAI SHORTS black blue
+102,SHORTS,TKB,ELASTICS,Ratro,XXL,BKBK,SHORTSRatro-BKBK-XXL,PIECE,,,9,https://activebrands.co.il/wp-content/uploads-new/2023/05/DSCF1206.jpg,THAI SHORTS black
+102,SHORTS,TKB,ELASTICS,Ratro,XXL,BKRD,SHORTSRatro-BKRD-XXL,PIECE,,,8,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1214.jpg,THAI SHORTS black red
+102,SHORTS,TKB,ELASTICS,Ratro,XXXL,BKYW,SHORTSRatro-BKYW-XXXL,PIECE,,,0,,
+102,SHORTS,TKB,ELASTICS,Ratro,XXXL,BKWH,SHORTSRatro-BKWH-XXXL,PIECE,,,0,,
+102,SHORTS,TKB,ELASTICS,Ratro,XXXL,BKRD,SHORTSRatro-BKRD-XXXL,PIECE,,,0,,
+102,SHORTS,TKB,ELASTICS,Ratro,XXXL,BKBU,SHORTSRatro-BKBU-XXXL,PIECE,,,0,,
+102,SHORTS,TKB,ELASTICS,Ratro,XXXL,BKBK,SHORTSRatro-BKBK-XXXL,PIECE,,,0,,
+103,SHORTS,TKB,ELASTICS,Geisha,4L,GRAPHIC,SHORTSGeisha-GRAPHIC-4L,PIECE,bc,,15,https://activebrands.co.il/wp-content/uploads/2026/03/shorts-hanuman.jpg,Geisha graphic
+103,SHORTS,TKB,ELASTICS,Hanuman,4L,GRAPHIC,SHORTSHanuman-GRAPHIC-4L,PIECE,bc,,19,https://activebrands.co.il/wp-content/uploads/2026/03/shorts-geisha.jpg,Hanuman graphic
+103,SHORTS,TKB,ELASTICS,Geisha,XL,GRAPHIC,SHORTSGeisha-GRAPHIC-XL,PIECE,bc,,4,https://activebrands.co.il/wp-content/uploads/2026/03/shorts-hanuman.jpg,Geisha graphic
+103,SHORTS,TKB,ELASTICS,Geisha,L,GRAPHIC,SHORTSGeisha-GRAPHIC-L,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/shorts-hanuman.jpg,Geisha graphic
+103,SHORTS,TKB,ELASTICS,Hanuman,L,GRAPHIC,SHORTSHanuman-GRAPHIC-L,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/shorts-geisha.jpg,Hanuman graphic
+103,SHORTS,TKB,ELASTICS,Hanuman,XL,GRAPHIC,SHORTSHanuman-GRAPHIC-XL,PIECE,bc,,8,https://activebrands.co.il/wp-content/uploads/2026/03/shorts-geisha.jpg,Hanuman graphic
+103,SHORTS,TKB,ELASTICS,Geisha,XXL,GRAPHIC,SHORTSGeisha-GRAPHIC-XXL,PIECE,bc,,19,https://activebrands.co.il/wp-content/uploads/2026/03/shorts-hanuman.jpg,Geisha graphic
+103,SHORTS,TKB,ELASTICS,Hanuman,XXL,GRAPHIC,SHORTSHanuman-GRAPHIC-XXL,PIECE,bc,,17,https://activebrands.co.il/wp-content/uploads/2026/03/shorts-geisha.jpg,Hanuman graphic
+103,SHORTS,TKB,ELASTICS,Geisha,XXXL,GRAPHIC,SHORTSGeisha-GRAPHIC-XXXL,PIECE,bc,,0,,
+103,SHORTS,TKB,ELASTICS,Hanuman,XXXL,GRAPHIC,SHORTSHanuman-GRAPHIC-XXXL,PIECE,bc,,0,,
+104,SHORTS,TKB,ELASTICS,202,4L,BKRD,SHORTS202-BKRD-4L,PIECE,22-Mar,,6,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1207.jpg,SHORTS black red
+104,SHORTS,TKB,ELASTICS,202,4L,BKBU,SHORTS202-BKBU-4L,PIECE,bc,,4,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1218.jpg,SHORTS black blue
+104,SHORTS,TKB,ELASTICS,226,4L,BU,SHORTS226-BU-4L,PIECE,22-Mar,,6,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1211.jpg,SHORTS blue
+104,SHORTS,TKB,ELASTICS,202,L,BKPK,SHORTS-202-BKPK-L,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1213.jpg,SHORTS black pink
+104,SHORTS,TKB,ELASTICS,202,L,BKPK,SHORTS202-BKPK-L,PIECE,21-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1213.jpg,SHORTS black pink
+104,SHORTS,TKB,ELASTICS,226,L,BU,SHORTS-226-BU-L,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1211.jpg,SHORTS blue
+104,SHORTS,TKB,ELASTICS,202,M,BKPK,SHORTS202-BKPK-M,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1213.jpg,SHORTS black pink
+104,SHORTS,TKB,ELASTICS,202,XL,BKRD,SHORTS202-BKRD-XL,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1207.jpg,SHORTS black red
+104,SHORTS,TKB,ELASTICS,202,XL,BKPK,SHORTS202-BKPK-XL,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1213.jpg,SHORTS black pink
+104,SHORTS,TKB,ELASTICS,226,XL,BU,SHORTS-226-BU-XL,PIECE,22-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1211.jpg,SHORTS blue
+104,SHORTS,TKB,ELASTICS,202,XXL,BKBU,SHORTS202-BKBU-XXL,PIECE,22-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1218.jpg,SHORTS black blue
+104,SHORTS,TKB,ELASTICS,226,XXL,BU,SHORTS226-BU-XXL,PIECE,22-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1211.jpg,SHORTS blue
+104,SHORTS,TKB,ELASTICS,202,XXL,BKRD,SHORTS202-BKRD-XXL,PIECE,22-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/DSCF1207.jpg,SHORTS black red
+106,EPAD,TKB,ELBOW PADS,EPAD,F,BK,EPAD-BK,PAIR,24-Sep,,60,https://activebrands.co.il/wp-content/uploads/2025/02/EPAD-BK.jpg,ELBOW PAD
+106,EPAD,TKB,ELBOW PADS,EPAD,F,RD,EPAD-RD,PAIR,24-Sep,,66,https://activebrands.co.il/wp-content/uploads/2025/02/EPAD-RD.jpg,ELBOW PAD
+106,ANKL,TKB,ELASTICS,ANKLE SUPPORTS,L,BK,ANKL-BK-L,PAIR,22-Mar,,6,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKB-Accessory-0-11_50220.png,ANKLE SUPPORTS black
+106,ANKL,TKB,ELASTICS,ANKLE SUPPORTS,M,BK,ANKL-BK-M,PAIR,22-Mar,,6,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKB-Accessory-0-11_50220.png,ANKLE SUPPORTS black
+106,ANKL,TKB,ELASTICS,ANKLE SUPPORTS,L,RD,ANKL-RD-L,PAIR,22-Mar,,0,,
+106,ANKL,TKB,ELASTICS,ANKLE SUPPORTS,L,BU,ANKL-BU-L,PAIR,22-Mar,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKB-Accessory-0-11_50220.png,ANKLE SUPPORTS blue
+106,BRA,TKB,CLOTHING,BRA TANK TOP,M,RDWH,BRA-RDWH-M,PIECE,22-Mar,,4,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-04_07_58-PM.jpg,TKB sports bra
+106,BRA,TKB,CLOTHING,BRA TANK TOP,S,RDWH,BRA-RDWH-S,PIECE,22-Mar,,6,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-04_07_58-PM.jpg,TKB sports bra
+106,ANKL,TKB,ELASTICS,ANKLE SUPPORTS,M,RD,ANKL-RD-M,PAIR,22-Mar,,0,,
+106,ANKL,TKB,ELASTICS,ANKLE SUPPORTS,M,BU,ANKL-BU-M,PAIR,22-Mar,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKB-Accessory-0-11_50220.png,ANKLE SUPPORTS blue
+106,ANKL,TKB,ELASTICS,ANKLE SUPPORTS,S,BK,ANKL-BK-S,PAIR,,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKB-Accessory-0-11_50220.png,ANKLE SUPPORTS black
+106,ANKL,TKB,ELASTICS,ANKLE SUPPORTS,S,RD,ANKL-RD-S,PAIR,,,0,,
+106,ANKL,TKB,ELASTICS,ANKLE SUPPORTS,S,BU,ANKL-BU-S,PAIR,,,5,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKB-Accessory-0-11_50220.png,ANKLE SUPPORTS blue
+107,SAUNA,TKB,CLOTHING,SAUNA SUITS,XXL,BK,SAUNA-BK-XXL,PIECE,22-Mar,,1,https://activebrands.co.il/wp-content/uploads/2025/02/SAUNA.jpg,TOP KING SAUNA SUIT BLACK
+107,KPED,TKB,ELASTICS,knee pad,F,BK,KPED,PAIR,bc,???,0,,
+107,SAUNA,TKB,CLOTHING,SAUNA SUITS,L,BK,SAUNA-BK-L,PIECE,22-Mar,,1,https://activebrands.co.il/wp-content/uploads/2025/02/SAUNA.jpg,TOP KING SAUNA SUIT BLACK
+107,SAUNA,TKB,CLOTHING,SAUNA SUITS,M,BK,SAUNA-BK-M,PIECE,22-Mar,,2,https://activebrands.co.il/wp-content/uploads/2025/02/SAUNA.jpg,TOP KING SAUNA SUIT BLACK
+107,SAUNA,TKB,CLOTHING,SAUNA SUITS,S,BK,SAUNA-BK-S,PIECE,21-Mar,,1,https://activebrands.co.il/wp-content/uploads/2025/02/SAUNA.jpg,TOP KING SAUNA SUIT BLACK
+107,SAUNA,TKB,CLOTHING,SAUNA SUITS,XL,BK,SAUNA-BK-XL,PIECE,22-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/02/SAUNA.jpg,TOP KING SAUNA SUIT BLACK
+108,ROPE,TKB,ROPE,,3M,,ROPE-3M,PIECE,,,36,https://activebrands.co.il/wp-content/uploads/2025/02/ROPE.webp,THAI SKIPPING ROPE
+108,GROIN,ELSE,GROIN PROTECTOR,FABRIC,XL,BK,GROINFABRIC-BK-XL,PIECE,,,2,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-07_43_28-PM.jpg,GROIN PROTECTOR
+108,GROIN,ELSE,GROIN PROTECTOR,FABRIC,L,BK,GROINFABRIC-BK-L,PIECE,,,14,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-07_43_28-PM.jpg,GROIN PROTECTOR
+108,GROIN,ELSE,GROIN PROTECTOR,FABRIC,M,BK,GROINFABRIC-BK-M,PIECE,,,35,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-07_43_28-PM.jpg,GROIN PROTECTOR
+108,GROIN,TKB,GROIN PROTECTOR,METAL,L,BK,GROIN-METAL-BK-L,PIECE,,,20,https://activebrands.co.il/wp-content/uploads-new/2021/10/groin-protector-metal.jpg,GROIN PROTECTOR
+108,GROIN,TKB,GROIN PROTECTOR,METAL,M,BK,GROIN-METAL-BK-M,PIECE,,,18,https://activebrands.co.il/wp-content/uploads-new/2021/10/groin-protector-metal.jpg,GROIN PROTECTOR
+108,GROIN,ELSE,GROIN PROTECTOR,FABRIC,S,BK,GROINFABRIC-BK-S,PIECE,,,0,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-07_43_28-PM.jpg,GROIN PROTECTOR
+108,GROIN,TKB,GROIN PROTECTOR,METAL,S,BK,GROIN-METAL-BK-S,PIECE,,,0,https://activebrands.co.il/wp-content/uploads-new/2021/10/groin-protector-metal.jpg,GROIN PROTECTOR
+108,GROIN,TKB,GROIN PROTECTOR,METAL,XL,BK,GROIN-METAL-BK-XL,PIECE,,,10,https://activebrands.co.il/wp-content/uploads-new/2021/10/groin-protector-metal.jpg,GROIN PROTECTOR
+110,HWR,TKB,ELASTICS,HAND WRAPS,F,RD,HWR-RD,PAIR,22-Mar,,186,https://activebrands.co.il/wp-content/uploads/2026/03/TKB-Accessory-0-58_50-1.jpg,HAND WRAPS RED
+110,HWR,TKB,ELASTICS,HAND WRAPS,F,PK,HWR-PK,PAIR,22-Mar,,32,https://activebrands.co.il/wp-content/uploads/2026/03/TKB-Accessory-0-58_50-1.jpg,HAND WRAPS PINK
+110,HWR,TKB,ELASTICS,HAND WRAPS,F,BK,HWR-BK,PAIR,22-Mar,,172,https://activebrands.co.il/wp-content/uploads/2026/03/TKB-Accessory-0-58_50-1.jpg,HAND WRAPS BLACK
+110,HWR,TKB,ELASTICS,HAND WRAPS,F,BU,HWR-BU,PAIR,22-Mar,,205,https://activebrands.co.il/wp-content/uploads/2026/03/TKB-Accessory-0-58_50-1.jpg,HAND WRAPS BLUE
+110,HWR,TKB,ELASTICS,HAND WRAPS,F,WH,HWR-WH,PAIR,22-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKB-Accessory-0-58_50-1.jpg,HAND WRAPS WHITE
+112,ABDOMINAL,TKB,TRAINERS,ABDOMINAL PROTECTOR,XL,BK,ABDOMINAL-BK-XL,PIECE,24-May,,3,https://activebrands.co.il/wp-content/uploads/2021/10/abdominal-protector-bk.jpg,ABDOMINAL PROTECTION black
+112,ABDOMINAL,TKB,TRAINERS,ABDOMINAL PROTECTOR,L,BK,ABDOMINAL-BK-L,PIECE,22-Oct,,5,https://activebrands.co.il/wp-content/uploads/2021/10/abdominal-protector-bk.jpg,ABDOMINAL PROTECTION black
+112,ABDOMINAL,TKB,TRAINERS,ABDOMINAL PROTECTOR,M,BK,ABDOMINAL-BK-M,PIECE,22-Mar,,3,https://activebrands.co.il/wp-content/uploads/2021/10/abdominal-protector-bk.jpg,ABDOMINAL PROTECTION black
+112,ABDOMINAL,TKB,TRAINERS,ABDOMINAL PROTECTOR,S,BK,ABDOMINAL-BK-S,PIECE,24-May,,2,https://activebrands.co.il/wp-content/uploads/2021/10/abdominal-protector-bk.jpg,ABDOMINAL PROTECTION black
+113,BBHB,TKB,TRAINERS,HEAVY BAG,L,BK,BBHB-BK-L,PIECE,,,2,https://activebrands.co.il/wp-content/uploads-new/2021/10/tkbbhb-bk.jpg,HEAVY BAG black
+113,BBHB,TKB,TRAINERS,HEAVY BAG,M,BK,BBHB-BK-M,PIECE,,,0,https://activebrands.co.il/wp-content/uploads-new/2021/10/tkbbhb-bk.jpg,HEAVY BAG black
+114,BBHB,TKB,TRAINERS,HEAVY BAG,XXL,BK,BBHB-BK-XXL,PIECE,,,4,https://activebrands.co.il/wp-content/uploads-new/2021/10/tkbbhb-bk.jpg,HEAVY BAG black
+114,BBHB,TKB,TRAINERS,HEAVY BAG,XL,BK,BBHB-BK-XL,PIECE,,,7,https://activebrands.co.il/wp-content/uploads-new/2021/10/tkbbhb-bk.jpg,HEAVY BAG black
+117,BBTD,TKB,TRAINERS,TEAR DROP,XXL,BKYW,BBTD-BKYW-XXL,PIECE,,,2,https://activebrands.co.il/wp-content/uploads-new/2021/10/tear-drop-bk-yw.jpeg,TEAR DROP black yellow
+117,BBTD,TKB,TRAINERS,TEAR DROP,L,BKYW,BBTD-BKYW-L,PIECE,,,2,https://activebrands.co.il/wp-content/uploads-new/2021/10/tear-drop-bk-yw.jpeg,TEAR DROP black yellow
+117,BBTD,TKB,TRAINERS,TEAR DROP,L,BK-RD,BBTD-BK-RD-L,PIECE,,,0,,
+117,BBTD,TKB,TRAINERS,TEAR DROP,M,BK-YW,BBTD-BK-YW-M,PIECE,,,0,https://activebrands.co.il/wp-content/uploads-new/2021/10/tear-drop-bk-yw.jpeg,TEAR DROP black yellow
+117,BBTD,TKB,TRAINERS,TEAR DROP,M,BK-RD,BBTD-BK-RD-M,PIECE,,???,0,,
+118,BBTD,TKB,TRAINERS,TEAR DROP,XXL,BKBK,BBTD-BKBK-XXL,PIECE,,,3,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-03_40_50-PM.jpg,TEAR DROP black yellow
+118,BBTD,TKB,TRAINERS,TEAR DROP,XL,BK-YW,BBTD-BK-YW-XL,PIECE,,,0,https://activebrands.co.il/wp-content/uploads-new/2021/10/tear-drop-bk-yw.jpeg,TEAR DROP black yellow
+118,BBTD,TKB,TRAINERS,TEAR DROP,XL,BK-RD,BBTD-BK-RD-XL,PIECE,,,0,,
+118,BBTD,TKB,TRAINERS,TEAR DROP,XXL,BK-YW,BBTD-BK-YW-XXL,PIECE,,,0,https://activebrands.co.il/wp-content/uploads-new/2021/10/tear-drop-bk-yw.jpeg,TEAR DROP black yellow
+118,BBTD,TKB,TRAINERS,TEAR DROP,XXL,BK-RD,BBTD-BK-RD-XXL,PIECE,,,0,,
+120,BELLYPRO,TKB,TRAINERS,BELLY PROTECTOR,M,BK,BELLYPRO-BK-M,PIECE,,,3,https://activebrands.co.il/wp-content/uploads-new/2021/05/belly-protector-bk.jpg,BELLY PROTECTOR black
+120,BELLYPRO,TKB,TRAINERS,BELLY PROTECTOR,S,BK,BELLYPRO-BK-S,PIECE,,,3,https://activebrands.co.il/wp-content/uploads-new/2021/05/belly-protector-bk.jpg,BELLY PROTECTOR black
+121,BELLYPRO,TKB,TRAINERS,BELLY PROTECTOR,XL,BK,BELLYPRO-BK-XL,PIECE,bc,,7,https://activebrands.co.il/wp-content/uploads-new/2021/05/belly-protector-bk.jpg,BELLY PROTECTOR black
+121,BELLYPRO,TKB,TRAINERS,BELLY PROTECTOR,L,BK,BELLYPRO-BK-L,PIECE,bc,,8,https://activebrands.co.il/wp-content/uploads-new/2021/05/belly-protector-bk.jpg,BELLY PROTECTOR black
+122,BELLYPRO,TKB,TRAINERS,BELLY&THIGH PROTEC,XL,BK,BELLYPRO-BELLY&THIGH PROTEC-BK-XL,PIECE,,,1,https://activebrands.co.il/wp-content/uploads-new/2021/05/belly-protector-bk.jpg,BELLYPRO-BELLY&THIGH PROTECTOR black
+122,BELLYPRO,TKB,TRAINERS,BELLY&THIGH PROTEC,L,BK,BELLYPRO-BELLY&THIGH PROTEC-BK-L,PIECE,,,0,https://activebrands.co.il/wp-content/uploads-new/2021/05/belly-protector-bk.jpg,BELLYPRO-BELLY&THIGH PROTECTOR black
+122,BELLYPRO,TKB,TRAINERS,BELLY&THIGH PROTEC,M,BK,BELLYPRO-BELLY&THIGH PROTEC-BK-M,PIECE,,,0,https://activebrands.co.il/wp-content/uploads-new/2021/05/belly-protector-bk.jpg,BELLYPRO-BELLY&THIGH PROTECTOR black
+123,BPRO,TKB,TRAINERS,Body Protector,S,BKSV,BPRO-BKSV-S,PIECE,bc,,1,https://activebrands.co.il/wp-content/uploads-new/2021/05/TKBDEM-01-BKSV.jpg,BODY PROTECTOR black silver
+123,BPRO,TKB,TRAINERS,Body Protector,M,BK,BPRO-BK-M,PIECE,bc,,2,https://activebrands.co.il/wp-content/uploads/2023/10/TKBDPT-BK.jpg,BODY PROTECTOR black
+124,BPRO,TKB,TRAINERS,BODY PROTECTOR,L,BK,BPRO-BK-L,PIECE,24-Sep,,2,https://activebrands.co.il/wp-content/uploads/2023/10/TKBDPT-BK.jpg,BODY PROTECTOR black
+124,BPRO,TKB,TRAINERS,BODY PROTECTOR,XL,BK,BPRO-BK-XL,PIECE,24-Sep,,2,https://activebrands.co.il/wp-content/uploads/2023/10/TKBDPT-BK.jpg,BODY PROTECTOR black
+125,FMU,TKB,TRAINERS,FOCUS MITTS,F,BK,FMU-BK,PAIR,bc,,5,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-06_48_34-PM.jpg,"""ULTIMATE"" Focus mitts"
+125,FMP,TKB,TRAINERS,FOCUS MITTS,F,RD,FMP-RD,PAIR,bc,,2,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-06_23_45-PM.jpg,"""PROFESSIONAL"" Focus mitts red"
+125,FMU,TKB,TRAINERS,FOCUS MITTS,F,BU,FMU-BU,PAIR,bc,,6,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-07_13_18-PM.jpg,"""ULTIMATE"" Focus mitts"
+125,FMU,TKB,TRAINERS,FOCUS MITTS,F,RD,FMU-RD,PAIR,bc,,6,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-06_55_08-PM.jpg,"""ULTIMATE"" Focus mitts"
+125,FMP,TKB,TRAINERS,FOCUS MITTS,F,YW,FMP-YW,PAIR,bc,,2,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-04_31_19-PM.jpg,"""PROFESSIONAL"" Focus mitts yellow"
+125,FMP,TKB,TRAINERS,FOCUS MITTS,F,WH,FMP-WH,PAIR,bc,,2,https://activebrands.co.il/wp-content/uploads/2026/03/topking-focus-mitts-professional-manopla.jpg,"""PROFESSIONAL"" Focus mitts white"
+125,FMU,TKB,TRAINERS,FOCUS MITTS,F,WH,FMU-WH,PAIR,bc,,6,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-06_43_30-PM.jpg,"""ULTIMATE"" Focus mitts"
+125,FMP,TKB,TRAINERS,FOCUS MITTS ,F,BK,FMP-BK,PAIR,bc,,0,,
+125,FMP,TKB,TRAINERS,FOCUS MITTS ,F,BU,FMP-BU,PAIR,bc,,3,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-06_27_53-PM.jpg,"""PROFESSIONAL"" Focus mitts blue"
+125,FMU,TKB,TRAINERS,FOCUS MITTS,F,BKRD,FMU-BKRD,PAIR,22-Mar,,0,,
+125,FMA,TKB,TRAINERS,FOCUS MITTS ,F,BK,FMA-BK,PAIR,bc,,3,https://activebrands.co.il/wp-content/uploads/2025/06/FMABK.webp,"AIR"" Focus mitts"
+125,FMA,TKB,TRAINERS,FOCUS MITTS ,F,WH,FMA-WH,PAIR,bc,,3,https://activebrands.co.il/wp-content/uploads/2025/06/FMAWH.jpg,"AIR"" Focus mitts"
+125,FMA,TKB,TRAINERS,FOCUS MITTS ,F,RD,FMA-RD,PAIR,bc,,2,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-04_17_21-PM.jpg,"AIR"" Focus mitts"
+125,FMA,TKB,TRAINERS,FOCUS MITTS ,F,BU,FMA-BU,PAIR,bc,,3,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-04_15_32-PM.jpg,"AIR"" Focus mitts"
+126,FME,TKB,TRAINERS,FOCUS MITTS,F,BKWH,FME-BKWH,PAIR,22-Mar,,4,https://activebrands.co.il/wp-content/uploads/2023/10/Top-King-Focus-Mitts-Extreme-TKFME-White-2-2-5-500x500-1.jpg,"""EXTREME"" Focus mitts"
+126,FME,TKB,TRAINERS,FOCUS MITTS,F,BKBU,FME-BKBU,PAIR,22-Mar,,3,https://activebrands.co.il/wp-content/uploads/2023/10/fme-bk-wh-bu.jpeg,"""EXTREME"" Focus mitts"
+126,FME,TKB,TRAINERS,FOCUS MITTS,F,BKRD,FME-BKRD,PAIR,22-Oct,,3,https://activebrands.co.il/wp-content/uploads/2023/10/fme-bk-wh-rd.jpg,"""EXTREME"" Focus mitts"
+126,FME,TKB,TRAINERS,FOCUS MITTS,F,BKYW,FME-BKYW,PAIR,22-Oct,,4,https://activebrands.co.il/wp-content/uploads/2023/10/TKBFME-YW.jpg,"""EXTREME"" Focus mitts"
+126,,TKB,TRAINERS,FOCUS MITTS ,F,RD,KPS-RD,PAIR,,,0,,
+127,KPS,TKB,TRAINERS,KICKING PAD,F,BKRD,KPS-BKRD-F,PAIR,22-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/02/KPS-BK-RD.jpg,KICKING PAD
+127,KPS,TKB,TRAINERS,KICKING PAD,F,BKWH,KPS-BKWH-F,PAIR,bc,,8,https://activebrands.co.il/wp-content/uploads-new/2021/10/kicking-pad-bk-wh.jpg,KICKING PAD
+127,KPS,TKB,TRAINERS,KICKING PAD,F,BKBU,KPS-BKBU-F,PAIR,22-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/02/KPS-BK-BU.jpg,KICKING PAD
+127,KPS,TKB,TRAINERS,KICKING PAD,F,BKRD,KPS-BKRD-F,PAIR,22-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/02/KPS-BK-RD.jpg,KICKING PAD
+127,KPS,TKB,TRAINERS,KICKING PAD,F,BKBU,KPS-BKBU-F,PAIR,22-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/02/KPS-BK-BU.jpg,KICKING PAD
+127,KPS,TKB,TRAINERS,KICKING PAD,L,BKYW,KPS-BKYW-L,PAIR,22-Mar,,0,,
+128,WMOUNT,TKB,TRAINERS,WALL MOUNT,F,WH-BK,WMOUNT-WH-BK,PIECE,22-Mar,,0,,
+128,WMOUNT,TKB,TRAINERS,WALL MOUNT,F,BK-YW,WMOUNTWALL MOUNT-BK-YW-F,PIECE,23-Sep,,1,,
+130,BG,TKB,BOXING GLOVES,PRO,8,WHBKBK,BGPRO-WHBKBK-8,PAIR,22-Oct,,1,https://activebrands.co.il/wp-content/uploads-new/2020/12/BGPRO-WHBK.jpg,PRO LACE-UP white black black
+130,BG,TKB,BOXING GLOVES,PRO,8,RDWHBK,BGPRO-RDWHBK-8,PAIR,22-Oct,,4,https://activebrands.co.il/wp-content/uploads-new/2021/10/bgpro-rd-wh-bk.jpeg,PRO LACE-UP red white black
+130,BG,TKB,BOXING GLOVES,SA,8,YWWHWH,BGSA-YWWHWH-8,PAIR,22-Oct,,2,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-511-scaled.jpg,SUPER AIR yellow white white
+130,BG,TKB,BOXING GLOVES,SA,8,RDBKBK,BGSA-RDBKBK-8,PAIR,23-Oct,,1,https://activebrands.co.il/wp-content/uploads-new/2020/12/BGSA-322.jpg,SUPER AIR red black black
+130,BG,TKB,BOXING GLOVES,SA,8,BK,BGSA-BK-8,PAIR,24-May,,2,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-222-scaled.jpg,SUPER AIR black
+130,BG,TKB,BOXING GLOVES,SA,8,WHPKPK,BGSA-WHPKPK-8,PAIR,22-Oct,,0,https://activebrands.co.il/wp-content/uploads-new/2022/11/TKBGSA-166.jpg,SUPER AIR white pink
+130,BG,TKB,BOXING GLOVES,SA,8,WHWHBK,BGSA-WHWHBK-8,PAIR,bc,,1,,
+130,BG,TKB,BOXING GLOVES,PRO,8,WHRDBK,BGPRO-WHRDBK-8,PAIR,22-Oct,,0,https://activebrands.co.il/wp-content/uploads/2026/03/topking_gloves.jpg,PRO LACE-UP white red black
+130,BG,TKB,BOXING GLOVES,SA,8,WH,BGSA-WH-8,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-111-scaled.jpg,SUPER AIR white
+130,BG,TKB,BOXING GLOVES,PRO,8,RDWHBK,BG-PRO-RDWHBK-8,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads-new/2021/10/bgpro-rd-wh-bk.jpeg,PRO LACE-UP red white black
+132,BG,TKB,BOXING GLOVES,SA-SEMI,10,YWBKBK,BG-SA-SEMI-YWBKBK-10,PAIR,bc,,3,https://activebrands.co.il/wp-content/uploads-new/2020/12/BGSA-522.jpg,SUPER AIR synthetic yellow black black
+132,BG,TKB,BOXING GLOVES,PRO,10,WHBKBK,BGPRO-WHBKBK-10,PAIR,22-Oct,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/BGPRO-WHBK.jpg,PRO LACE-UP white black black
+132,BG,TKB,BOXING GLOVES,PRO,10,WHRDBK,BGPRO-WHRDBK-10,PAIR,22-Oct,,0,https://activebrands.co.il/wp-content/uploads/2026/03/topking_gloves.jpg,PRO LACE-UP white red black
+132,BG,TKB,BOXING GLOVES,SA,10,RDBKBK,BGSA-RDBKBK-10,PAIR,22-Oct,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/BGSA-322.jpg,SUPER AIR red black black
+132,BG,TKB,BOXING GLOVES,SA-SEMI,10,BKWHRD,BG-SA-SEMI-BKWHRD-10,PAIR,bc,,0,,
+133,BG,TKB,BOXING GLOVES,C-TH,10,BK,BG-C-TH-BK-10,PAIR,bc,,6,https://activebrands.co.il/wp-content/uploads-new/2021/10/bgc-th.jpg,CULTURE SERIES - THAILAND
+133,BG,TKB,BOXING GLOVES,C-CN,10,RD,BGC-CN-RD-10,PAIR,22-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/bgch.jpg,CULTURE SERIES - CHINA
+133,BG,TKB,BOXING GLOVES,SA,10,RDBKBK,BGSA-RDBKBK-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/BGSA-322.jpg,SUPER AIR red black black
+133,BG,TKB,BOXING GLOVES,BL01,10,BKRD,BGBL01-BKRD-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2023/10/top-king-muay-thai-gloves-blend-01-red-01-1000x1000-1.jpg,BLEND 01 black red
+133,BG,TKB,BOXING GLOVES,SA,10,BKWHRD,BGSA-BKWHRD-10,PAIR,24-May,,0,,
+133,BG,TKB,BOXING GLOVES,SA,10,WHPKPK,BGSA-WHPKPK-10,PAIR,24-Sep,,0,https://activebrands.co.il/wp-content/uploads-new/2022/11/TKBGSA-166.jpg,SUPER AIR white pink
+133,BG,TKB,BOXING GLOVES,KN01,10,OLIVE,BGKN01-OLIVE-10,PAIR,23-Mar,,0,https://activebrands.co.il/wp-content/uploads-new/2021/10/gbkn-01-olive-1.jpg,KANOK olive green
+133,BG,TKB,BOXING GLOVES,SA,10,YWWHWH,BGSA-YWWHWH-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-511-scaled.jpg,SUPER AIR yellow white white
+133,BG,TKB,BOXING GLOVES,SA,10,BK,BGSA-BK-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-222-scaled.jpg,SUPER AIR black
+133,BG,TKB,BOXING GLOVES,SA,10,WH,BGSA-WH-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-111-scaled.jpg,SUPER AIR white
+133,BG,TKB,BOXING GLOVES,SA,10,WHRDBK,BGSA-WHRDBK-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGAV_133.jpg,SUPER AIR white red black
+133,BG,TKB,BOXING GLOVES,SA,10,BKBUWH,BGSA-BKBUWH-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/11/TKBGSA-142.jpeg,SUPER AIR black blue white
+133,BG,TKB,BOXING GLOVES,SA,10,WHYWBK,BGSA-WHYWBK-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-152-scaled.jpg,SUPER AIR white yellow black
+133,BG,TKB,BOXING GLOVES,SS01,10,RD,BGSS01-RD-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGSS-01A-RD-.jpg,SUPER STAR red
+133,BG,TKB,BOXING GLOVES,SS01,10,BU,BGSS01-BU-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGSS-01-BU-scaled-1.jpg,SUPER STAR blue
+133,BG,TKB,BOXING GLOVES,SS01,10,SV,BGSS01-SV-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGSS-01A-SV.jpg,SUPER STAR silver
+133,BG,TKB,BOXING GLOVES,BL01,10,BKBU,BGBL01-BKBU-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2025/02/TKBGBL_01_242_1024x.webp,BLEND 01 black blue
+133,BG,TKB,BOXING GLOVES,BL01,10,WHBU,BGBL01-WHBU-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2024/05/top-king-muay-thai-boxing-gloves-lace-blue2-1000x1000-1.jpg,BLEND 01 white blue
+133,BG,TKB,BOXING GLOVES,BL01,10,BKWH,BGBL01-BKWH-10,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2023/09/images.jpg,BLEND 01 black white
+136,BG,TKB,BOXING GLOVES,PRO,12,WHBKBK,BGPRO-WHBKBK-12,PAIR,22-Oct,,4,https://activebrands.co.il/wp-content/uploads-new/2020/12/BGPRO-WHBK.jpg,PRO LACE-UP white black black
+136,BG,TKB,BOXING GLOVES,SC,12,WH,BGSC-WH-12,PAIR,23-Oct,,5,https://activebrands.co.il/wp-content/uploads/2026/03/Top-King-Lace-Up-Boxing-Gloves-Super-Competition-TKBGSC-White-1.png,SUPER COMPETITION white
+136,BG,TKB,BOXING GLOVES,PRO,12,RDWHBK,BGPRO-RDWHBK-12,PAIR,22-Oct,,5,https://activebrands.co.il/wp-content/uploads-new/2021/10/bgpro-rd-wh-bk.jpeg,PRO LACE-UP red white black
+136,BG,TKB,BOXING GLOVES,PRO,12,WHRDBK,BGPRO-WHRDBK-12,PAIR,22-Oct,,5,https://activebrands.co.il/wp-content/uploads/2026/03/topking_gloves.jpg,PRO LACE-UP white red black
+136,BG,TKB,BOXING GLOVES,C-TH,12,BK,BG-C-TH-BK-12,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads-new/2021/10/bgc-th.jpg,CULTURE SERIES - THAILAND
+136,BG,TKB,BOXING GLOVES,C-CN,12,RD,BGC-CN-RD-12,PAIR,22-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/bgch.jpg,CULTURE SERIES - CHINA
+137,BG,TKB,BOXING GLOVES,SA,12,BK,BGSA-BK-12,PAIR,24-Sep,,22,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-222-scaled.jpg,SUPER AIR black
+138,BG,TKB,BOXING GLOVES,SA,12,WH,BGSA-WH-12,PAIR,24-Sep,,10,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-111-scaled.jpg,SUPER AIR white
+139,BG,TKB,BOXING GLOVES,SA,12,BKWHRD,BGSA-BKWHRD-12,PAIR,24-Jan,,0,,
+139,BG,TKB,BOXING GLOVES,SA,12,WHPKPK,BGSA-WHPKPK-12,PAIR,24-May,,1,https://activebrands.co.il/wp-content/uploads-new/2022/11/TKBGSA-166.jpg,SUPER AIR white pink
+139,BG,TKB,BOXING GLOVES,SA,12,YWWHWH,BGSA-YWWHWH-12,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-511-scaled.jpg,SUPER AIR yellow white white
+139,BG,TKB,BOXING GLOVES,SA,12,RDBKBK,BGSA-RDBKBK-12,PAIR,26-Feb,,10,https://activebrands.co.il/wp-content/uploads-new/2020/12/BGSA-322.jpg,SUPER AIR red black black
+140,BG,TKB,BOXING GLOVES,SA,12,WHYWBK,BGSA-WHYWBK-12,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-152-scaled.jpg,SUPER AIR white yellow black
+140,BG,TKB,BOXING GLOVES,SA,12,WHRDBK,BGSA-WHRDBK-12,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGAV_133.jpg,SUPER AIR white red black
+140,BG,TKB,BOXING GLOVES,SA,12,BKBUWH,BGSA-BKBUWH-12,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/11/TKBGSA-142.jpeg,SUPER AIR black blue white
+141,BG,TKB,BOXING GLOVES,SS01,12,SV,BGSS01-SV-12,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGSS-01A-SV.jpg,SUPER STAR silver
+141,BG,TKB,BOXING GLOVES,SS01,12,RD,BGSS01-RD-12,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGSS-01A-RD-.jpg,SUPER STAR red
+141,BG,TKB,BOXING GLOVES,SS01,12,BU,BGSS01-BU-12,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGSS-01-BU-scaled-1.jpg,SUPER STAR blue
+142,BG,TKB,BOXING GLOVES,BL01,12,BKWH,BGBL01-BKWH-12,PAIR,24-May,,3,https://activebrands.co.il/wp-content/uploads-new/2023/09/images.jpg,BLEND 01 black white
+142,BG,TKB,BOXING GLOVES,BL01,12,BKRD,BGBL01-BKRD-12,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2023/10/top-king-muay-thai-gloves-blend-01-red-01-1000x1000-1.jpg,BLEND 01 black red
+142,BG,TKB,BOXING GLOVES,BL01,12,BKBU,BGBL01-BKBU-12,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2025/02/TKBGBL_01_242_1024x.webp,BLEND 01 black blue
+142,BG,TKB,BOXING GLOVES,BL01,12,WHBU,BGBL01-WHBU-12,PAIR,24-May,,1,https://activebrands.co.il/wp-content/uploads/2024/05/top-king-muay-thai-boxing-gloves-lace-blue2-1000x1000-1.jpg,BLEND 01 white blue
+143,BG,TKB,BOXING GLOVES,EM01,12,WHSV,BGEM01-WHSV-12,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGEM-01-SV-White.jpg,EMPOWER CREATIVITY white silver
+143,BG,TKB,BOXING GLOVES,EM01,12,BKSV,BGEM01-BKSV-12,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGEM-01-SV-Black.jpg,EMPOWER CREATIVITY black silver
+143,BG,TKB,BOXING GLOVES,DRAGON,12,BK,BGDRAGON-BK-12,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads/2025/02/BG-DRAGON-BK.jpg,DRAGON  black
+143,BG,TKB,BOXING GLOVES,WS,12,WHBU,BGWS-WHBU-12,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads/2023/10/WS-BLUE-300x300-1.webp,WORLD SERIES blue
+143,BG,TKB,BOXING GLOVES,WS,12,WHRD,BGWS-WHRD-12,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads-new/2023/04/WS-RED.jpg,WORLD SERIES red
+159,BG,TKB,BOXING GLOVES,WS,14,WHBU,BGWS-WHBU-14,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads/2023/10/WS-BLUE-300x300-1.webp,WORLD SERIES blue
+159,BG,TKB,BOXING GLOVES,WS,14,WHRD,BGWS-WHRD-14,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads-new/2023/04/WS-RED.jpg,WORLD SERIES red
+143,BG,TKB,BOXING GLOVES,DRAGON,12,WH,BGDRAGON-WH-12,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads/2025/02/BG-DRAGON-WH.jpg,DRAGON  white
+145,BG,TKB,BOXING GLOVES,PRO,14,WHRDBK,BGPRO-WHRDBK-14,PAIR,22-Oct,,0,https://activebrands.co.il/wp-content/uploads/2026/03/topking_gloves.jpg,PRO LACE-UP white red black
+145,BG,TKB,BOXING GLOVES,PRO,14,RDWHBK,BGPRO-RDWHBK-14,PAIR,22-Oct,,0,https://activebrands.co.il/wp-content/uploads-new/2021/10/bgpro-rd-wh-bk.jpeg,PRO LACE-UP red white black
+145,BG,TKB,BOXING GLOVES,SC,14,WH,BGSC-WH-14,PAIR,23-Oct,,5,https://activebrands.co.il/wp-content/uploads/2026/03/Top-King-Lace-Up-Boxing-Gloves-Super-Competition-TKBGSC-White-1.png,SUPER COMPETITION white
+145,BG,TKB,BOXING GLOVES,PRO,14,WHBKBK,BGPRO-WHBKBK-14,PAIR,22-Oct,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/BGPRO-WHBK.jpg,PRO LACE-UP white black black
+146,BG,TKB,BOXING GLOVES,SA,14,BK,BGSA-BK-14,PAIR,24-Sep,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-222-scaled.jpg,SUPER AIR black
+149,BG,TKB,BOXING GLOVES,SA,14,WH,BGSA-WH-14,PAIR,24-Sep,,15,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-111-scaled.jpg,SUPER AIR white
+152,BG,TKB,BOXING GLOVES,SA,14,BKWHRD,BGSA-BKWHRD-14,PAIR,24-Jan,,9,,
+152,BG,TKB,BOXING GLOVES,SA,14,WHPKPK,BGSA-WHPKPK-14,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/11/TKBGSA-166.jpg,SUPER AIR white pink
+153,BG,TKB,BOXING GLOVES,SA,14,WHYWBK,BGSA-WHYWBK-14,PAIR,24-May,,2,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-152-scaled.jpg,SUPER AIR white yellow black
+153,BG,TKB,BOXING GLOVES,SA,14,YWWHWH,BGSA-YWWHWH-14,PAIR,26-Feb,,10,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-511-scaled.jpg,SUPER AIR yellow white white
+153,BG,TKB,BOXING GLOVES,SA,14,BKBUWH,BGSA-BKBUWH-14,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/11/TKBGSA-142.jpeg,SUPER AIR black blue white
+153,BG,TKB,BOXING GLOVES,SA,14,WHRDBK,BGSA-WHRDBK-14,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGAV_133.jpg,SUPER AIR white red black
+153,BG,TKB,BOXING GLOVES,SA,14,RDBKBK,BGSA-RDBKBK-14,PAIR,26-Feb,,10,https://activebrands.co.il/wp-content/uploads-new/2020/12/BGSA-322.jpg,SUPER AIR red black black
+155,BG,TKB,BOXING GLOVES,SS01,14,BU,BGSS01-BU-14,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGSS-01-BU-scaled-1.jpg,SUPER STAR blue
+155,BG,TKB,BOXING GLOVES,SS01,14,RD,BGSS01-RD-14,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGSS-01A-RD-.jpg,SUPER STAR red
+155,BG,TKB,BOXING GLOVES,SS01,14,SV,BGSS01-SV-14,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGSS-01A-SV.jpg,SUPER STAR silver
+157,BG,TKB,BOXING GLOVES,BL01,14,BKWH,BGBL01-BKWH-14,PAIR,24-May,,6,https://activebrands.co.il/wp-content/uploads-new/2023/09/images.jpg,BLEND 01 black white
+157,BG,TKB,BOXING GLOVES,BL01,14,WHBU,BGBL01-WHBU-14,PAIR,24-May,,3,https://activebrands.co.il/wp-content/uploads/2024/05/top-king-muay-thai-boxing-gloves-lace-blue2-1000x1000-1.jpg,BLEND 01 white blue
+157,BG,TKB,BOXING GLOVES,BL01,14,BKRD,BGBL01-BKRD-14,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2023/10/top-king-muay-thai-gloves-blend-01-red-01-1000x1000-1.jpg,BLEND 01 black red
+157,BG,TKB,BOXING GLOVES,BL01,14,BKBU,BGBL01-BKBU-14,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2025/02/TKBGBL_01_242_1024x.webp,BLEND 01 black blue
+158,BG,TKB,BOXING GLOVES,EM01,14,WHSV,BGEM01-WHSV-14,PAIR,24-May,,2,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGEM-01-SV-White.jpg,EMPOWER CREATIVITY white silver
+158,BG,TKB,BOXING GLOVES,EM01,14,BKSV,BGEM01-BKSV-14,PAIR,24-May,,3,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGEM-01-SV-Black.jpg,EMPOWER CREATIVITY black silver
+159,BG,TKB,BOXING GLOVES,DRAGON,14,BK,BGDRAGON-BK-14,PAIR,24-May,,10,https://activebrands.co.il/wp-content/uploads/2025/02/BG-DRAGON-BK.jpg,DRAGON  black
+159,BG,TKB,BOXING GLOVES,DRAGON,14,WH,BGDRAGON-WH-14,PAIR,24-May,,9,https://activebrands.co.il/wp-content/uploads/2025/02/BG-DRAGON-WH.jpg,DRAGON  white
+160,BG,TKB,BOXING GLOVES,PRO,16,RDWHBK,BGPRO-RDWHBK-16,PAIR,22-Oct,,0,https://activebrands.co.il/wp-content/uploads-new/2021/10/bgpro-rd-wh-bk.jpeg,PRO LACE-UP red white black
+160,BG,TKB,BOXING GLOVES,SC,16,WH,BGSC-WH-16,PAIR,23-Oct,,5,https://activebrands.co.il/wp-content/uploads/2026/03/Top-King-Lace-Up-Boxing-Gloves-Super-Competition-TKBGSC-White-1.png,SUPER COMPETITION white
+160,BG,TKB,BOXING GLOVES,PRO,16,WHRDBK,BGPRO-WHRDBK-16,PAIR,22-Oct,,2,https://activebrands.co.il/wp-content/uploads/2026/03/topking_gloves.jpg,PRO LACE-UP white red black
+160,BG,TKB,BOXING GLOVES,PRO,16,WHBKBK,BGPRO-WHBKBK-16,PAIR,22-Oct,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/BGPRO-WHBK.jpg,PRO LACE-UP white black black
+161,BG,TKB,BOXING GLOVES,SA,16,BK,BGSA-BK-16,PAIR,24-Sep,,26,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-222-scaled.jpg,SUPER AIR black
+163,BG,TKB,BOXING GLOVES,SA,16,WH,BGSA-WH-16,PAIR,24-Sep,,26,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-111-scaled.jpg,SUPER AIR white
+165,BG,TKB,BOXING GLOVES,SA,16,BKWHRD,BGSA-BKWHRD-16,PAIR,24-Jan,,8,,
+165,BG,TKB,BOXING GLOVES,SA,16,WHYWBK,BGSA-WHYWBK-16,PAIR,24-May,,6,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-152-scaled.jpg,SUPER AIR white yellow black
+166,BG,TKB,BOXING GLOVES,SA,16,WHRDBK,BGSA-WHRDBK-16,PAIR,24-May,,4,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGAV_133.jpg,SUPER AIR white red black
+166,BG,TKB,BOXING GLOVES,SA,16,BKBUWH,BGSA-BKBUWH-16,PAIR,24-May,,2,https://activebrands.co.il/wp-content/uploads-new/2022/11/TKBGSA-142.jpeg,SUPER AIR black blue white
+166,BG,TKB,BOXING GLOVES,SA,16,RDBKBK,BGSA-RDBKBK-16,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/BGSA-322.jpg,SUPER AIR red black black
+167,BG,TKB,BOXING GLOVES,SS01,16,BU,BGSS01-BU-16,PAIR,24-May,,2,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGSS-01-BU-scaled-1.jpg,SUPER STAR blue
+167,BG,TKB,BOXING GLOVES,SS01,16,SV,BGSS01-SV-16,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGSS-01A-SV.jpg,SUPER STAR silver
+167,BG,TKB,BOXING GLOVES,SS01,16,RD,BGSS01-RD-16,PAIR,24-May,,2,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGSS-01A-RD-.jpg,SUPER STAR red
+168,BG,TKB,BOXING GLOVES,BL01,16,BKRD,BGBL01-BKRD-16,PAIR,24-May,,1,https://activebrands.co.il/wp-content/uploads/2023/10/top-king-muay-thai-gloves-blend-01-red-01-1000x1000-1.jpg,BLEND 01 black red
+168,BG,TKB,BOXING GLOVES,BL01,16,BKWH,BGBL01-BKWH-16,PAIR,24-May,,4,https://activebrands.co.il/wp-content/uploads-new/2023/09/images.jpg,BLEND 01 black white
+168,BG,TKB,BOXING GLOVES,BL01,16,WHBU,BGBL01-WHBU-16,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2024/05/top-king-muay-thai-boxing-gloves-lace-blue2-1000x1000-1.jpg,BLEND 01 white blue
+168,BG,TKB,BOXING GLOVES,BL01,16,BKBU,BGBL01-BKBU-16,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2025/02/TKBGBL_01_242_1024x.webp,BLEND 01 black blue
+169,BG,TKB,BOXING GLOVES,EM01,16,WHSV,BGEM01-WHSV-16,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGEM-01-SV-White.jpg,EMPOWER CREATIVITY white silver
+169,BG,TKB,BOXING GLOVES,EM01,16,BKSV,BGEM01-BKSV-16,PAIR,24-May,,1,https://activebrands.co.il/wp-content/uploads/2026/03/TKBGEM-01-SV-Black.jpg,EMPOWER CREATIVITY black silver
+169,BG,TKB,BOXING GLOVES,DRAGON,16,BK,BGDRAGON-BK-16,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2025/02/BG-DRAGON-BK.jpg,DRAGON  black
+169,BG,TKB,BOXING GLOVES,DRAGON,16,WH,BGDRAGON-WH-16,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2025/02/BG-DRAGON-WH.jpg,DRAGON  white
+170,BG,TKB,BOXING GLOVES,SA,18,BK,BGSA-BK-18,PAIR,24-Sep,,3,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-222-scaled.jpg,SUPER AIR black
+170,BG,TKB,BOXING GLOVES,PRO,18,WHRDBK,BGPRO-WHRDBK-18,PAIR,25-Sep,,1,https://activebrands.co.il/wp-content/uploads/2026/03/topking_gloves.jpg,PRO LACE-UP white red black
+170,BG,TKB,BOXING GLOVES,SA,18,WH,BGSA-WH-18,PAIR,24-Sep,,3,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKBGSA-111-scaled.jpg,SUPER AIR white
+172,GG,TKB,GRAPPLING GLOVE,EX,XL,WH,GGEX-WH-XL,PAIR,,,3,https://activebrands.co.il/wp-content/uploads-new/2020/12/extreme-wh.png,"MMA Grappling Gloves ""Extreme"" Edition"
+172,GG,TKB,GRAPPLING GLOVE,EX,L,WH,GGEX-WH-L,PAIR,,,4,https://activebrands.co.il/wp-content/uploads-new/2020/12/extreme-wh.png,"MMA Grappling Gloves ""Extreme"" Edition"
+172,GG,TKB,GRAPPLING GLOVE,EX,L,BK,GGEX-BK-L,PAIR,,,8,https://activebrands.co.il/wp-content/uploads-new/2020/12/extreme-bk.png,"MMA Grappling Gloves ""Extreme"" Edition"
+172,GG,TKB,GRAPPLING GLOVE,EX,M,WH,GGEX-WH-M,PAIR,,,5,https://activebrands.co.il/wp-content/uploads-new/2020/12/extreme-wh.png,"MMA Grappling Gloves ""Extreme"" Edition"
+172,GG,TKB,GRAPPLING GLOVE,EX,M,BK,GGEX-BK-M,PAIR,,,15,https://activebrands.co.il/wp-content/uploads-new/2020/12/extreme-bk.png,"MMA Grappling Gloves ""Extreme"" Edition"
+172,GG,TKB,GRAPPLING GLOVE,EX,S,WH,GGEX-WH-S,PAIR,,,4,https://activebrands.co.il/wp-content/uploads-new/2020/12/extreme-wh.png,"MMA Grappling Gloves ""Extreme"" Edition"
+172,GG,TKB,GRAPPLING GLOVE,EX,S,BK,GGEX-BK-S,PAIR,,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/extreme-bk.png,"MMA Grappling Gloves ""Extreme"" Edition"
+172,GG,TKB,GRAPPLING GLOVE,EX,XL,BK,GGEX-BK-XL,PAIR,,,2,https://activebrands.co.il/wp-content/uploads-new/2020/12/extreme-bk.png,"MMA Grappling Gloves ""Extreme"" Edition"
+173,GG,TKB,GRAPPLING GLOVE,COM,XL,WH,GGCOM-WH-XL,PAIR,,,3,https://activebrands.co.il/wp-content/uploads-new/2020/12/combat-wh.png,"MMA Grappling Gloves ""Combat"" Edition"
+173,GG,TKB,GRAPPLING GLOVE,COM,L,WH,GGCOM-WH-L,PAIR,,,2,https://activebrands.co.il/wp-content/uploads-new/2020/12/combat-wh.png,"MMA Grappling Gloves ""Combat"" Edition"
+173,GG,TKB,GRAPPLING GLOVE,COM,L,BK,GGCOM-BK-L,PAIR,,,1,https://activebrands.co.il/wp-content/uploads-new/2020/12/combat-bk.png,"MMA Grappling Gloves ""Combat"" Edition"
+173,GG,TKB,GRAPPLING GLOVE,COM,M,WH,GGCOM-WH-M,PAIR,,,1,https://activebrands.co.il/wp-content/uploads-new/2020/12/combat-wh.png,"MMA Grappling Gloves ""Combat"" Edition"
+173,GG,TKB,GRAPPLING GLOVE,COM,M,BK,GGCOM-BK-M,PAIR,,,11,https://activebrands.co.il/wp-content/uploads-new/2020/12/combat-bk.png,"MMA Grappling Gloves ""Combat"" Edition"
+173,GG,TKB,GRAPPLING GLOVE,COM,S,WH,GGCOM-WH-S,PAIR,,,3,https://activebrands.co.il/wp-content/uploads-new/2020/12/combat-wh.png,"MMA Grappling Gloves ""Combat"" Edition"
+173,GG,TKB,GRAPPLING GLOVE,COM,S,BK,GGCOM-BK-S,PAIR,,,2,https://activebrands.co.il/wp-content/uploads-new/2020/12/combat-bk.png,"MMA Grappling Gloves ""Combat"" Edition"
+173,GG,TKB,GRAPPLING GLOVE,COM,XL,BK,GGCOM-BK-XL,PAIR,,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/combat-bk.png,"MMA Grappling Gloves ""Combat"" Edition"
+175,BAGMI,TKB,BAG MITTS,MU-OT,XL,WH-RD-BK,BAGMI-MU-OT-WH-RD-BK-XL,PAIR,bc,,1,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-03_29_33-PM.jpg,BAG GLOVE OPEN THUMB black red white
+175,BAGMI,TKB,BAG MITTS,MU-OT,L,BK-WH-RD,BAGMI-MU-OT-BK-WH-RD-L,PAIR,bc,,2,https://activebrands.co.il/wp-content/uploads-new/2021/03/TKBMMI-OT-312.jpg,BAG GLOVE OPEN THUMB red white black
+175,BAGMI,TKB,BAG MITTS,MU-OT,L,WH-BK-RD,BAGMI-MU-OT-WH-BK-RD-L,PAIR,bc,,2,https://activebrands.co.il/wp-content/uploads-new/2020/10/begmi-123.jpg,BAG GLOVE OPEN THUMB white black red
+175,BAGMI,TKB,BAG MITTS,MU-OT,L,WH,BAGMI-MU-OT-WH-L,PAIR,bc,,2,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-1-2026-09_43_35-PM-1-1.jpg,BAG GLOVE OPEN THUMB white
+175,BAGMI,TKB,BAG MITTS,MU-OT,L,BK,BAGMI-MU-OT-BK-L,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-1-2026-09_53_55-PM.jpg,BAG GLOVE OPEN THUMB white black red
+175,BAGMI,TKB,BAG MITTS,MU-OT,L,WH-RD-BK,BAGMI-MU-OT-WH-RD-BK-L,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-03_29_33-PM.jpg,BAG GLOVE OPEN THUMB black red white
+175,BAGMI,TKB,BAG MITTS,MU-OT,M,BK-WH-RD,BAGMI-MU-OT-BK-WH-RD-M,PAIR,bc,,4,https://activebrands.co.il/wp-content/uploads-new/2021/03/TKBMMI-OT-312.jpg,BAG GLOVE OPEN THUMB red white black
+175,BAGMI,TKB,BAG MITTS,MU-OT,M,WH-BK-RD,BAGMI-MU-OT-WH-BK-RD-M,PAIR,bc,,4,https://activebrands.co.il/wp-content/uploads-new/2020/10/begmi-123.jpg,BAG GLOVE OPEN THUMB white black red
+175,BAGMI,TKB,BAG MITTS,MU-OT,M,RD-WH-BK,BAGMI-MU-OT-RD-WH-BK-M,PAIR,bc,,0,,
+175,BAGMI,TKB,BAG MITTS,MU-OT,M,WH-RD-BK,BAGMI-MU-OT-WH-RD-BK-M,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-03_29_33-PM.jpg,BAG GLOVE OPEN THUMB black red white
+175,BAGMI,TKB,BAG MITTS,MU-OT,M,BK,BAGMI-MU-OT-BK-M,PAIR,bc,,2,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-1-2026-09_53_55-PM.jpg,BAG GLOVE OPEN THUMB white black red
+175,BAGMI,TKB,BAG MITTS,MU-OT,M,WH,BAGMI-MU-OT-WH-M,PAIR,bc,,3,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-1-2026-09_43_35-PM-1-1.jpg,BAG GLOVE OPEN THUMB white
+175,BAGMI,TKB,BAG MITTS,MU-OT,S,BK,BAGMI-MU-OT-BK-S,PAIR,bc,,2,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-1-2026-09_53_55-PM.jpg,BAG GLOVE OPEN THUMB white black red
+175,BAGMI,TKB,BAG MITTS,MU-OT,S,WH,BAGMI-MU-OT-WH-S,PAIR,bc,,2,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-1-2026-09_43_35-PM-1-1.jpg,BAG GLOVE OPEN THUMB white
+175,BAGMI,TKB,BAG MITTS,MU-OT,S,RD-WH-BK,BAGMI-MU-OT-RD-WH-BK-S,PAIR,bc,,0,,
+175,BAGMI,TKB,BAG MITTS,MU-OT,S,WH-RD-BK,BAGMI-MU-OT-WH-RD-BK-S,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-03_29_33-PM.jpg,BAG GLOVE OPEN THUMB black red white
+175,BAGMI,TKB,BAG MITTS,MU-OT,S,WH-BK-RD,BAGMI-MU-OT-WH-BK-RD-S,PAIR,bc,,1,https://activebrands.co.il/wp-content/uploads-new/2020/10/begmi-123.jpg,BAG GLOVE OPEN THUMB white black red
+175,BAGMI,TKB,BAG MITTS,MU-OT,XL,BK-WH-RD,BAGMI-MU-OT-BK-WH-RD-XL,PAIR,bc,,2,https://activebrands.co.il/wp-content/uploads-new/2021/03/TKBMMI-OT-312.jpg,BAG GLOVE OPEN THUMB red white black
+175,BAGMI,TKB,BAG MITTS,MU-OT,XL,WH-BK-RD,BAGMI-MU-OT-WH-BK-RD-XL,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads-new/2020/10/begmi-123.jpg,BAG GLOVE OPEN THUMB white black red
+175,BAGMI,TKB,BAG MITTS,MU-OT,XL,BK,BAGMI-MU-OT-BK-XL,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-1-2026-09_53_55-PM.jpg,BAG GLOVE OPEN THUMB white black red
+175,BAGMI,TKB,BAG MITTS,MU-OT,XL,WH,BAGMI-MU-OT-WH-XL,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-1-2026-09_43_35-PM-1-1.jpg,BAG GLOVE OPEN THUMB white
+178,GMB01,TKB,GYM BAG,GYM BAG,F,GY,GMB01-GY,PIECE,,,35,https://activebrands.co.il/wp-content/uploads/2023/10/zoom_18092017175759_1.jpg,GYM BAG
+181,GMB01,TKB,GYM BAG,GYM BAG,0,GN,GMB01-GN,PIECE,,,9,https://activebrands.co.il/wp-content/uploads/2023/10/gg11108.jpg,GYM BAG
+182,GMB02,TKB,BACKPACK,GMB-02,F,GY,GMB02-GY,PIECE,23-Sep,,27,https://activebrands.co.il/wp-content/uploads/2023/10/TK-GBM-01-BG.jpg,BACKPACK
+185,GMB03,TKB,GYM BAG,GMB-04,F,RD,GMB03-RD,PIECE,24-Jan,,0,https://activebrands.co.il/wp-content/uploads/2024/06/TopKinggymbagsuperexportshop_4.webp,GYM BAG
+187,HG,TKB,HEAD GUARD,EC,S,RD,HGEC-RD-S,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2023/10/TKHG-RD.jpg,EXTRA COVERAGE red
+187,HG,TKB,HEAD GUARD,EC,S,WH,HGEC-WH-S,PIECE,bc,,2,https://activebrands.co.il/wp-content/uploads/2023/10/TKHG-WH.jpg,EXTRA COVERAGE white
+187,HG,TKB,HEAD GUARD,EC,S,BK,HGEC-BK-S,PIECE,24-Sep,,2,https://activebrands.co.il/wp-content/uploads/2023/10/TKHG-BK.jpg,EXTRA COVERAGE black
+187,HG,TKB,HEAD GUARD,SS01,S,SV,HGSS01-SV-S,PIECE,24-May,,2,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgss01-sv_1.jpg,SUPER STAR silver
+187,HG,TKB,HEAD GUARD,EM01,S,BKSV,HGEM01-BKSV-S,PIECE,24-Jan,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgem01-bksv.jpg,EMPOWER CREATIVITY black silver
+187,HG,TKB,HEAD GUARD,EM01,S,WHSV,HGEM01-WHSV-S,PIECE,24-Jan,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgem01-whsv.jpg,EMPOWER CREATIVITY white silver
+187,HG,TKB,HEAD GUARD,FC,S,BK,HGFC-BK-S,PIECE,24-Sep,,2,,
+187,HG,TKB,HEAD GUARD,OC,S,BK,HGOC-BK-S,PIECE,22-Mar,,2,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKHG-OC-222.jpg,OPEN CHIN black
+187,HG,TKB,HEAD GUARD,OC,S,WH,HGOC-WH-S,PIECE,24-May,,2,https://activebrands.co.il/wp-content/uploads/2025/02/HGOCWH.jpg,OPEN CHIN  white
+188,HG,TKB,HEAD GUARD,EC,M,WH,HGEC-WH-M,PIECE,bc,,4,https://activebrands.co.il/wp-content/uploads/2023/10/TKHG-WH.jpg,EXTRA COVERAGE white
+188,HG,TKB,HEAD GUARD,EC,M,RD,HGEC-RD-M,PIECE,bc,,1,https://activebrands.co.il/wp-content/uploads/2023/10/TKHG-RD.jpg,EXTRA COVERAGE red
+188,HG,TKB,HEAD GUARD,EC,M,BU,HGEC-BU-M,PIECE,bc,,1,https://activebrands.co.il/wp-content/uploads/2025/02/HGECBU.jpg,EXTRA COVERAGE blue
+188,HG,TKB,HEAD GUARD,EC,M,BK,HGEC-BK-M,PIECE,24-Sep,,7,https://activebrands.co.il/wp-content/uploads/2023/10/TKHG-BK.jpg,EXTRA COVERAGE black
+188,HG,TKB,HEAD GUARD,FC,M,WH,HGFC-WH-M,PIECE,25-Sep,,2,,
+188,HG,TKB,HEAD GUARD,FC,M,BK,HGFC-BK-M,PIECE,24-Sep,,0,,
+188,HG,TKB,HEAD GUARD,SS01,M,SV,HGSS01-SV-M,PIECE,24-May,,3,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgss01-sv_1.jpg,SUPER STAR silver
+188,HG,TKB,HEAD GUARD,EM01,M,WHSV,HGEM01-WHSV-M,PIECE,24-Jan,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgem01-whsv.jpg,EMPOWER CREATIVITY white silver
+188,HG,TKB,HEAD GUARD,SS01,M,RD,HGSS01-RD-M,PIECE,26-May,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgss01-rd.jpg,SUPER STAR red
+188,HG,TKB,HEAD GUARD,EM01,M,BKSV,HGEM01-BKSV-M,PIECE,24-Jan,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgem01-bksv.jpg,EMPOWER CREATIVITY black silver
+188,HG,TKB,HEAD GUARD,OC,M,BK,HGOC-BK-M,PIECE,22-Mar,,5,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKHG-OC-222.jpg,OPEN CHIN black
+188,HG,TKB,HEAD GUARD,OC,M,WH,HGOC-WH-M,PIECE,24-May,,1,https://activebrands.co.il/wp-content/uploads/2025/02/HGOCWH.jpg,OPEN CHIN  white
+188,HG,TKB,HEAD GUARD,SS01,M,BU,HGSS01-BU-M,PIECE,25-May,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgss01-bu.jpg,SUPER STAR blue
+189,HG,TKB,HEAD GUARD,EC,L,BU,HGEC-BU-L,PIECE,bc,,1,https://activebrands.co.il/wp-content/uploads/2025/02/HGECBU.jpg,EXTRA COVERAGE blue
+189,HG,TKB,HEAD GUARD,FC,L,WH,HGFC-WH-L,PIECE,23-Sep,,0,,
+189,HG,TKB,HEAD GUARD,EC,L,RD,HGEC-RD-L,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2023/10/TKHG-RD.jpg,EXTRA COVERAGE red
+189,HG,TKB,HEAD GUARD,EC,L,WH,HGEC-WH-L,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2023/10/TKHG-WH.jpg,EXTRA COVERAGE white
+189,HG,TKB,HEAD GUARD,OC,L,WH,HGOC-WH-L,PIECE,24-May,,0,https://activebrands.co.il/wp-content/uploads/2025/02/HGOCWH.jpg,OPEN CHIN  white
+189,HG,TKB,HEAD GUARD,SS01,L,RD,HGSS01-RD-L,PIECE,25-May,,1,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgss01-rd.jpg,SUPER STAR red
+189,HG,TKB,HEAD GUARD,OC,L,BK,HGOC-BK-L,PIECE,22-Mar,,1,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKHG-OC-222.jpg,OPEN CHIN black
+189,HG,TKB,HEAD GUARD,EC,L,BK,HGEC-BK-L,PIECE,24-Sep,,8,https://activebrands.co.il/wp-content/uploads/2023/10/TKHG-BK.jpg,EXTRA COVERAGE black
+189,HG,TKB,HEAD GUARD,FC,L,BK,HGFC-BK-L,PIECE,24-Sep,,0,,
+189,HG,TKB,HEAD GUARD,SS01,L,SV,HGSS01-SV-L,PIECE,24-May,,2,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgss01-sv_1.jpg,SUPER STAR silver
+189,HG,TKB,HEAD GUARD,SS01,L,BU,HGSS01-BU-L,PIECE,26-May,,3,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgss01-bu.jpg,SUPER STAR blue
+189,HG,TKB,HEAD GUARD,EM01,L,WHSV,HGEM01-WHSV-L,PIECE,24-Jan,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgem01-whsv.jpg,EMPOWER CREATIVITY white silver
+189,HG,TKB,HEAD GUARD,EM01,L,BKSV,HGEM01-BKSV-L,PIECE,24-Jan,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgem01-bksv.jpg,EMPOWER CREATIVITY black silver
+190,HG,TKB,HEAD GUARD,EC,XL,WH,HGEC-WH-XL,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2023/10/TKHG-WH.jpg,EXTRA COVERAGE white
+190,HG,TKB,HEAD GUARD,EC,XL,RD,HGEC-RD-XL,PIECE,bc,,1,https://activebrands.co.il/wp-content/uploads/2023/10/TKHG-RD.jpg,EXTRA COVERAGE red
+190,HG,TKB,HEAD GUARD,EC,XL,BU,HGEC-BU-XL,PIECE,bc,,1,https://activebrands.co.il/wp-content/uploads/2025/02/HGECBU.jpg,EXTRA COVERAGE blue
+190,HG,TKB,HEAD GUARD,SS01,XL,GD,HGSS01-GD-XL,PIECE,24-May,,1,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgss01-gd.jpg,SUPER STAR gold
+190,HG,TKB,HEAD GUARD,EC,XL,BK,HGEC-BK-XL,PIECE,24-Sep,,4,https://activebrands.co.il/wp-content/uploads/2023/10/TKHG-BK.jpg,EXTRA COVERAGE black
+190,HG,TKB,HEAD GUARD,FC,XL,BK,HGFC-BK-XL,PIECE,24-Sep,,0,,
+190,HG,TKB,HEAD GUARD,EM01,XL,WHSV,HGEM01-WHSV-XL,PIECE,24-Jan,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgem01-whsv.jpg,EMPOWER CREATIVITY white silver
+190,HG,TKB,HEAD GUARD,EM01,XL,BKSV,HGEM01-BKSV-XL,PIECE,24-Jan,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/hgem01-bksv.jpg,EMPOWER CREATIVITY black silver
+190,HG,TKB,HEAD GUARD,OC,XL,BK,HGOC-BK-XL,PIECE,22-Mar,,2,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKHG-OC-222.jpg,OPEN CHIN black
+190,HG,TKB,HEAD GUARD,OC,XL,WH,HGOC-WH-XL,PIECE,24-May,,2,https://activebrands.co.il/wp-content/uploads/2025/02/HGOCWH.jpg,OPEN CHIN  white
+190,HG,TKB,HEAD GUARD,OC,XL,BKWHRD,HGOC-BKWHRD-XL,PIECE,21-Mar,,0,,
+191,SG,TKB,SHIN GUARDS,GL,S,WH,SGGL-WH-S,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-112-scaled.jpg,PRO-GL white
+191,SG,TKB,SHIN GUARDS,BL01,S,WHBU,SGBL01-WHBU-S,PAIR,24-May,,2,https://activebrands.co.il/wp-content/uploads/2024/05/unnamed.jpg,SHIN GUARDS BLEND 01  white blue
+191,SG,TKB,SHIN GUARDS,BL01,S,BKWH,SGBL01-BKWH-S,PAIR,24-Sep,,1,https://activebrands.co.il/wp-content/uploads-new/2023/09/top-king-boxing-schienbeinschoner-blend-01-schwarz-weiss-1.jpg,SHIN GUARDS BLEND 01 black white
+191,SG,TKB,SHIN GUARDS,GL,S,BK,SGGL-BK-S,PAIR,24-Sep,,0,https://activebrands.co.il/wp-content/uploads-new/2022/11/TKSGP-22-copy.jpg,PRO-GL black
+191,SG,TKB,SHIN GUARDS,GL,S,GN,SGGL-GN-S,PAIR,24-Sep,,3,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGP_GL_GN.jpg,SHIN GUARDS PRO-GL green
+194,SG,TKB,SHIN GUARDS,GL,M,GN,SGGL-GN-M,PAIR,24-Sep,,5,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGP_GL_GN.jpg,SHIN GUARDS PRO-GL green
+211,SG,TKB,SHIN GUARDS,GL,L,GN,SGGL-GN-L,PAIR,24-Sep,,5,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGP_GL_GN.jpg,SHIN GUARDS PRO-GL green
+216,SG,TKB,SHIN GUARDS,GL,XL,GN,SGGL-GN-XL,PAIR,24-Sep,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGP_GL_GN.jpg,SHIN GUARDS PRO-GL green
+191,SG,TKB,SHIN GUARDS,BL01,S,WHBK,SGBL01-WHBK-S,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2024/05/images-_1_.jpg,SHIN GUARDS BLEND 01  white black
+191,SG,TKB,SHIN GUARDS,BL01,S,BKRD,SGBL01-BKRD-S,PAIR,24-Sep,,0,https://activebrands.co.il/wp-content/uploads/2026/03/BL-01-mm-2.jpg,SHIN GUARDS BLEND 01 black red
+191,SG,TKB,SHIN GUARDS,GL,S,YW,SGGL-YW-S,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-552-scaled.jpg,PRO-GL yellow
+191,SG,TKB,SHIN GUARDS,GL,S,RD,SGGL-RD-S,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-331-scaled.jpg,PRO-GL red
+191,SG,TKB,SHIN GUARDS,GL,S,BU,SGGL-BU-S,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-441-scaled.jpg,PRO-GL blue
+191,SG,TKB,SHIN GUARDS,EM01,S,WHSV,SGEM01-WHSV-S,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGEM-01-SV-White.jpg,EMPOWER CREATIVITY white silver
+191,SG,TKB,SHIN GUARDS,EM02,S,BKSV,SGEM02-BKSV-S,PAIR,24-May,,0,,
+191,SG,TKB,SHIN GUARDS,SS01,S,RD,SGSS01-RD-S,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKSG-SS01-RD-1.jpg,SUPER STAR gold
+191,SG,TKB,SHIN GUARDS,SS01,S,BU,SGSS01-BU-S,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKSG-SS01-BU.jpg,SUPER STAR blue
+191,SG,TKB,SHIN GUARDS,SS01,S,SV,SGSS01-SV-S,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/tksgss-sv.jpg,SUPER STAR silver
+191,SG,TKB,SHIN GUARDS,BL01,S,BKBU,SGBL01-BKBU-S,PAIR,25-May,,0,,
+191,SG,TKB,SHIN GUARDS,GL,S,PK,SGGL-PK-S,PAIR,24-Sep,,1,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-662-scaled.jpg,PRO-GL pink
+191,SG,TKB,SHIN GUARDS,KN-01,S,olive,SGKN-01-olive-S,PAIR,bc,???,0,https://activebrands.co.il/wp-content/uploads-new/2021/11/TKSGKN-01-Olive.jpg,KANOK olive green
+194,SG,TKB,SHIN GUARDS,GL,M,YW,SGGL-YW-M,PAIR,24-May,,1,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-552-scaled.jpg,PRO-GL yellow
+194,SG,TKB,SHIN GUARDS,GL,M,RD,SGGL-RD-M,PAIR,24-May,,1,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-331-scaled.jpg,PRO-GL red
+194,SG,TKB,SHIN GUARDS,GL,M,PK,SGGL-PK-M,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-662-scaled.jpg,PRO-GL pink
+194,SG,TKB,SHIN GUARDS,GL,M,BU,SGGL-BU-M,PAIR,24-May,,4,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-441-scaled.jpg,PRO-GL blue
+195,SG,TKB,SHIN GUARDS,GL,M,WH,SGGL-WH-M,PAIR,24-Sep,,46,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-112-scaled.jpg,PRO-GL white
+197,SG,TKB,SHIN GUARDS,GL,M,BK,SGGL-BK-M,PAIR,24-Sep,,33,https://activebrands.co.il/wp-content/uploads-new/2022/11/TKSGP-22-copy.jpg,PRO-GL black
+200,SG,TKB,SHIN GUARDS,BL01,M,WHBU,SGBL01-WHBU-M,PAIR,24-May,,6,https://activebrands.co.il/wp-content/uploads/2024/05/unnamed.jpg,SHIN GUARDS BLEND 01  white blue
+200,SG,TKB,SHIN GUARDS,BL01,M,BKWH,SGBL01-BKWH-M,PAIR,24-May,,4,https://activebrands.co.il/wp-content/uploads-new/2023/09/top-king-boxing-schienbeinschoner-blend-01-schwarz-weiss-1.jpg,SHIN GUARDS BLEND 01 black white
+200,SG,TKB,SHIN GUARDS,BL01,M,WHBK,SGBL01-WHBK-M,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2024/05/images-_1_.jpg,SHIN GUARDS BLEND 01  white black
+200,SG,TKB,SHIN GUARDS,BL01,M,BKBU,SGBL01-BKBU-M,PAIR,24-Jan,,0,,
+200,SG,TKB,SHIN GUARDS,CCN,M,RD,SGCCN-RD-M,PAIR,23-Jan,,0,https://activebrands.co.il/wp-content/uploads-new/2021/10/sgc-cn.png,CULTURE SERIES - CHINA
+200,SG,TKB,SHIN GUARDS,BL01,M,BKRD,SGBL01-BKRD-M,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/BL-01-mm-2.jpg,SHIN GUARDS BLEND 01 black red
+202,SG,TKB,SHIN GUARDS,SS01,M,BU,SGSS01-BU-M,PAIR,24-Jan,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKSG-SS01-BU.jpg,SUPER STAR blue
+202,SG,TKB,SHIN GUARDS,SS01,M,SV,SGSS01-SV-M,PAIR,24-May,,6,https://activebrands.co.il/wp-content/uploads-new/2020/12/tksgss-sv.jpg,SUPER STAR silver
+202,SG,TKB,SHIN GUARDS,SS01,M,BU,SGSS01-BU-M,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKSG-SS01-BU.jpg,SUPER STAR blue
+202,SG,TKB,SHIN GUARDS,EM01,M,WHSV,SGEM01-WHSV-M,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGEM-01-SV-White.jpg,EMPOWER CREATIVITY white silver
+202,SG,TKB,SHIN GUARDS,KN01,M,OLIVE,SGKN01-OLIVE-M,PAIR,25-May,,0,https://activebrands.co.il/wp-content/uploads-new/2021/11/TKSGKN-01-Olive.jpg,KANOK olive green
+202,SG,TKB,SHIN GUARDS,SS01,M,RD,SGSS01-RD-M,PAIR,24-Jan,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKSG-SS01-RD-1.jpg,SUPER STAR gold
+202,SG,TKB,SHIN GUARDS,EM01,M,BKSV,SGEM01-BKSV-M,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/sgem01-bksv.jpg,EMPOWER CREATIVITY black silver
+204,SG,TKB,SHIN GUARDS,BL01,L,WHBU,SGBL01-WHBU-L,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads/2024/05/unnamed.jpg,SHIN GUARDS BLEND 01  white blue
+204,SG,TKB,SHIN GUARDS,BL01,L,BKWH,SGBL01-BKWH-L,PAIR,24-May,,2,https://activebrands.co.il/wp-content/uploads-new/2023/09/top-king-boxing-schienbeinschoner-blend-01-schwarz-weiss-1.jpg,SHIN GUARDS BLEND 01 black white
+204,SG,TKB,SHIN GUARDS,BL01,L,WHBK,SGBL01-WHBK-L,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2024/05/images-_1_.jpg,SHIN GUARDS BLEND 01  white black
+204,SG,TKB,SHIN GUARD,BL01,L,BKBU,SGBL01-BKBU-L,PAIR,24-Jan,,0,,
+204,SG,TKB,SHIN GUARDS,BL01,L,BKRD,SGBL01-BKRD-L,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/BL-01-mm-2.jpg,SHIN GUARDS BLEND 01 black red
+206,SG,TKB,SHIN GUARDS,GL,L,WH,SGGL-WH-L,PAIR,24-Sep,,20,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-112-scaled.jpg,PRO-GL white
+208,SG,TKB,SHIN GUARDS,GL,L,BK,SGGL-BK-L,PAIR,24-Sep,,8,https://activebrands.co.il/wp-content/uploads-new/2022/11/TKSGP-22-copy.jpg,PRO-GL black
+211,SG,TKB,SHIN GUARDS,GL,L,BU,SGGL-BU-L,PAIR,24-May,,3,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-441-scaled.jpg,PRO-GL blue
+211,SG,TKB,SHIN GUARDS,GL,L,RD,SGGL-RD-L,PAIR,24-May,,3,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-331-scaled.jpg,PRO-GL red
+211,SG,TKB,SHIN GUARDS,GL,L,PK,SGGL-PK-L,PAIR,24-May,,3,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-662-scaled.jpg,PRO-GL pink
+211,SG,TKB,SHIN GUARDS,GL,L,YW,SGGL-YW-L,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-552-scaled.jpg,PRO-GL yellow
+212,SG,TKB,SHIN GUARDS,SS01,L,RD,SGSS01-RD-L,PAIR,24-Jan,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKSG-SS01-RD-1.jpg,SUPER STAR gold
+212,SG,TKB,SHIN GUARDS,EM01,L,WHSV,SGEM01-WHSV-L,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGEM-01-SV-White.jpg,EMPOWER CREATIVITY white silver
+212,SG,TKB,SHIN GUARDS,EM01,L,BKSV,SGEM01-BKSV-L,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/sgem01-bksv.jpg,EMPOWER CREATIVITY black silver
+191,SG,TKB,SHIN GUARDS,DRAGON,S,BK,SGDRAGON-BK-S,PAIR,24-May,,2,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGDG_BK.jpg,SHIN GUARDS DRAGON black
+191,SG,TKB,SHIN GUARDS,DRAGON,S,WH,SGDRAGON-WH-S,PAIR,24-May,,2,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGDG_WH.jpg,SHIN GUARDS DRAGON white
+202,SG,TKB,SHIN GUARDS,DRAGON,M,BK,SGDRAGON-BK-M,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGDG_BK.jpg,SHIN GUARDS DRAGON black
+202,SG,TKB,SHIN GUARDS,DRAGON,M,WH,SGDRAGON-WH-M,PAIR,24-May,,5,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGDG_WH.jpg,SHIN GUARDS DRAGON white
+212,SG,TKB,SHIN GUARDS,DRAGON,L,BK,SGDRAGON-BK-L,PAIR,24-May,,3,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGDG_BK.jpg,SHIN GUARDS DRAGON black
+212,SG,TKB,SHIN GUARDS,DRAGON,L,WH,SGDRAGON-WH-L,PAIR,24-May,,3,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGDG_WH.jpg,SHIN GUARDS DRAGON white
+212,SG,TKB,SHIN GUARDS,SS01,L,SV,SGSS01-SV-L,PAIR,24-May,,1,https://activebrands.co.il/wp-content/uploads-new/2020/12/tksgss-sv.jpg,SUPER STAR silver
+212,SG,TKB,SHIN GUARDS,SS01,L,BU,SGSS01-BU-L,PAIR,24-May,,1,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKSG-SS01-BU.jpg,SUPER STAR blue
+214,SG,TKB,SHIN GUARDS,GL,XL,WH,SGGL-WH-XL,PAIR,24-Sep,,8,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-112-scaled.jpg,PRO-GL white
+214,SG,TKB,SHIN GUARDS,GL,XL,BK,SGGL-BK-XL,PAIR,24-Sep,,5,https://activebrands.co.il/wp-content/uploads-new/2022/11/TKSGP-22-copy.jpg,PRO-GL black
+216,SG,TKB,SHIN GUARDS,SS01,XL,BU,SGSS01-BU-XL,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKSG-SS01-BU.jpg,SUPER STAR blue
+216,SG,TKB,SHIN GUARD,BL01,XL,BKBU,SGBL01-BKBU-XL,PAIR,24-Jan,,0,,
+216,SG,TKB,SHIN GUARD,SS01,XL,RD,SGSS01-RD-XL,PAIR,24-Jan,,1,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKSG-SS01-RD-1.jpg,SUPER STAR gold
+216,SG,TKB,SHIN GUARDS,EM01,XL,WHSV,SGEM01-WHSV-XL,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/TKSGEM-01-SV-White.jpg,EMPOWER CREATIVITY white silver
+216,SG,TKB,SHIN GUARDS,BL01,XL,BKWH,SGBL01-BKWH-XL,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2023/09/top-king-boxing-schienbeinschoner-blend-01-schwarz-weiss-1.jpg,SHIN GUARDS BLEND 01 black white
+216,SG,TKB,SHIN GUARD,SS01,XL,BU,SGSS01-BU-XL,PAIR,24-Jan,,1,https://activebrands.co.il/wp-content/uploads-new/2020/12/TKSG-SS01-BU.jpg,SUPER STAR blue
+216,SG,TKB,SHIN GUARDS,BL01,XL,BKRD,SGBL01-BKRD-XL,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2026/03/BL-01-mm-2.jpg,SHIN GUARDS BLEND 01 black red
+216,SG,TKB,SHIN GUARDS,SS01,XL,SV,SGSS01-SV-XL,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/tksgss-sv.jpg,SUPER STAR silver
+216,SG,TKB,SHIN GUARDS,GL,XL,RD,SGGL-RD-XL,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-331-scaled.jpg,PRO-GL red
+216,SG,TKB,SHIN GUARDS,GL,XL,PK,SGGL-PK-XL,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-662-scaled.jpg,PRO-GL pink
+216,SG,TKB,SHIN GUARDS,GL,XL,BU,SGGL-BU-XL,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-441-scaled.jpg,PRO-GL blue
+216,SG,TKB,SHIN GUARDS,GL,XL,YW,SGGL-YW-XL,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2022/09/TKSGP-552-scaled.jpg,PRO-GL yellow
+216,SG,TKB,SHIN GUARDS,EM01,XL,BKSV,SGEM01-BKSV-XL,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads-new/2020/12/sgem01-bksv.jpg,EMPOWER CREATIVITY black silver
+216,SG,TKB,SHIN GUARDS,BL01,XL,WHBU,SGBL01-WHBU-XL,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2024/05/unnamed.jpg,SHIN GUARDS BLEND 01  white blue
+216,SG,TKB,SHIN GUARDS,BL01,XL,WHBK,SGBL01-WHBK-XL,PAIR,24-May,,0,https://activebrands.co.il/wp-content/uploads/2024/05/images-_1_.jpg,SHIN GUARDS BLEND 01  white black
+217,SG,TKB,SHIN GUARDS,CTH,XL,BU,SGCTH-BU-XL,PAIR,26-May,,2,https://activebrands.co.il/wp-content/uploads/2026/03/sgc-th.jpg,CULTURE SERIES - THAILAND
+217,SG,TKB,SHIN GUARDS,SEMI,XL,WHGD,SGSEMI-WHGD-XL,PAIR,27-May,,0,,
+217,SG,TKB,SHIN GUARDS,CCN,XL,RD,SGCCN-RD-XL,PAIR,25-May,,5,https://activebrands.co.il/wp-content/uploads-new/2021/10/sgc-cn.png,CULTURE SERIES - CHINA
+277,BG,OSO,BOXING GLOVES,OSO,14,WH,BG-OSO-WH-14,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG_5061-01-01-scaled.jpeg,כפפות איגרוף עור Boxing Gloves OSO white
+277,BG,OSO,BOXING GLOVES,OSO,16,BK,BG-OSO-BK-16,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG-20211114-WA0001-01.jpeg,כפפות איגרוף עור Boxing Gloves OSO black
+278,BG,OSO,BOXING GLOVES,OSO,16,WH,BG-OSO-WH-16,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG_5061-01-01-scaled.jpeg,כפפות איגרוף עור Boxing Gloves OSO white
+281,BS,OSO,BOXING SHOES,OSO,F,,BS-OSO-F,PAIR,bc,,0,,
+282,BELT,OSO,CLOTHING,BELT,A2,WH,,,bc,,0,,
+282,mouth guard,OSO,MG,OSO,ONE_SIDE,F,MG-OSO-ONE_SIDE,PIECE,bc,,0,,
+282,SHORTS,OSO,ELASTICS,MMA,S,BK,SHORTS-MMA-S,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads-new/2022/03/Photo-10-03-2022-22-31-08-scaled.jpg,SHORTS
+282,RASH GUARD,OSO,CLOTHING,RASH GUARD,S,BK,,,bc,,0,,
+282,TIGHTS,OSO,CLOTHING,TIGHTS,S,BK,,,bc,,0,,
+282,GROIN,OSO,GROIN PROTECTOR,FABRIC,XL,WH,GROINFABRIC-WH-XL,PIECE,bc,,0,,
+284,BG,OSO,BOXING GLOVES,OSO,16,WH,BGOSO-WH-16,PAIR,bc,,9,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG_5061-01-01-scaled.jpeg,כפפות איגרוף עור Boxing Gloves OSO white
+285,BG,OSO,BOXING GLOVES,OSO,16,BK,BGOSO-BK-16,PAIR,bc,,10,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG-20211114-WA0001-01.jpeg,כפפות איגרוף עור Boxing Gloves OSO black
+286,BG,OSO,BOXING GLOVES,OSO,14,BK,BGOSO-BK-14,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG-20211114-WA0001-01.jpeg,כפפות איגרוף עור Boxing Gloves OSO black
+287,BG,OSO,BOXING GLOVES,OSO,12,BK,BGOSO-BK-12,PAIR,bc,,13,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG-20211114-WA0001-01.jpeg,כפפות איגרוף עור Boxing Gloves OSO black
+288,BG,OSO,BOXING GLOVES,OSO,12,WH,BGOSO-WH-12,PAIR,bc,,29,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG_5061-01-01-scaled.jpeg,כפפות איגרוף עור Boxing Gloves OSO white
+298,RASH GUARD,RDX,ELASTICS,T15BF,XL,BK,RASH GUARDT15BF-BK-XL,PIECE,23-Oct,,25,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt.jpg,RDX COMPRESSION RASH GUARD BLACK FULL
+298,RASH GUARD,RDX,ELASTICS,T15BF,L,BK,RASH GUARDT15BF-BK-L,PIECE,23-Oct,,22,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt.jpg,RDX COMPRESSION RASH GUARD BLACK FULL
+298,RASH GUARD,RDX,ELASTICS,T15BF,M,BK,RASH GUARDT15BF-BK-M,PIECE,23-Oct,,14,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt.jpg,RDX COMPRESSION RASH GUARD BLACK FULL
+298,RASH GUARD,RDX,ELASTICS,T15BF,S,BK,RASH GUARDT15BF-BK-S,PIECE,23-Oct,,16,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt.jpg,RDX COMPRESSION RASH GUARD BLACK FULL
+298,RASH GUARD,RDX,ELASTICS,T15BF,XS,BK,RASH GUARDT15BF-BK-XS,PIECE,23-Oct,,18,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt.jpg,RDX COMPRESSION RASH GUARD BLACK FULL
+298,RASH GUARD,RDX,ELASTICS,T15BF,XXL,BK,RASH GUARDT15BF-BK-XXL,PIECE,23-Oct,,17,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt.jpg,RDX COMPRESSION RASH GUARD BLACK FULL
+298,RASH GUARD,RDX,ELASTICS,T15BF,XXXL,BK,RASH GUARDT15BF-BK-XXXL,PIECE,23-Oct,,17,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt.jpg,RDX COMPRESSION RASH GUARD BLACK FULL
+299,RASH GUARD,RDX,ELASTICS,T15BH,XL,BK,RASH GUARDT15BH-BK-XL,PIECE,23-Oct,,23,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt-1.jpg,RDX COMPRESSION RASH GUARD BLACK HALF
+299,RASH GUARD,RDX,ELASTICS,T15BH,L,BK,RASH GUARDT15BH-BK-L,PIECE,23-Oct,,21,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt-1.jpg,RDX COMPRESSION RASH GUARD BLACK HALF
+299,RASH GUARD,RDX,ELASTICS,T15BH,M,BK,RASH GUARDT15BH-BK-M,PIECE,23-Oct,,10,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt-1.jpg,RDX COMPRESSION RASH GUARD BLACK HALF
+299,RASH GUARD,RDX,ELASTICS,T15BH,S,BK,RASH GUARDT15BH-BK-S,PIECE,23-Oct,,16,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt-1.jpg,RDX COMPRESSION RASH GUARD BLACK HALF
+299,RASH GUARD,RDX,ELASTICS,T15BH,XS,BK,RASH GUARDT15BH-BK-XS,PIECE,23-Oct,,18,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt-1.jpg,RDX COMPRESSION RASH GUARD BLACK HALF
+299,RASH GUARD,RDX,ELASTICS,T15BH,XXL,BK,RASH GUARDT15BH-BK-XXL,PIECE,23-Oct,,16,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt-1.jpg,RDX COMPRESSION RASH GUARD BLACK HALF
+299,RASH GUARD,RDX,ELASTICS,T15BH,XXXL,BK,RASH GUARDT15BH-BK-XXXL,PIECE,23-Oct,,16,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-t15-compression-shirt-1.jpg,RDX COMPRESSION RASH GUARD BLACK HALF
+300,SHORTS,RDX,ELASTICS,MMA,XL,BK,SHORTSMMA-BK-XL,PIECE,23-Oct,,18,https://activebrands.co.il/wp-content/uploads/2023/09/rdx_t15_mma_fight_shorts_black_1__2.jpg,RDX SHORTS T15 BLACK
+300,SHORTS,RDX,ELASTICS,MMA,M,BK,SHORTSMMA-BK-M,PIECE,23-Oct,,4,https://activebrands.co.il/wp-content/uploads/2023/09/rdx_t15_mma_fight_shorts_black_1__2.jpg,RDX SHORTS T15 BLACK
+300,SHORTS,RDX,ELASTICS,MMA,S,BK,SHORTSMMA-BK-S,PIECE,23-Oct,,9,https://activebrands.co.il/wp-content/uploads/2023/09/rdx_t15_mma_fight_shorts_black_1__2.jpg,RDX SHORTS T15 BLACK
+300,SHORTS,RDX,ELASTICS,MMA,XXL,BK,SHORTSMMA-BK-XXL,PIECE,23-Oct,,12,https://activebrands.co.il/wp-content/uploads/2023/09/rdx_t15_mma_fight_shorts_black_1__2.jpg,RDX SHORTS T15 BLACK
+300,SHORTS,RDX,ELASTICS,MMA,XS,BK,SHORTSMMA-BK-XS,PIECE,23-Oct,,15,https://activebrands.co.il/wp-content/uploads/2023/09/rdx_t15_mma_fight_shorts_black_1__2.jpg,RDX SHORTS T15 BLACK
+300,SHORTS,RDX,ELASTICS,MMA,XXXL,BK,SHORTSMMA-BK-XXXL,PIECE,23-Oct,,13,https://activebrands.co.il/wp-content/uploads/2023/09/rdx_t15_mma_fight_shorts_black_1__2.jpg,RDX SHORTS T15 BLACK
+301,SHORTS,RDX,ELASTICS,MMA,S,BK,SHORTSMMA-BK-S,PIECE,23-Oct,,13,https://activebrands.co.il/wp-content/uploads/2023/09/rdx_t15_mma_fight_shorts_black_1__2.jpg,RDX SHORTS T15 BLACK
+301,SHORTS,RDX,ELASTICS,MMA,L,BK,SHORTSMMA-BK-L,PIECE,23-Oct,,18,https://activebrands.co.il/wp-content/uploads/2023/09/rdx_t15_mma_fight_shorts_black_1__2.jpg,RDX SHORTS T15 BLACK
+301,SHORTS,RDX,ELASTICS,MMA,L,BK,SHORTSMMA-BK-L,PIECE,23-Oct,,10,https://activebrands.co.il/wp-content/uploads/2023/09/rdx_t15_mma_fight_shorts_black_1__2.jpg,RDX SHORTS T15 BLACK
+301,SHORTS,RDX,ELASTICS,MMA,S,BK,SHORTSMMA-BK-S,PIECE,23-Oct,,0,https://activebrands.co.il/wp-content/uploads/2023/09/rdx_t15_mma_fight_shorts_black_1__2.jpg,RDX SHORTS T15 BLACK
+301,SHORTS,RDX,ELASTICS,MMA,XL,BK,SHORTSMMA-BK-XL,PIECE,23-Oct,,0,https://activebrands.co.il/wp-content/uploads/2023/09/rdx_t15_mma_fight_shorts_black_1__2.jpg,RDX SHORTS T15 BLACK
+301,SHORTS,RDX,ELASTICS,MMA,XL,BK,SHORTSMMA-BK-XL,PIECE,23-Oct,,10,https://activebrands.co.il/wp-content/uploads/2023/09/rdx_t15_mma_fight_shorts_black_1__2.jpg,RDX SHORTS T15 BLACK
+521,BG,FS,BOXING GLOVES,CLASSIC,10,WH,BGCLASSIC-WH-10,PAIR,24-Mar,,1,https://activebrands.co.il/wp-content/uploads/2024/03/IMG_7137.jpg,INFIGHTSTYLE CLASSIC white
+521,BG,FS,BOXING GLOVES,CLASSIC,10,BK,BGCLASSIC-BK-10,PAIR,24-Mar,,8,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_7149.jpg,INFIGHTSTYLE CLASSIC black
+521,BG,FS,BOXING GLOVES,CLASSIC,10,TEAL,BGCLASSIC-TEAL-10,PAIR,24-Mar,,4,https://activebrands.co.il/wp-content/uploads/2025/08/IMG_7625_900x.jpg,INFIGHTSTYLE CLASSIC teal
+521,BG,FS,BOXING GLOVES,CLASSIC,10,MAROON,BGCLASSIC-MAROON-10,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-04_10_39-PM.jpg,INFIGHTSTYLE CLASSIC boxing gloves maroon
+521,BG,FS,BOXING GLOVES,CLASSIC,10,POWDER PINK,BGCLASSIC-POWDER PINK-10,PAIR,24-Mar,,2,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design-3.jpg,INFIGHTSTYLE CLASSIC boxing gloves powder pink
+521,BG,FS,BOXING GLOVES,CLASSIC,10,PK,BGCLASSIC-PK-10,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2024/03/CLASSIC-BG-PINK.webp,INFIGHTSTYLE CLASSIC pink
+521,BG,FS,BOXING GLOVES,CLASSIC,10,PR,BGCLASSIC-PR-10,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/converted_image.jpg,INFIGHTSTYLE CLASSIC red
+521,BG,FS,BOXING GLOVES,CLASSIC,10,RD,BGCLASSIC-RD-10,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2024/03/BG-CLASSIC-RD.webp,INFIGHTSTYLE CLASSIC red
+521,BG,FS,BOXING GLOVES,CLASSIC SEMI,10,PALE GREEN,BGCLASSIC SEMI-PALE GREEN-10,PAIR,24-Mar,,0,,
+522,BG,FS,BOXING GLOVES,CLASSIC,12,WH,BGCLASSIC-WH-12,PAIR,24-Mar,,14,https://activebrands.co.il/wp-content/uploads/2024/03/IMG_7137.jpg,INFIGHTSTYLE CLASSIC white
+524,BG,FS,BOXING GLOVES,CLASSIC,12,BK,BGCLASSIC-BK-12,PAIR,24-Mar,,13,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_7149.jpg,INFIGHTSTYLE CLASSIC black
+526,BG,FS,BOXING GLOVES,CLASSIC,12,MAROON,BGCLASSIC-MAROON-12,PAIR,24-Mar,,11,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-04_10_39-PM.jpg,INFIGHTSTYLE CLASSIC boxing gloves maroon
+526,BG,FS,BOXING GLOVES,CLASSIC,12,LBU,BGCLASSIC-LBU-12,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/08/download-1.jpg,INFIGHTSTYLE CLASSIC boxing gloves light blue
+526,BG,FS,BOXING GLOVES,CLASSIC,12,PK,BGCLASSIC-PK-12,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2024/03/CLASSIC-BG-PINK.webp,INFIGHTSTYLE CLASSIC pink
+526,BG,FS,BOXING GLOVES,CLASSIC,12,PR,BGCLASSIC-PR-12,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/converted_image.jpg,INFIGHTSTYLE CLASSIC red
+526,BG,FS,BOXING GLOVES,CLASSIC,12,RD,BGCLASSIC-RD-12,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2024/03/BG-CLASSIC-RD.webp,INFIGHTSTYLE CLASSIC red
+526,BG,FS,BOXING GLOVES,CLASSIC,12,TEAL,BGCLASSIC-TEAL-12,PAIR,24-Mar,,6,https://activebrands.co.il/wp-content/uploads/2025/08/IMG_7625_900x.jpg,INFIGHTSTYLE CLASSIC teal
+526,BG,FS,BOXING GLOVES,CLASSIC,12,BU,BGCLASSIC-BU-12,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_7143.jpg,INFIGHTSTYLE CLASSIC blue
+526,BG,FS,BOXING GLOVES,CLASSIC,12,POWDER PINK,BGCLASSIC-POWDER PINK-12,PAIR,24-Mar,,1,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design-3.jpg,INFIGHTSTYLE CLASSIC boxing gloves powder pink
+528,BG,FS,BOXING GLOVES,CLASSIC,14,BK,BGCLASSIC-BK-14,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_7149.jpg,INFIGHTSTYLE CLASSIC black
+531,BG,FS,BOXING GLOVES,CLASSIC,14,WH,BGCLASSIC-WH-14,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2024/03/IMG_7137.jpg,INFIGHTSTYLE CLASSIC white
+533,BG,FS,BOXING GLOVES,CLASSIC,14,RD,BGCLASSIC-RD-14,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2024/03/BG-CLASSIC-RD.webp,INFIGHTSTYLE CLASSIC red
+534,BG,FS,BOXING GLOVES,CLASSIC,14,BU,BGCLASSIC-BU-14,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_7143.jpg,INFIGHTSTYLE CLASSIC blue
+535,BG,FS,BOXING GLOVES,CLASSIC,14,LBU,BGCLASSIC-LBU-14,PAIR,24-Mar,,6,https://activebrands.co.il/wp-content/uploads/2025/08/download-1.jpg,INFIGHTSTYLE CLASSIC boxing gloves light blue
+535,BG,FS,BOXING GLOVES,CLASSIC,14,PK,BGCLASSIC-PK-14,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2024/03/CLASSIC-BG-PINK.webp,INFIGHTSTYLE CLASSIC pink
+535,BG,FS,BOXING GLOVES,CLASSIC,14,PR,BGCLASSIC-PR-14,PAIR,25-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/converted_image.jpg,INFIGHTSTYLE CLASSIC red
+535,BG,FS,BOXING GLOVES,CLASSIC,14,PALE GREEN,BGCLASSIC-PALE GREEN-14,PAIR,25-Mar,,0,,
+535,BG,FS,BOXING GLOVES,CLASSIC,14,MAROON,BGCLASSIC-MAROON-14,PAIR,24-Mar,,15,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-04_10_39-PM.jpg,INFIGHTSTYLE CLASSIC boxing gloves maroon
+535,BG,FS,BOXING GLOVES,CLASSIC,14,TEAL,BGCLASSIC-TEAL-14,PAIR,24-Mar,,15,https://activebrands.co.il/wp-content/uploads/2025/08/IMG_7625_900x.jpg,INFIGHTSTYLE CLASSIC teal
+535,BG,FS,BOXING GLOVES,CLASSIC,14,POWDER PINK,BGCLASSIC-POWDER PINK-14,PAIR,24-Mar,,7,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design-3.jpg,INFIGHTSTYLE CLASSIC boxing gloves powder pink
+537,BG,FS,BOXING GLOVES,CLASSIC,16,BK,BGCLASSIC-BK-16,PAIR,24-Mar,,8,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_7149.jpg,INFIGHTSTYLE CLASSIC black
+539,BG,FS,BOXING GLOVES,CLASSIC,16,WH,BGCLASSIC-WH-16,PAIR,24-Mar,,30,https://activebrands.co.il/wp-content/uploads/2024/03/IMG_7137.jpg,INFIGHTSTYLE CLASSIC white
+539,BG,FS,BOXING GLOVES,CLASSIC,18,WH,BGCLASSIC-WH-18,PAIR,25-Mar,,1,https://activebrands.co.il/wp-content/uploads/2024/03/IMG_7137.jpg,INFIGHTSTYLE CLASSIC white
+541,BG,FS,BOXING GLOVES,CLASSIC,16,MAROON,BGCLASSIC-MAROON-16,PAIR,24-Mar,,4,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-04_10_39-PM.jpg,INFIGHTSTYLE CLASSIC boxing gloves maroon
+541,BG,FS,BOXING GLOVES,CLASSIC,16,TEAL,BGCLASSIC-TEAL-16,PAIR,24-Mar,,4,https://activebrands.co.il/wp-content/uploads/2025/08/IMG_7625_900x.jpg,INFIGHTSTYLE CLASSIC teal
+541,BG,FS,BOXING GLOVES,CLASSIC,16,LBU,BGCLASSIC-LBU-16,PAIR,24-Mar,,1,https://activebrands.co.il/wp-content/uploads/2025/08/download-1.jpg,INFIGHTSTYLE CLASSIC boxing gloves light blue
+541,BG,FS,BOXING GLOVES,CLASSIC,16,POWDER PINK,BGCLASSIC-POWDER PINK-16,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design-3.jpg,INFIGHTSTYLE CLASSIC boxing gloves powder pink
+541,BG,FS,BOXING GLOVES,CLASSIC,16,BU,BGCLASSIC-BU-16,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_7143.jpg,INFIGHTSTYLE CLASSIC blue
+541,BG,FS,BOXING GLOVES,CLASSIC,16,RD,BGCLASSIC-RD-16,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2024/03/BG-CLASSIC-RD.webp,INFIGHTSTYLE CLASSIC red
+541,BG,FS,BOXING GLOVES,CLASSIC,18,BK,BGCLASSIC-BK-18,PAIR,25-Mar,,2,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_7149.jpg,INFIGHTSTYLE CLASSIC black
+542,SG,FS,SHIN GUARD,CLASSIC,S,BK,SGCLASSIC-BK-S,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2026/03/SHINGUARD_COVID_200615_0024.jpg,INFIGHTSTYLE CLASSIC black
+544,SG,FS,SHIN GUARD,CLASSIC,S,LBU,SGCLASSIC-LBU-S,PAIR,24-Mar,,2,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design-2.jpg,INFIGHTSTYLE CLASSIC sky blue
+544,SG,FS,SHIN GUARD,CLASSIC,S,POWDER PINK,SGCLASSIC-POWDER PINK-S,PAIR,24-Mar,,2,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design.jpg,INFIGHTSTYLE CLASSIC powder pink
+544,SG,FS,SHIN GUARD,CLASSIC,S,MAROON,SGCLASSIC-MAROON-S,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design-1.jpg,INFIGHTSTYLE CLASSIC maroon
+544,SG,FS,SHIN GUARD,CLASSIC,S,WH,SGCLASSIC-WH-S,PAIR,24-Mar,,4,https://activebrands.co.il/wp-content/uploads/2024/03/MuayThaiClassicShinguard-White_600x.webp,INFIGHTSTYLE CLASSIC white
+544,SG,FS,SHIN GUARD,CLASSIC,S,RD,SGCLASSIC-RD-S,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2024/03/SemiClassicShinguards_Red_f547e3ed-acff-4e26-8b4f-f1e3dc064d83_600x600_crop_center.webp,INFIGHTSTYLE CLASSIC red
+544,SG,FS,SHIN GUARD,CLASSIC,S,FPK,SGCLASSIC-FPK-S,PAIR,24-Mar,,0,,
+544,SG,FS,SHIN GUARD,CLASSIC,S,BU,SGCLASSIC-BU-S,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2024/03/PhotoRoom_20230624_1532472_600x600_crop_center.webp,INFIGHTSTYLE CLASSIC blue
+544,SG,FS,SHIN GUARD,CLASSIC,S,PR,SGCLASSIC-PR-S,PAIR,25-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/fe6e539b-5f1e-4583-ac13-da7763f67338-1.jpg,INFIGHTSTYLE CLASSIC purple
+544,SG,FS,SHIN GUARD,CLASSIC,S,TEAL,SGCLASSIC-TEAL-S,PAIR,24-Mar,,1,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-07_18_39-PM.jpg,INFIGHTSTYLE CLASSIC teal
+545,SG,FS,SHIN GUARD,CLASSIC,M,BK,SGCLASSIC-BK-M,PAIR,24-Mar,,35,https://activebrands.co.il/wp-content/uploads/2026/03/SHINGUARD_COVID_200615_0024.jpg,INFIGHTSTYLE CLASSIC black
+548,SG,FS,SHIN GUARD,CLASSIC,M,WH,SGCLASSIC-WH-M,PAIR,24-Mar,,21,https://activebrands.co.il/wp-content/uploads/2024/03/MuayThaiClassicShinguard-White_600x.webp,INFIGHTSTYLE CLASSIC white
+551,SG,FS,SHIN GUARD,CLASSIC,M,BU,SGCLASSIC-BU-M,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2024/03/PhotoRoom_20230624_1532472_600x600_crop_center.webp,INFIGHTSTYLE CLASSIC blue
+552,SG,FS,SHIN GUARD,CLASSIC,M,LBU,SGCLASSIC-LBU-M,PAIR,24-Mar,,8,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design-2.jpg,INFIGHTSTYLE CLASSIC sky blue
+552,SG,FS,SHIN GUARD,CLASSIC,M,POWDER PINK,SGCLASSIC-POWDER PINK-M,PAIR,24-Mar,,6,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design.jpg,INFIGHTSTYLE CLASSIC powder pink
+552,SG,FS,SHIN GUARD,CLASSIC,M,MAROON,SGCLASSIC-MAROON-M,PAIR,24-Mar,,12,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design-1.jpg,INFIGHTSTYLE CLASSIC maroon
+552,SG,FS,SHIN GUARD,CLASSIC,M,PR,SGCLASSIC-PR-M,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2026/03/fe6e539b-5f1e-4583-ac13-da7763f67338-1.jpg,INFIGHTSTYLE CLASSIC purple
+552,SG,FS,SHIN GUARD,CLASSIC,M,PK,SGCLASSIC-PK-M,PAIR,24-Mar,,0,,
+552,SG,FS,SHIN GUARD,CLASSIC,M,TEAL,SGCLASSIC-TEAL-M,PAIR,24-Mar,,8,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-07_18_39-PM.jpg,INFIGHTSTYLE CLASSIC teal
+554,SG,FS,SHIN GUARD,CLASSIC,L,BK,SGCLASSIC-BK-L,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2026/03/SHINGUARD_COVID_200615_0024.jpg,INFIGHTSTYLE CLASSIC black
+557,SG,FS,SHIN GUARD,CLASSIC,L,WH,SGCLASSIC-WH-L,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2024/03/MuayThaiClassicShinguard-White_600x.webp,INFIGHTSTYLE CLASSIC white
+560,SG,FS,SHIN GUARD,CLASSIC,L,RD,SGCLASSIC-RD-L,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2024/03/SemiClassicShinguards_Red_f547e3ed-acff-4e26-8b4f-f1e3dc064d83_600x600_crop_center.webp,INFIGHTSTYLE CLASSIC red
+560,SG,FS,SHIN GUARD,CLASSIC,L,PR,SGCLASSIC-PR-L,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2026/03/fe6e539b-5f1e-4583-ac13-da7763f67338-1.jpg,INFIGHTSTYLE CLASSIC purple
+561,SG,FS,SHIN GUARD,CLASSIC,L,PK,SGCLASSIC-PK-L,PAIR,24-Mar,,3,,
+561,SG,FS,SHIN GUARD,CLASSIC,L,LBU,SGCLASSIC-LBU-L,PAIR,24-Mar,,7,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design-2.jpg,INFIGHTSTYLE CLASSIC sky blue
+561,SG,FS,SHIN GUARD,CLASSIC,L,POWDER PINK,SGCLASSIC-POWDER PINK-L,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design.jpg,INFIGHTSTYLE CLASSIC powder pink
+561,SG,FS,SHIN GUARD,CLASSIC,L,TEAL,SGCLASSIC-TEAL-L,PAIR,24-Mar,,15,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-07_18_39-PM.jpg,INFIGHTSTYLE CLASSIC teal
+561,SG,FS,SHIN GUARD,CLASSIC,L,MAROON,SGCLASSIC-MAROON-L,PAIR,24-Mar,,16,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design-1.jpg,INFIGHTSTYLE CLASSIC maroon
+563,SG,FS,SHIN GUARD,CLASSIC,XL,BK,SGCLASSIC-BK-XL,PAIR,24-Mar,,13,https://activebrands.co.il/wp-content/uploads/2026/03/SHINGUARD_COVID_200615_0024.jpg,INFIGHTSTYLE CLASSIC black
+564,SG,FS,SHIN GUARD,CLASSIC,XL,WH,SGCLASSIC-WH-XL,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2024/03/MuayThaiClassicShinguard-White_600x.webp,INFIGHTSTYLE CLASSIC white
+565,SG,FS,SHIN GUARD,CLASSIC,XL,MAROON,SGCLASSIC-MAROON-XL,PAIR,24-Mar,,12,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design-1.jpg,INFIGHTSTYLE CLASSIC maroon
+565,SG,FS,SHIN GUARD,CLASSIC,XL,LBU,SGCLASSIC-LBU-XL,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design-2.jpg,INFIGHTSTYLE CLASSIC sky blue
+565,SG,FS,SHIN GUARD,CLASSIC,XL,POWDER PINK,SGCLASSIC-POWDER PINK-XL,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/09/Untitled-design.jpg,INFIGHTSTYLE CLASSIC powder pink
+565,SG,FS,SHIN GUARD,CLASSIC,XL,TEAL,SGCLASSIC-TEAL-XL,PAIR,24-Mar,,4,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-07_18_39-PM.jpg,INFIGHTSTYLE CLASSIC teal
+565,SG,FS,SHIN GUARD,CLASSIC,XL,BU,SGCLASSIC-BU-XL,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2024/03/PhotoRoom_20230624_1532472_600x600_crop_center.webp,INFIGHTSTYLE CLASSIC blue
+565,SG,FS,SHIN GUARD,CLASSIC,XL,RD,SGCLASSIC-RD-XL,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2024/03/SemiClassicShinguards_Red_f547e3ed-acff-4e26-8b4f-f1e3dc064d83_600x600_crop_center.webp,INFIGHTSTYLE CLASSIC red
+567,BP,FS,BACKPACK,BACKPACK,F,BK,BPBACKPACK-BK,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_24_41-PM.jpg,INFIGHTSTYLE BACKPACK תיק גב
+568,BP,FS,BACKPACK,BACKPACK,F,GY,BPBACKPACK-GY,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_7845-scaled-1.jpg,INFIGHTSTYLE BACKPACK תיק גב
+570,HG,FS,HEAD GUARD,IFSFC,S,BK,HGIFSFC-BK-S,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-02_48_17-PM.jpg,FULL COVERAGE black
+570,HG,FS,HEAD GUARD,IFSFC,S,WH,HGIFSFC-WH-S,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-02_51_25-PM.jpg,FULL COVERAGE white
+570,HG,FS,HEAD GUARD,IFSFC,XL,BK,HGIFSFC-BK-XL,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-02_48_17-PM.jpg,FULL COVERAGE black
+570,HG,FS,HEAD GUARD,IFSFC,XL,WH,HGIFSFC-WH-XL,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-02_51_25-PM.jpg,FULL COVERAGE white
+571,HG,FS,HEAD GUARD,IFSFC,L,BK,HGIFSFC-BK-L,PAIR,24-Mar,,1,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-02_48_17-PM.jpg,FULL COVERAGE black
+571,HG,FS,HEAD GUARD,IFSFC,L,WH,HGIFSFC-WH-L,PAIR,24-Mar,,2,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-02_51_25-PM.jpg,FULL COVERAGE white
+571,HG,FS,HEAD GUARD,IFSFC,M,BK,HGIFSFC-BK-M,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-02_48_17-PM.jpg,FULL COVERAGE black
+571,HG,FS,HEAD GUARD,IFSFC,M,WH,HGIFSFC-WH-M,PAIR,24-Mar,,1,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-02_51_25-PM.jpg,FULL COVERAGE white
+573,KPS,FS,KICKING PADS,DOUBLE,F,BK,KPSDOUBLE-BK-F,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/08/images-1.jpeg,KICKING PAD
+573,KPS,FS,KICKING PADS,SINGLE,F,BK,KPSSINGLE-BK-F,PAIR,24-Mar,,0,,
+574,KPS,FS,KICKING PADS,DOUBLE,F,WH,KPSDOUBLE-WH-F,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads-new/2021/10/kicking-pad-bk-wh.jpg,KICKING PAD
+574,KPS SEMI,FS,KICKING PADS,DOUBLE,F,PALE GREEN,KPS SEMIDOUBLE-PALE GREEN-F,PAIR,23-Mar,,3,https://activebrands.co.il/wp-content/uploads/2026/03/infightstyle_pads_mint.jpg,KICKING PAD
+574,KPS,FS,KICKING PADS,DOUBLE,F,BK,KPSDOUBLE-BK-F,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/08/images-1.jpeg,KICKING PAD
+574,BFM,FS,FOCUS MITTS,BOXING,F,BK,BFMBOXING-BK,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2026/03/Screenshot_2.jpg,INFIGHTSTYLE speed mitts
+574,KPS,FS,KICKING PADS,SINGLE,F,WH,KPSSINGLE-WH-F,PAIR,24-Mar,,0,,
+574,KPS,FS,KICKING PADS,SINGLE,F,BK,KPSSINGLE-BK-F,PAIR,24-Mar,,0,,
+576,HB,FS,HEAVY BAG,HEAVY BAG,XL,BK,HBHEAVY BAG-BK-XL,PAIR,25-Mar,,4,https://activebrands.co.il/wp-content/uploads/2025/08/FSHB.png,HEAVY BAG black
+577,HB,FS,HEAVY BAG,HEAVY BAG,XXL,BK,HBHEAVY BAG-BK-XXL,PAIR,26-Mar,,3,https://activebrands.co.il/wp-content/uploads/2025/08/FSHB.png,HEAVY BAG black
+579,SHORTS,FS,SHORTS,CLASSIC,L,BK,SHORTSCLASSIC-BK-L,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-SHORTS-CLASSIC-BLACK.webp,CLASSIC black
+579,SHORTS,FS,SHORTS,CLASSIC,L,BKBU,SHORTSCLASSIC-BKBU-L,PAIR,25-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-SHORTS-RETRO-BLACK-BLUE.jpeg,CLASSIC black blue
+579,SHORTS,FS,SHORTS,CLASSIC,L,NAVY BLUE,SHORTSCLASSIC-NAVY BLUE-L,PAIR,25-Mar,,4,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-08_12_23-PM.jpg,CLASSIC navy blue
+579,SHORTS,FS,SHORTS,CLASSIC,L,BEIGE,SHORTSCLASSIC-BEIGE-L,PAIR,24-Mar,,9,https://activebrands.co.il/wp-content/uploads/2026/03/shorts_63kb_final.jpg,CLASSIC beige
+579,SHORTS,FS,SHORTS,CLASSIC,L,CREAM,SHORTSCLASSIC-CREAM-L,PAIR,24-Mar,,2,https://activebrands.co.il/wp-content/uploads/2026/03/images.jpeg,CLASSIC cream
+579,SHORTS,FS,SHORTS,IRON MAN,L,GY,SHORTSIRON MAN-GY-L,PAIR,24-Mar,,11,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_7027-Copy.jpg,IRON MAN grey
+579,SHORTS,FS,SHORTS,PINK BLUSH,M,WHPK,SHORTSPINK BLUSH-WHPK-M,PAIR,26-Feb,,20,https://activebrands.co.il/wp-content/uploads/2026/03/9FF4DC69-9788-4BDB-8368-2E05F37EC301_1024x.webp,PINK BLUSH white pink
+579,SHORTS,FS,SHORTS,PINK BLUSH,L,WHPK,SHORTSPINK BLUSH-WHPK-L,PAIR,26-Feb,,25,https://activebrands.co.il/wp-content/uploads/2026/03/9FF4DC69-9788-4BDB-8368-2E05F37EC301_1024x.webp,PINK BLUSH white pink
+579,SHORTS,FS,SHORTS,PINK BLUSH,XL,WHPK,SHORTSPINK BLUSH-WHPK-XL,PAIR,26-Feb,,20,https://activebrands.co.il/wp-content/uploads/2026/03/9FF4DC69-9788-4BDB-8368-2E05F37EC301_1024x.webp,PINK BLUSH white pink
+579,SHORTS,FS,SHORTS,PINK BLUSH,XXL,WHPK,SHORTSPINK BLUSH-WHPK-XXL,PAIR,26-Feb,,15,https://activebrands.co.il/wp-content/uploads/2026/03/9FF4DC69-9788-4BDB-8368-2E05F37EC301_1024x.webp,PINK BLUSH white pink
+579,SHORTS,FS,SHORTS,PINK BLUSH,XXXL,WHPK,SHORTSPINK BLUSH-WHPK-XXXL,PAIR,26-Feb,,0,https://activebrands.co.il/wp-content/uploads/2026/03/9FF4DC69-9788-4BDB-8368-2E05F37EC301_1024x.webp,PINK BLUSH white pink
+579,SHORTS,FS,SHORTS,HARBOR GREEN,M,HGN,SHORTSHARBOR GREEN-HGN-M,PAIR,26-Feb,,1,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_6153_1024x.webp,HARBOR GREEN
+579,SHORTS,FS,SHORTS,HARBOR GREEN,L,HGN,SHORTSHARBOR GREEN-HGN-L,PAIR,26-Feb,,3,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_6153_1024x.webp,HARBOR GREEN
+579,SHORTS,FS,SHORTS,HARBOR GREEN,XL,HGN,SHORTSHARBOR GREEN-HGN-XL,PAIR,26-Feb,,7,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_6153_1024x.webp,HARBOR GREEN
+579,SHORTS,FS,SHORTS,HARBOR GREEN,XXL,HGN,SHORTSHARBOR GREEN-HGN-XXL,PAIR,26-Feb,,14,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_6153_1024x.webp,HARBOR GREEN
+579,SHORTS,FS,SHORTS,HARBOR GREEN,XXXL,HGN,SHORTSHARBOR GREEN-HGN-XXXL,PAIR,26-Feb,,7,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_6153_1024x.webp,HARBOR GREEN
+579,SHORTS,FS,SHORTS,LAKERS,M,PROR,SHORTSLAKERS-PROR-M,PAIR,26-Feb,,0,https://activebrands.co.il/wp-content/uploads/2026/03/image_6536944e-af1f-4271-8569-39315cdaa649_1024x.webp,LAKERS purple gold
+579,SHORTS,FS,SHORTS,LAKERS,L,PROR,SHORTSLAKERS-PROR-L,PAIR,26-Feb,,9,https://activebrands.co.il/wp-content/uploads/2026/03/image_6536944e-af1f-4271-8569-39315cdaa649_1024x.webp,LAKERS purple gold
+579,SHORTS,FS,SHORTS,LAKERS,XL,PROR,SHORTSLAKERS-PROR-XL,PAIR,26-Feb,,15,https://activebrands.co.il/wp-content/uploads/2026/03/image_6536944e-af1f-4271-8569-39315cdaa649_1024x.webp,LAKERS purple gold
+579,SHORTS,FS,SHORTS,LAKERS,XXL,PROR,SHORTSLAKERS-PROR-XXL,PAIR,26-Feb,,15,https://activebrands.co.il/wp-content/uploads/2026/03/image_6536944e-af1f-4271-8569-39315cdaa649_1024x.webp,LAKERS purple gold
+579,SHORTS,FS,SHORTS,LAKERS,XXXL,PROR,SHORTSLAKERS-PROR-XXXL,PAIR,26-Feb,,10,https://activebrands.co.il/wp-content/uploads/2026/03/image_6536944e-af1f-4271-8569-39315cdaa649_1024x.webp,LAKERS purple gold
+579,SHORTS,FS,SHORTS,CLASSIC,L,GN,SHORTSCLASSIC-GN-L,PAIR,24-Mar,,8,https://activebrands.co.il/wp-content/uploads/2025/02/IFS-SHORTS-GREEN.jpg,CLASSIC green
+579,SHORTS,FS,SHORTS,CLASSIC,L,LIGHT BLUE,SHORTSCLASSIC-LIGHT BLUE-L,PAIR,24-Mar,,0,,
+579,SHORTS,FS,SHORTS,CLASSIC,M,BKBU,SHORTSCLASSIC-BKBU-M,PAIR,25-Mar,,1,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-SHORTS-RETRO-BLACK-BLUE.jpeg,CLASSIC black blue
+579,SHORTS,FS,SHORTS,CLASSIC,M,BK,SHORTSCLASSIC-BK-M,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-SHORTS-CLASSIC-BLACK.webp,CLASSIC black
+579,SHORTS,FS,SHORTS,IRON MAN,M,GY,SHORTSIRON MAN-GY-M,PAIR,25-Mar,,8,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_7027-Copy.jpg,IRON MAN grey
+579,SHORTS,FS,SHORTS,CLASSIC,M,CREAM,SHORTSCLASSIC-CREAM-M,PAIR,24-Mar,,2,https://activebrands.co.il/wp-content/uploads/2026/03/images.jpeg,CLASSIC cream
+579,SHORTS,FS,SHORTS,CLASSIC,M,GN,SHORTSCLASSIC-GN-M,PAIR,24-Mar,,7,https://activebrands.co.il/wp-content/uploads/2025/02/IFS-SHORTS-GREEN.jpg,CLASSIC green
+579,SHORTS,FS,SHORTS,CLASSIC,M,NAVY BLUE,SHORTSCLASSIC-NAVY BLUE-M,PAIR,25-Mar,,4,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-08_12_23-PM.jpg,CLASSIC navy blue
+579,SHORTS,FS,SHORTS,CLASSIC,M,BEIGE,SHORTSCLASSIC-BEIGE-M,PAIR,24-Mar,,8,https://activebrands.co.il/wp-content/uploads/2026/03/shorts_63kb_final.jpg,CLASSIC beige
+579,SHORTS,FS,SHORTS,CLASSIC,M,LIGHT BLUE,SHORTSCLASSIC-LIGHT BLUE-M,PAIR,24-Mar,,0,,
+579,SHORTS,FS,SHORTS,CLASSIC,S,BK,SHORTSCLASSIC-BK-S,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-SHORTS-CLASSIC-BLACK.webp,CLASSIC black
+579,SHORTS,FS,SHORTS,CLASSIC,S,LIGHT BLUE,SHORTSCLASSIC-LIGHT BLUE-S,PAIR,24-Mar,,0,,
+579,SHORTS,FS,SHORTS,CLASSIC,S,GN,SHORTSCLASSIC-GN-S,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/02/IFS-SHORTS-GREEN.jpg,CLASSIC green
+579,SHORTS,FS,SHORTS,CLASSIC,S,CREAM,SHORTSCLASSIC-CREAM-S,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2026/03/images.jpeg,CLASSIC cream
+579,SHORTS,FS,SHORTS,CLASSIC,S,BKBU,SHORTSCLASSIC-BKBU-S,PAIR,25-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-SHORTS-RETRO-BLACK-BLUE.jpeg,CLASSIC black blue
+579,SHORTS,FS,SHORTS,CLASSIC,XL,NAVY BLUE,SHORTSCLASSIC-NAVY BLUE-XL,PAIR,25-Mar,,7,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-08_12_23-PM.jpg,CLASSIC navy blue
+579,SHORTS,FS,SHORTS,CLASSIC,XL,BEIGE,SHORTSCLASSIC-BEIGE-XL,PAIR,24-Mar,,14,https://activebrands.co.il/wp-content/uploads/2026/03/shorts_63kb_final.jpg,CLASSIC beige
+579,SHORTS,FS,SHORTS,IRON MAN,XL,GY,SHORTSIRON MAN-GY-XL,PAIR,24-Mar,,12,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_7027-Copy.jpg,IRON MAN grey
+579,SHORTS,FS,SHORTS,CLASSIC,XX,NAVY BLUE,SHORTSCLASSIC-NAVY BLUE-XX,PAIR,25-Mar,,9,,
+579,SHORTS,FS,SHORTS,CLASSIC,XXXL,BK,SHORTSCLASSIC-BK-XXXL,PAIR,24-Mar,,6,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-SHORTS-CLASSIC-BLACK.webp,CLASSIC black
+579,SHORTS,FS,SHORTS,CLASSIC,XXXL,BKBU,SHORTSCLASSIC-BKBU-XXXL,PAIR,25-Mar,,2,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-SHORTS-RETRO-BLACK-BLUE.jpeg,CLASSIC black blue
+579,SHORTS,FS,SHORTS,CLASSIC,XXXL,CREAM,SHORTSCLASSIC-CREAM-XXXL,PAIR,24-Mar,,2,https://activebrands.co.il/wp-content/uploads/2026/03/images.jpeg,CLASSIC cream
+579,SHORTS,FS,SHORTS,CLASSIC,XXXL,LIGHT BLUE,SHORTSCLASSIC-LIGHT BLUE-XXXL,PAIR,24-Mar,,0,,
+579,SHORTS,FS,SHORTS,CLASSIC,XXXL,GN,SHORTSCLASSIC-GN-XXXL,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/02/IFS-SHORTS-GREEN.jpg,CLASSIC green
+580,ANKL,FS,ANKLETS,CLASSIC,F,BU,ANKLCLASSIC-BU-F,PAIR,24-Mar,,2,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-ANKLE-BLUE.webp,INFIGHTSTYLE ANKLETS BLUE  מגן קרסול
+580,ANKL,FS,ANKLETS,CLASSIC,F,RD,ANKLCLASSIC-RD-F,PAIR,24-Mar,,6,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-ANKLE-RED.webp,INFIGHTSTYLE ANKLETS RED  מגן קרסול
+580,ANKL,FS,ANKLETS,CLASSIC,F,BK,ANKLCLASSIC-BK-F,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-ANKLE-BLACK.webp,INFIGHTSTYLE ANKLETS BLACK  מגן קרסול
+580,SHORTS,FS,SHORTS,CLASSIC,XL,BK,SHORTSCLASSIC-BK-XL,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-SHORTS-CLASSIC-BLACK.webp,CLASSIC black
+580,SHORTS,FS,SHORTS,CLASSIC,XL,BKBU,SHORTSCLASSIC-BKBU-XL,PAIR,25-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-SHORTS-RETRO-BLACK-BLUE.jpeg,CLASSIC black blue
+580,SHORTS,FS,SHORTS,CLASSIC,XL,CREAM,SHORTSCLASSIC-CREAM-XL,PAIR,24-Mar,,3,https://activebrands.co.il/wp-content/uploads/2026/03/images.jpeg,CLASSIC cream
+580,SHORTS,FS,SHORTS,CLASSIC,XL,LIGHT BLUE,SHORTSCLASSIC-LIGHT BLUE-XL,PAIR,24-Mar,,0,,
+579,SHORTS,FS,SHORTS,CLASSIC,XL,GN,SHORTSCLASSIC-GN-XL,PAIR,24-Mar,,12,https://activebrands.co.il/wp-content/uploads/2025/02/IFS-SHORTS-GREEN.jpg,CLASSIC green
+580,SHORTS,FS,SHORTS,CLASSIC,XXL,BK,SHORTSCLASSIC-BK-XXL,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/05/IFS-SHORTS-CLASSIC-BLACK.webp,CLASSIC black
+580,SHORTS,FS,SHORTS,CLASSIC,XXL,NAVY BLUE,SHORTSCLASSIC-NAVY BLUE-XXL,PAIR,25-Mar,,6,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-08_12_23-PM.jpg,CLASSIC navy blue
+580,SHORTS,FS,SHORTS,CLASSIC,XXL,CREAM,SHORTSCLASSIC-CREAM-XXL,PAIR,24-Mar,,4,https://activebrands.co.il/wp-content/uploads/2026/03/images.jpeg,CLASSIC cream
+580,SHORTS,FS,SHORTS,CLASSIC,XXL,BEIGE,SHORTSCLASSIC-BEIGE-XXL,PAIR,24-Mar,,6,https://activebrands.co.il/wp-content/uploads/2026/03/shorts_63kb_final.jpg,CLASSIC beige
+579,SHORTS,FS,SHORTS,CLASSIC,XXL,GN,SHORTSCLASSIC-GN-XXL,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/02/IFS-SHORTS-GREEN.jpg,CLASSIC green
+580,SHORTS,FS,SHORTS,IRON MAN,XXL,GY,SHORTSIRON MAN-GY-XXL,PAIR,24-Mar,,6,https://activebrands.co.il/wp-content/uploads/2026/03/IMG_7027-Copy.jpg,IRON MAN grey
+580,SHORTS,FS,SHORTS,CLASSIC,XXL,LIGHT BLUE,SHORTSCLASSIC-LIGHT BLUE-XXL,PAIR,24-Mar,,0,,
+580,SHORTS,FS,SHORTS,CLASSIC,XXXL,NAVY BLUE,SHORTSCLASSIC-NAVY BLUE-XXXL,PAIR,25-Mar,,4,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-3-2026-08_12_23-PM.jpg,CLASSIC navy blue
+581,BG,FS,BOXING GLOVES,LACE,10,BK,BGLACE-BK-10,PAIR,24-Mar,,2,https://activebrands.co.il/wp-content/uploads/2025/08/IMG_7242_2400x_ed84a36c-b23c-47e0-90cf-de663f69bb00.webp,INFIGHTSTYLE LACE boxing gloves black
+581,BG,FS,BOXING GLOVES,LACE,10,WH,BGLACE-WH-10,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/08/image_cc189a04-fc94-4570-a391-f2a26f681337.webp,INFIGHTSTYLE LACE boxing gloves white
+581,BG,FS,BOXING GLOVES,LACE,12,BK,BGLACE-BK-12,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/08/IMG_7242_2400x_ed84a36c-b23c-47e0-90cf-de663f69bb00.webp,INFIGHTSTYLE LACE boxing gloves black
+581,BG,FS,BOXING GLOVES,LACE,12,WH,BGLACE-WH-12,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/08/image_cc189a04-fc94-4570-a391-f2a26f681337.webp,INFIGHTSTYLE LACE boxing gloves white
+582,BG,FS,BOXING GLOVES,LACE,14,BK,BGLACE-BK-14,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/08/IMG_7242_2400x_ed84a36c-b23c-47e0-90cf-de663f69bb00.webp,INFIGHTSTYLE LACE boxing gloves black
+582,BG,FS,BOXING GLOVES,LACE,14,WH,BGLACE-WH-14,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/08/image_cc189a04-fc94-4570-a391-f2a26f681337.webp,INFIGHTSTYLE LACE boxing gloves white
+583,BG,FS,BOXING GLOVES,LACE,16,BK,BGLACE-BK-16,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/08/IMG_7242_2400x_ed84a36c-b23c-47e0-90cf-de663f69bb00.webp,INFIGHTSTYLE LACE boxing gloves black
+583,BG,FS,BOXING GLOVES,LACE,16,WH,BGLACE-WH-16,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/08/image_cc189a04-fc94-4570-a391-f2a26f681337.webp,INFIGHTSTYLE LACE boxing gloves white
+590,SHIRTS,FS,SHIRTS,TANK,XS,GY,SHIRTSTANK-GY-XS,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_18_09-PM.jpg,CLASSIC grey
+590,SHIRTS,FS,SHIRTS,TANK,S,GY,SHIRTSTANK-GY-S,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_18_09-PM.jpg,CLASSIC grey
+590,SHIRTS,FS,SHIRTS,TANK,M,GY,SHIRTSTANK-GY-M,PAIR,24-Mar,,15,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_18_09-PM.jpg,CLASSIC grey
+590,SHIRTS,FS,SHIRTS,TANK,L,GY,SHIRTSTANK-GY-L,PAIR,24-Mar,,15,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_18_09-PM.jpg,CLASSIC grey
+590,SHIRTS,FS,SHIRTS,TANK,XL,GY,SHIRTSTANK-GY-XL,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_18_09-PM.jpg,CLASSIC grey
+590,SHIRTS,FS,SHIRTS,TANK,XXL,GY,SHIRTSTANK-GY-XXL,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_18_09-PM.jpg,CLASSIC grey
+590,SHIRTS,FS,SHIRTS,TANK,XS,WH,SHIRTSTANK-WH-XS,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_03_01-PM.jpg,CLASSIC white
+590,SHIRTS,FS,SHIRTS,TANK,S,WH,SHIRTSTANK-WH-S,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_03_01-PM.jpg,CLASSIC white
+590,SHIRTS,FS,SHIRTS,TANK,M,WH,SHIRTSTANK-WH-M,PAIR,24-Mar,,15,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_03_01-PM.jpg,CLASSIC white
+590,SHIRTS,FS,SHIRTS,TANK,L,WH,SHIRTSTANK-WH-L,PAIR,24-Mar,,15,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_03_01-PM.jpg,CLASSIC white
+590,SHIRTS,FS,SHIRTS,TANK,XL,WH,SHIRTSTANK-WH-XL,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_03_01-PM.jpg,CLASSIC white
+590,SHIRTS,FS,SHIRTS,TANK,XXL,WH,SHIRTSTANK-WH-XXL,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_03_01-PM.jpg,CLASSIC white
+590,SHIRTS,FS,SHIRTS,TANK,XS,PK,SHIRTSTANK-PK-XS,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_22_22-PM.jpg,CLASSIC pink
+590,SHIRTS,FS,SHIRTS,TANK,S,PK,SHIRTSTANK-PK-S,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_22_22-PM.jpg,CLASSIC pink
+590,SHIRTS,FS,SHIRTS,TANK,M,PK,SHIRTSTANK-PK-M,PAIR,24-Mar,,15,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_22_22-PM.jpg,CLASSIC pink
+590,SHIRTS,FS,SHIRTS,TANK,L,PK,SHIRTSTANK-PK-L,PAIR,24-Mar,,15,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_22_22-PM.jpg,CLASSIC pink
+590,SHIRTS,FS,SHIRTS,TANK,XL,PK,SHIRTSTANK-PK-XL,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_22_22-PM.jpg,CLASSIC pink
+590,SHIRTS,FS,SHIRTS,TANK,XXL,PK,SHIRTSTANK-PK-XXL,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_22_22-PM.jpg,CLASSIC pink
+590,SHIRTS,FS,SHIRTS,TANK,XS,PURPLE,SHIRTSTANK-PURPLE-XS,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2025/08/PhotoRoom_20231107_210633_800x_79d06f18-ac18-4b6e-a4ca-dba23f830332.webp,CLASSIC purple
+590,SHIRTS,FS,SHIRTS,TANK,S,PURPLE,SHIRTSTANK-PURPLE-S,PAIR,24-Mar,,11,https://activebrands.co.il/wp-content/uploads/2025/08/PhotoRoom_20231107_210633_800x_79d06f18-ac18-4b6e-a4ca-dba23f830332.webp,CLASSIC purple
+590,SHIRTS,FS,SHIRTS,TANK,S,BK,SHIRTSTANK-BK-S,PAIR,24-Mar,,4,https://activebrands.co.il/wp-content/uploads/2025/08/PhotoRoom_20231107_210607_800x_7d3284be-e605-4ec9-95d4-513a931c2418.webp,CLASSIC black
+590,SHIRTS,FS,SHIRTS,TANK,S,OLIVE,SHIRTSTANK-OLIVE-S,PAIR,24-Mar,,4,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_16_13-PM.jpg,CLASSIC olive
+590,SHIRTS,FS,SHIRTS,TANK,XL,PURPLE,SHIRTSTANK-PURPLE-XL,PAIR,24-Mar,,21,https://activebrands.co.il/wp-content/uploads/2025/08/PhotoRoom_20231107_210633_800x_79d06f18-ac18-4b6e-a4ca-dba23f830332.webp,CLASSIC purple
+590,SHIRTS,FS,SHIRTS,TANK,XL,BK,SHIRTSTANK-BK-XL,PAIR,24-Mar,,8,https://activebrands.co.il/wp-content/uploads/2025/08/PhotoRoom_20231107_210607_800x_7d3284be-e605-4ec9-95d4-513a931c2418.webp,CLASSIC black
+590,SHIRTS,FS,SHIRTS,TANK,XL,OLIVE,SHIRTSTANK-OLIVE-XL,PAIR,24-Mar,,11,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_16_13-PM.jpg,CLASSIC olive
+590,SHIRTS,FS,SHIRTS,TANK,XXL,PURPLE,SHIRTSTANK-PURPLE-XXL,PAIR,24-Mar,,12,https://activebrands.co.il/wp-content/uploads/2025/08/PhotoRoom_20231107_210633_800x_79d06f18-ac18-4b6e-a4ca-dba23f830332.webp,CLASSIC purple
+590,SHIRTS,FS,SHIRTS,TANK,XXL,BK,SHIRTSTANK-BK-XXL,PAIR,24-Mar,,6,https://activebrands.co.il/wp-content/uploads/2025/08/PhotoRoom_20231107_210607_800x_7d3284be-e605-4ec9-95d4-513a931c2418.webp,CLASSIC black
+590,SHIRTS,FS,SHIRTS,TANK,XXL,OLIVE,SHIRTSTANK-OLIVE-XXL,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_16_13-PM.jpg,CLASSIC olive
+590,SHIRTS,FS,SHIRTS,TANK,L,PURPLE,SHIRTSTANK-PURPLE-L,PAIR,24-Mar,,31,https://activebrands.co.il/wp-content/uploads/2025/08/PhotoRoom_20231107_210633_800x_79d06f18-ac18-4b6e-a4ca-dba23f830332.webp,CLASSIC purple
+591,SHIRTS,FS,SHIRTS,TANK,L,BK,SHIRTSTANK-BK-L,PAIR,24-Mar,,10,https://activebrands.co.il/wp-content/uploads/2025/08/PhotoRoom_20231107_210607_800x_7d3284be-e605-4ec9-95d4-513a931c2418.webp,CLASSIC black
+591,SHIRTS,FS,SHIRTS,TANK,L,OLIVE,SHIRTSTANK-OLIVE-L,PAIR,24-Mar,,12,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_16_13-PM.jpg,CLASSIC olive
+590,SHIRTS,FS,SHIRTS,TANK,M,PURPLE,SHIRTSTANK-PURPLE-M,PAIR,24-Mar,,13,https://activebrands.co.il/wp-content/uploads/2025/08/PhotoRoom_20231107_210633_800x_79d06f18-ac18-4b6e-a4ca-dba23f830332.webp,CLASSIC purple
+591,SHIRTS,FS,SHIRTS,TANK,M,BK,SHIRTSTANK-BK-M,PAIR,24-Mar,,2,https://activebrands.co.il/wp-content/uploads/2025/08/PhotoRoom_20231107_210607_800x_7d3284be-e605-4ec9-95d4-513a931c2418.webp,CLASSIC black
+591,SHIRTS,FS,SHIRTS,TANK,M,OLIVE,SHIRTSTANK-OLIVE-M,PAIR,24-Mar,,4,https://activebrands.co.il/wp-content/uploads/2026/03/ChatGPT-Image-Mar-2-2026-09_16_13-PM.jpg,CLASSIC olive
+592,SG,FS,SHIN GUARD,PRO,S,POWDER PINK,SGPRO-POWDER PINK-S,PAIR,24-Mar,,0,,
+592,SG,FS,SHIN GUARD,PRO,S,TEAL,SGPRO-TEAL-S,PAIR,24-Mar,,0,https://activebrands.co.il/wp-content/uploads/2025/08/IMG_7702_2400x.webp,INFIGHTSTYLE PRO teal
+592,SG,FS,SHIN GUARD,PRO,S,BK,SGPRO-BK-S,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2025/08/image_945ff20f-a1a2-4c93-8073-f9e549e975a2_2400x.webp,INFIGHTSTYLE PRO black
+592,SG,FS,SHIN GUARD,PRO,S,WH,SGPRO-WH-S,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2025/08/SHINGUARD_COVID_200616_0018_2400x.webp,INFIGHTSTYLE PRO white
+592,SG,FS,SHIN GUARD,PRO,XL,POWDER PINK,SGPRO-POWDER PINK-XL,PAIR,24-Mar,,0,,
+592,SG,FS,SHIN GUARD,PRO,XL,BK,SGPRO-BK-XL,PAIR,24-Mar,,1,https://activebrands.co.il/wp-content/uploads/2025/08/image_945ff20f-a1a2-4c93-8073-f9e549e975a2_2400x.webp,INFIGHTSTYLE PRO black
+592,SG,FS,SHIN GUARD,PRO,XL,WH,SGPRO-WH-XL,PAIR,24-Mar,,2,https://activebrands.co.il/wp-content/uploads/2025/08/SHINGUARD_COVID_200616_0018_2400x.webp,INFIGHTSTYLE PRO white
+592,SG,FS,SHIN GUARD,PRO,XL,TEAL,SGPRO-TEAL-XL,PAIR,24-Mar,,4,https://activebrands.co.il/wp-content/uploads/2025/08/IMG_7702_2400x.webp,INFIGHTSTYLE PRO teal
+593,SG,FS,SHIN GUARD,PRO,M,WH,SGPRO-WH-M,PAIR,24-Mar,,5,https://activebrands.co.il/wp-content/uploads/2025/08/SHINGUARD_COVID_200616_0018_2400x.webp,INFIGHTSTYLE PRO white
+593,SG,FS,SHIN GUARD,PRO,M,POWDER PINK,SGPRO-POWDER PINK-M,PAIR,24-Mar,,0,,
+593,SG,FS,SHIN GUARD,PRO,M,BK,SGPRO-BK-M,PAIR,24-Mar,,7,https://activebrands.co.il/wp-content/uploads/2025/08/image_945ff20f-a1a2-4c93-8073-f9e549e975a2_2400x.webp,INFIGHTSTYLE PRO black
+593,SG,FS,SHIN GUARD,PRO,M,TEAL,SGPRO-TEAL-M,PAIR,24-Mar,,16,https://activebrands.co.il/wp-content/uploads/2025/08/IMG_7702_2400x.webp,INFIGHTSTYLE PRO teal
+594,SG,FS,SHIN GUARD,PRO,L,POWDER PINK,SGPRO-POWDER PINK-L,PAIR,24-Mar,,0,,
+594,SG,FS,SHIN GUARD,PRO,L,BK,SGPRO-BK-L,PAIR,24-Mar,,4,https://activebrands.co.il/wp-content/uploads/2025/08/image_945ff20f-a1a2-4c93-8073-f9e549e975a2_2400x.webp,INFIGHTSTYLE PRO black
+594,SG,FS,SHIN GUARD,PRO,L,WH,SGPRO-WH-L,PAIR,24-Mar,,17,https://activebrands.co.il/wp-content/uploads/2025/08/SHINGUARD_COVID_200616_0018_2400x.webp,INFIGHTSTYLE PRO white
+594,SG,FS,SHIN GUARD,PRO,L,TEAL,SGPRO-TEAL-L,PAIR,24-Mar,,12,https://activebrands.co.il/wp-content/uploads/2025/08/IMG_7702_2400x.webp,INFIGHTSTYLE PRO teal
+600,BG,OSO,BOXING GLOVES,OSO,12,BK,BGOSO-BK-12,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG-20211114-WA0001-01.jpeg,כפפות איגרוף עור Boxing Gloves OSO black
+602,BG,OSO,BOXING GLOVES,OSO,12,WH,BGOSO-WH-12,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG_5061-01-01-scaled.jpeg,כפפות איגרוף עור Boxing Gloves OSO white
+602,BG,OSO,BOXING GLOVES,OSO,14,BK,BGOSO-BK-14,PAIR,bc,,0,https://activebrands.co.il/wp-content/uploads-new/2021/11/IMG-20211114-WA0001-01.jpeg,כפפות איגרוף עור Boxing Gloves OSO black
+700,BG,RDX,BOXING GLOVES,F4B,12,BKWH,BGF4B-BKWH-12,PIECE,23-Oct,,0,https://activebrands.co.il/wp-content/uploads/2023/10/BGR-F4_BGR-F4G_grey_f4_boxing_gloves_1_.jpg,RDX F4 Boxing Sparring Gloves Hook & Loop
+702,BG,RDX,BOXING GLOVES,F15MB,12,BK,BGF15MB-BK-12,PIECE,23-Oct,,0,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-f15-artificial-leather-boxing-gloves.jpg,RDX F15 Boxing Sparring Gloves Black Matte
+704,BG,RDX,BOXING GLOVES,F4B,12,BKWH,BGF4B-BKWH-12,PIECE,23-Oct,,0,https://activebrands.co.il/wp-content/uploads/2023/10/BGR-F4_BGR-F4G_grey_f4_boxing_gloves_1_.jpg,RDX F4 Boxing Sparring Gloves Hook & Loop
+704,BG,RDX,BOXING GLOVES,F4B,14,BKWH,BGF4B-BKWH-14,PIECE,23-Oct,,0,https://activebrands.co.il/wp-content/uploads/2023/10/BGR-F4_BGR-F4G_grey_f4_boxing_gloves_1_.jpg,RDX F4 Boxing Sparring Gloves Hook & Loop
+706,BG,RDX,BOXING GLOVES,F15MB,12,BK,BGF15MB-BK-12,PIECE,23-Oct,,1,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-f15-artificial-leather-boxing-gloves.jpg,RDX F15 Boxing Sparring Gloves Black Matte
+706,BG,RDX,BOXING GLOVES,F15MB,14,BK,BGF15MB-BK-14,PIECE,23-Oct,,0,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-f15-artificial-leather-boxing-gloves.jpg,RDX F15 Boxing Sparring Gloves Black Matte
+708,BG,RDX,BOXING GLOVES,F4B,16,BKWH,BGF4B-BKWH-16,PIECE,23-Oct,,25,https://activebrands.co.il/wp-content/uploads/2023/10/BGR-F4_BGR-F4G_grey_f4_boxing_gloves_1_.jpg,RDX F4 Boxing Sparring Gloves Hook & Loop
+710,BG,RDX,BOXING GLOVES,F15MB,16,BK,BGF15MB-BK-16,PIECE,23-Oct,,9,https://activebrands.co.il/wp-content/uploads/2023/09/rdx-sports-f15-artificial-leather-boxing-gloves.jpg,RDX F15 Boxing Sparring Gloves Black Matte
+712,GG,RDX,GRAPPLING GLOVE,GGF15MB,L,BK,GGF15MB-BK-L,PAIR,26-Oct,,25,https://activebrands.co.il/wp-content/uploads/2023/09/f15_noir_mma_gloves_2.jpg,RDX F15 grapling Gloves Black Matte
+712,GG,RDX,GRAPPLING GLOVE,GGF15MB,M,BK,GGF15MB-BK-M,PAIR,25-Oct,,25,https://activebrands.co.il/wp-content/uploads/2023/09/f15_noir_mma_gloves_2.jpg,RDX F15 grapling Gloves Black Matte
+712,GG,RDX,GRAPPLING GLOVE,GGF15MB,S,BK,GGF15MB-BK-S,PAIR,24-Oct,,16,https://activebrands.co.il/wp-content/uploads/2023/09/f15_noir_mma_gloves_2.jpg,RDX F15 grapling Gloves Black Matte
+712,GG,RDX,GRAPPLING GLOVE,GGF15MB,XS,BK,GGF15MB-BK-XS,PAIR,27-Oct,,12,https://activebrands.co.il/wp-content/uploads/2023/09/f15_noir_mma_gloves_2.jpg,RDX F15 grapling Gloves Black Matte
+712,GG,RDX,GRAPPLING GLOVE,GGF15MB,XL,BK,GGF15MB-BK-XL,PAIR,23-Oct,,0,https://activebrands.co.il/wp-content/uploads/2023/09/f15_noir_mma_gloves_2.jpg,RDX F15 grapling Gloves Black Matte
+713,GROIN,RDX,GROIN PROTECTOR,H1B,XL,BK,GROINH1B-BK-XL,PIECE,23-Oct,,0,https://activebrands.co.il/wp-content/uploads/2023/10/91jmgo3_cbl._ac_sl1500_.jpg,RDX GROIN PROTECTOR BLACK
+800,mouth guard,SJ,mouth guard,SJ,A,ICE,SJ-ICE,PIECE,bc,,80,https://activebrands.co.il/wp-content/uploads/2020/12/SJ_Extro_Ice_Angle.jpg,SAFEJAWS ICE
+800,mouth guard,SJ,mouth guard,SJ,A,SIMPLE,SJ-SIMPLE,PIECE,bc,,11,https://activebrands.co.il/wp-content/uploads/2026/03/71FrsmvYk4L._AC_UF10001000_QL80_.jpg,SAFEJAWS SIMPLE
+800,mouth guard,SJ,mouth guard,SJ,A,KIDS,SJ-KIDS,PIECE,bc,,122,https://activebrands.co.il/wp-content/uploads/2026/03/safebrace_blue.jpg,SAFEJAWS KIDS
+800,GI,OSO,CLOTHING,GI,A1,BK,GI-BK-A1,PIECE,bc,,13,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-16-21-18.jpg,חליפת ג'יו ג'יטסו GI black
+800,GI,OSO,CLOTHING,GI,A1,WH,GI-WH-A1,PIECE,bc,,14,https://activebrands.co.il/wp-content/uploads-new/2022/03/Photo-09-03-2022-22-14-23-scaled.jpg,GI blue חליפת ג'יו ג'יטסו
+800,GI,OSO,CLOTHING,GI,A1,GY,GI-GY-A1,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads-new/2022/03/Photo-09-03-2022-22-14-25-1-min-scaled.jpg,GI grey חליפת ג'יו ג'יטסו
+800,GI,OSO,CLOTHING,GI,A1,PK,GI-PK-A1,PIECE,bc,,0,,
+800,GI,OSO,CLOTHING,GI,A3,BK,GI-BK-A3,PIECE,bc,,2,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-16-21-18.jpg,חליפת ג'יו ג'יטסו GI black
+800,GI,OSO,CLOTHING,GI,A3,WH,GI-WH-A3,PIECE,bc,,13,https://activebrands.co.il/wp-content/uploads-new/2022/03/Photo-09-03-2022-22-14-23-scaled.jpg,GI white חליפת ג'יו ג'יטסו
+800,GI,OSO,CLOTHING,GI,A3,BU,GI-BU-A3,PIECE,bc,,1,,
+800,GI,OSO,CLOTHING,GI,A3,GY,GI-GY-A3,PIECE,bc,,1,https://activebrands.co.il/wp-content/uploads-new/2022/03/Photo-09-03-2022-22-14-25-1-min-scaled.jpg,GI grey חליפת ג'יו ג'יטסו
+800,GI,OSO,CLOTHING,GI,A4,BK,GI-BK-A4,PIECE,bc,,6,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-16-21-18.jpg,חליפת ג'יו ג'יטסו GI black
+800,GI,OSO,CLOTHING,GI,A4,WH,GI-WH-A4,PIECE,bc,,13,https://activebrands.co.il/wp-content/uploads-new/2022/03/Photo-09-03-2022-22-14-23-scaled.jpg,GI white חליפת ג'יו ג'יטסו
+800,GI,OSO,CLOTHING,GI,A4,GY,GI-GY-A4,PIECE,bc,,4,https://activebrands.co.il/wp-content/uploads-new/2022/03/Photo-09-03-2022-22-14-25-1-min-scaled.jpg,GI grey חליפת ג'יו ג'יטסו
+800,FGI,OSO,CLOTHING,GI,F0,PK,FGI-PK-F0,PIECE,bc,,4,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-22-14-24-scaled-1.jpg,GI pink חליפת ג'יו ג'יטסו נשים
+800,FGI,OSO,CLOTHING,GI,F0,WH,FGI-WH-F0,PIECE,bc,,4,,
+800,FGI,OSO,CLOTHING,GI,F0,BU,FGI-BU-F0,PIECE,bc,,4,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-16-18-35.jpg,GI blue חליפת ג'יו ג'יטסו נשים
+800,FGI,OSO,CLOTHING,GI,F0,BK,FGI-BK-F0,PIECE,bc,,5,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-22-21-06-scaled-1.jpg,GI black חליפת ג'יו ג'יטסו נשים
+800,FGI,OSO,CLOTHING,GI,F1,BK,FGI-BK-F1,PIECE,bc,,2,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-22-21-06-scaled-1.jpg,GI black חליפת ג'יו ג'יטסו נשים
+800,FGI,OSO,CLOTHING,GI,F1,PK,FGI-PK-F1,PIECE,bc,,3,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-22-14-24-scaled-1.jpg,GI pink חליפת ג'יו ג'יטסו נשים
+800,FGI,OSO,CLOTHING,GI,F1,BU,FGI-BU-F1,PIECE,bc,,4,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-16-18-35.jpg,GI blue חליפת ג'יו ג'יטסו נשים
+800,FGI,OSO,CLOTHING,GI,F1,WH,FGI-WH-F1,PIECE,bc,,2,,
+800,FGI,OSO,CLOTHING,GI,F2,WH,FGI-WH-F2,PIECE,bc,,2,,
+800,FGI,OSO,CLOTHING,GI,F2,PK,FGI-PK-F2,PIECE,bc,,2,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-22-14-24-scaled-1.jpg,GI pink חליפת ג'יו ג'יטסו נשים
+800,FGI,OSO,CLOTHING,GI,F2,BU,FGI-BU-F2,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-16-18-35.jpg,GI blue חליפת ג'יו ג'יטסו נשים
+800,CHGI,OSO,CLOTHING,GI,M0,GY,CHGI-GY-M0,PIECE,bc,,4,https://activebrands.co.il/wp-content/uploads/2022/03/Photo-09-03-2022-22-14-25-1-min-scaled-1.jpg,GI black חליפת ג'יו ג'יטסו ילדים
+800,CHGI,OSO,CLOTHING,GI,M0,BU,CHGI-BU-M0,PIECE,bc,,5,https://activebrands.co.il/wp-content/uploads/2022/03/Photo-09-03-2022-22-14-25-min-scaled-1.jpg,GI blue חליפת ג'יו ג'יטסו ילדים
+800,CHGI,OSO,CLOTHING,GI,M0,WH,CHGI-WH-M0,PIECE,bc,,7,https://activebrands.co.il/wp-content/uploads-new/2022/03/Photo-09-03-2022-22-14-25-min-scaled.jpg,GI blue חליפת ג'יו ג'יטסו ילדים
+800,CHGI,OSO,CLOTHING,GI,M0,BK,CHGI-BK-M0,PIECE,bc,,7,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-16-21-18.jpg,GI black חליפת ג'יו ג'יטסו ילדים
+800,CHGI,OSO,CLOTHING,GI,M1,WH,CHGI-WH-M1,PIECE,bc,,3,https://activebrands.co.il/wp-content/uploads-new/2022/03/Photo-09-03-2022-22-14-25-min-scaled.jpg,GI white חליפת ג'יו ג'יטסו ילדים
+800,CHGI,OSO,CLOTHING,GI,M1,BU,CHGI-BU-M1,PIECE,bc,,3,https://activebrands.co.il/wp-content/uploads/2022/03/Photo-09-03-2022-22-14-25-min-scaled-1.jpg,GI white חליפת ג'יו ג'יטסו ילדים
+800,CHGI,OSO,CLOTHING,GI,M1,GY,CHGI-GY-M1,PIECE,bc,,6,https://activebrands.co.il/wp-content/uploads/2022/03/Photo-09-03-2022-22-14-25-1-min-scaled-1.jpg,GI black חליפת ג'יו ג'יטסו ילדים
+800,CHGI,OSO,CLOTHING,GI,M1,BK,CHGI-BK-M1,PIECE,bc,,1,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-16-21-18.jpg,GI black חליפת ג'יו ג'יטסו ילדים
+800,CHGI,OSO,CLOTHING,GI,M2,BK,CHGI-BK-M2,PIECE,bc,,2,https://activebrands.co.il/wp-content/uploads/2026/03/Photo-09-03-2022-16-21-18.jpg,GI black חליפת ג'יו ג'יטסו ילדים
+800,CHGI,OSO,CLOTHING,GI,M2,WH,CHGI-WH-M2,PIECE,bc,,2,https://activebrands.co.il/wp-content/uploads-new/2022/03/Photo-09-03-2022-22-14-25-min-scaled.jpg,GI white חליפת ג'יו ג'יטסו ילדים
+800,CHGI,OSO,CLOTHING,GI,M2,BU,CHGI-BU-M2,PIECE,bc,,2,https://activebrands.co.il/wp-content/uploads/2022/03/Photo-09-03-2022-22-14-25-min-scaled-1.jpg,GI white חליפת ג'יו ג'יטסו ילדים
+800,CHGI,OSO,CLOTHING,GI,M2,GY,CHGI-GY-M2,PIECE,bc,,5,https://activebrands.co.il/wp-content/uploads/2022/03/Photo-09-03-2022-22-14-25-1-min-scaled-1.jpg,GI black חליפת ג'יו ג'יטסו ילדים
+801,mouth guard,SJ,mouth guard,SJ,A,GOLDIE,SJ-GOLDIE,PIECE,bc,,56,https://activebrands.co.il/wp-content/uploads-new/2020/12/SJ_Extro_Goldie_Front.jpg,SAFEJAWS GOLDIE
+802,mouth guard,SJ,mouth guard,SJ,A,OGRE,SJ-OGRE,PIECE,bc,,20,https://activebrands.co.il/wp-content/uploads-new/2020/12/SJ_Extro_Ogre_Front.jpg,SAFEJAWS OGRE
+803,mouth guard,SJ,mouth guard,SJ,A,VIPER,SJ-VIPER,PIECE,bc,,30,https://activebrands.co.il/wp-content/uploads-new/2020/12/SJ_Extro_Viper_Front.jpg,SAFEJAWS VIPER
+804,mouth guard,SJ,mouth guard,SJ,A,BRACES-FANGZ-BK,SJ-BRACES-FANGZ-BK,PIECE,,,17,https://activebrands.co.il/wp-content/uploads/2026/03/safebrace5.jpg,SAFEJAWS FANGZ BRACES BLACK
+805,mouth guard,SJ,mouth guard,SJ,A,SHARK,SJ-SHARK,PIECE,bc,,108,https://activebrands.co.il/wp-content/uploads-new/2020/12/SJ_Extro_Shark_Front.jpg,SAFEJAWS SHARK
+806,mouth guard,SJ,mouth guard,SJ,A,FANGZ-BK,SJ-FANGZ-BK,PIECE,bc,,66,https://activebrands.co.il/wp-content/uploads-new/2020/12/SJ_Extro_BlackFangz_Front.jpg,SAFEJAWS FANGZ BLACK
+807,mouth guard,SJ,mouth guard,SJ,A,MU,SJ-MU,PIECE,bc,,99,https://activebrands.co.il/wp-content/uploads-new/2020/12/SJ_Extro_Mo_Front.jpg,SAFEJAWS MUSTACHE
+808,mouth guard,SJ,mouth guard,SJ,A,FANGZ-PK,SJ-FANGZ-PK,PIECE,bc,,45,https://activebrands.co.il/wp-content/uploads-new/2020/12/SJ_Extro_Goldie_Front.jpg,SAFEJAWS FANGZ PINK
+809,mouth guard,SJ,mouth guard,SJ,A,C.AMERICA,SJ-C.AMERICA,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2025/02/SJ-CAMERICA.jpg,SAFEJAWS CAPTAIN AMERICA
+810,mouth guard,SJ,mouth guard,SJ,A,VENUM,SJ-VENUM,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2025/02/SJVENUM.jpg,SAFEJAWS VENUM
+811,mouth guard,SJ,mouth guard,SJ,A,BK PANTER ,SJ-BK PANTER ,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2025/02/SJPANTER.jpg,SAFEJAWS BLACK PANTER
+812,mouth guard,SJ,mouth guard,SJ,A,HALK,SJ-HALK,PIECE,bc,,0,https://activebrands.co.il/wp-content/uploads/2025/02/SJSMASH.jpg,SAFEJAWS HALK
+813,mouth guard,SJ,mouth guard,SJ,A,DEADPOOL,SJ-DEADPOOL,PIECE,bc,,0,,
+814,mouth guard,SJ,mouth guard,SJ,A,VOLVARINE,SJ-VOLVARINE,PIECE,bc,,0,,
+815,mouth guard,SJ,mouth guard,SJ,A,IRONMAN,SJ-IRONMAN,PIECE,bc,,0,,
+816,mouth guard,SJ,mouth guard,SJ,A,SPIDERMAN,SJ-SPIDERMAN,PIECE,bc,,1,,

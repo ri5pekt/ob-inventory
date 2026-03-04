@@ -2,7 +2,10 @@
   <div class="inventory-view">
     <div class="view-header">
       <h2 class="view-title">Warehouses</h2>
-      <Button label="Add Warehouse" icon="pi pi-plus" size="small" @click="showDialog = true" />
+      <div class="header-actions">
+        <Button label="Import Products" icon="pi pi-file-import" size="small" severity="secondary" @click="showImport = true" />
+        <Button label="Add Warehouse" icon="pi pi-plus" size="small" @click="showDialog = true" />
+      </div>
     </div>
 
     <!-- Loading skeletons -->
@@ -76,6 +79,9 @@
       </div>
     </div>
 
+    <!-- Import Products Modal -->
+    <ImportProductsModal v-model="showImport" @done="queryClient.invalidateQueries({ queryKey: ['warehouses'] })" />
+
     <!-- Add Warehouse Dialog -->
     <Dialog v-model:visible="showDialog" header="Add Warehouse" modal style="width: 420px" :draggable="false">
       <form class="dialog-form" @submit.prevent="handleCreate">
@@ -108,6 +114,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import ImportProductsModal from '@/components/warehouse/ImportProductsModal.vue'
 import { useRouter } from 'vue-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import Button from 'primevue/button'
@@ -134,6 +141,7 @@ const mainWarehouses = computed(() => warehouses.value?.filter(w => w.type === '
 const partnerWarehouses = computed(() => warehouses.value?.filter(w => w.type !== 'main') ?? [])
 
 const showDialog = ref(false)
+const showImport = ref(false)
 const form = ref({ name: '', type: 'main' as WarehouseType, notes: '' })
 
 const typeOptions = [
@@ -178,6 +186,11 @@ function typeSeverity(type: string) {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
 }
 
 .view-title {

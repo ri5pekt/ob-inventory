@@ -4,6 +4,10 @@ import fastifyJwt from '@fastify/jwt'
 import fastifyCookie from '@fastify/cookie'
 import fastifyCors from '@fastify/cors'
 import fastifyHelmet from '@fastify/helmet'
+import fastifyMultipart from '@fastify/multipart'
+import fastifyStatic from '@fastify/static'
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { env } from './env.js'
 import { healthRoutes } from './routes/health.js'
 import { authRoutes } from './routes/auth.js'
@@ -18,6 +22,10 @@ import { transferRoutes } from './routes/transfers.js'
 import { logsRoutes } from './routes/logs.js'
 import { productSearchRoutes } from './routes/product-search.js'
 import { userRoutes } from './routes/users.js'
+import { importRoutes } from './routes/import.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname  = dirname(__filename)
 
 const fastify = Fastify({
   logger: env.NODE_ENV === 'development'
@@ -26,6 +34,16 @@ const fastify = Fastify({
 })
 
 await fastify.register(fastifyCookie)
+
+await fastify.register(fastifyMultipart, {
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB max CSV
+})
+
+await fastify.register(fastifyStatic, {
+  root: join(__dirname, '../uploads'),
+  prefix: '/uploads',
+  decorateReply: false,
+})
 
 await fastify.register(fastifyJwt, {
   secret: env.JWT_SECRET,
@@ -61,6 +79,7 @@ await fastify.register(transferRoutes)
 await fastify.register(logsRoutes)
 await fastify.register(productSearchRoutes)
 await fastify.register(userRoutes)
+await fastify.register(importRoutes)
 
 try {
   await fastify.listen({ port: env.API_PORT, host: '0.0.0.0' })

@@ -14,8 +14,11 @@ export default defineConfig({
     port: 5173,
     allowedHosts: 'all', // allow ngrok *.ngrok-free.app / *.ngrok.io hosts
     proxy: {
-      // In dev, proxy /api requests to the Fastify API
       '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/uploads': {
         target: 'http://localhost:3000',
         changeOrigin: true,
       },
