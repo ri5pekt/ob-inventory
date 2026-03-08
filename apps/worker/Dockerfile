@@ -26,6 +26,18 @@ RUN pnpm --filter @ob-inventory/types build \
     && pnpm --filter @ob-inventory/db build \
     && pnpm --filter @ob-inventory/worker build
 
+# Patch package.json exports to point to compiled dist
+RUN node -e " \
+  const fs = require('fs'); \
+  ['packages/db/package.json', 'packages/types/package.json'].forEach(p => { \
+    const pkg = JSON.parse(fs.readFileSync(p, 'utf8')); \
+    const js = pkg.main.replace('./src/', './dist/').replace(/\\.ts$/, '.js'); \
+    const dts = js.replace('/index.js', '/index.d.ts'); \
+    pkg.main = js; pkg.types = dts; pkg.exports = {'.': {types: dts, default: js}}; \
+    fs.writeFileSync(p, JSON.stringify(pkg, null, 2)); \
+  }); \
+"
+
 # ─── Production image ───────────────────────────────────
 FROM node:22-alpine AS runner
 WORKDIR /app
@@ -43,8 +55,8 @@ COPY --from=deps /app/apps/worker/node_modules   ./apps/worker/node_modules
 COPY --from=deps /app/packages/db/node_modules   ./packages/db/node_modules
 
 COPY package.json pnpm-workspace.yaml ./
-COPY apps/worker/package.json       ./apps/worker/
-COPY packages/db/package.json       ./packages/db/
-COPY packages/types/package.json    ./packages/types/
+COPY apps/worker/package.json                          ./apps/worker/
+COPY --from=builder /app/packages/db/package.json     ./packages/db/
+COPY --from=builder /app/packages/types/package.json  ./packages/types/
 
 CMD ["node", "apps/worker/dist/index.js"]

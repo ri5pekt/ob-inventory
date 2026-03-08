@@ -31,6 +31,19 @@ RUN pnpm --filter @ob-inventory/types build \
 RUN mkdir -p apps/api/dist/migrations
 COPY packages/db/src/migrations/*.sql apps/api/dist/migrations/
 
+# Patch package.json exports to point to compiled dist (not TypeScript source)
+# This fixes Node.js module resolution in the production image
+RUN node -e " \
+  const fs = require('fs'); \
+  ['packages/db/package.json', 'packages/types/package.json'].forEach(p => { \
+    const pkg = JSON.parse(fs.readFileSync(p, 'utf8')); \
+    const js = pkg.main.replace('./src/', './dist/').replace(/\\.ts$/, '.js'); \
+    const dts = js.replace('/index.js', '/index.d.ts'); \
+    pkg.main = js; pkg.types = dts; pkg.exports = {'.': {types: dts, default: js}}; \
+    fs.writeFileSync(p, JSON.stringify(pkg, null, 2)); \
+  }); \
+"
+
 # ─── Production image ───────────────────────────────────
 FROM node:22-alpine AS runner
 WORKDIR /app
@@ -49,11 +62,11 @@ COPY --from=deps /app/node_modules             ./node_modules
 COPY --from=deps /app/apps/api/node_modules    ./apps/api/node_modules
 COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
 
-# Copy manifests (needed for module resolution)
+# Copy manifests — use patched db/types package.json from builder (exports point to dist)
 COPY package.json pnpm-workspace.yaml ./
-COPY apps/api/package.json         ./apps/api/
-COPY packages/db/package.json      ./packages/db/
-COPY packages/types/package.json   ./packages/types/
+COPY apps/api/package.json                       ./apps/api/
+COPY --from=builder /app/packages/db/package.json      ./packages/db/
+COPY --from=builder /app/packages/types/package.json   ./packages/types/
 
 EXPOSE 3000
 
