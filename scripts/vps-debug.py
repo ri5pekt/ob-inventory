@@ -15,7 +15,7 @@ def run(cmd, timeout=120):
         time.sleep(0.2)
     print(stdout.read().decode("utf-8", errors="replace"), end="")
 
-# Check git status and vite error more clearly
-run("cd /opt/ob-inventory && git log --oneline -3", timeout=10)
-run("cd /opt/ob-inventory && docker build --no-cache --progress=plain -f apps/web/Dockerfile . 2>&1 | grep -E 'vite|error|Error|plugin|Could not|transform' | head -30", timeout=300)
+run("cd /opt/ob-inventory && git pull && docker compose up -d --no-build", timeout=30)
+run("sleep 10 && cd /opt/ob-inventory && docker compose ps", timeout=20)
+run("curl -s https://activebrands.cloud/api/health 2>&1", timeout=15)
 client.close()
