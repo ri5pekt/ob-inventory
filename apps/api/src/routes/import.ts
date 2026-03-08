@@ -496,6 +496,13 @@ export const importRoutes: FastifyPluginAsync = async (fastify) => {
           brands, categories
          CASCADE`
       )
+      // Also wipe all uploaded product images so disk doesn't accumulate stale files
+      try {
+        const { readdirSync, unlinkSync } = await import('node:fs')
+        for (const f of readdirSync(UPLOADS_DIR)) {
+          unlinkSync(join(UPLOADS_DIR, f))
+        }
+      } catch { /* dir may not exist yet — safe to ignore */ }
       return reply.send({ ok: true })
     },
   )
