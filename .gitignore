@@ -16,6 +16,9 @@ build/
 *.log
 logs/
 
+# Keep source component directories that happen to be named 'logs'
+!apps/web/src/components/logs/
+
 # OS
 .DS_Store
 Thumbs.db
