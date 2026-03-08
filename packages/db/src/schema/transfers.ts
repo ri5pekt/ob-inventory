@@ -1,7 +1,7 @@
 import { pgTable, uuid, text, integer, timestamp, pgEnum } from 'drizzle-orm/pg-core'
-import { warehouses } from './inventory'
-import { products } from './catalog'
-import { users } from './auth'
+import { warehouses } from './inventory.js'
+import { products } from './catalog.js'
+import { users } from './auth.js'
 
 export const transferStatusEnum = pgEnum('transfer_status', ['completed', 'cancelled'])
 

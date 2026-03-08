@@ -2,8 +2,8 @@ import {
   pgTable, uuid, text, boolean, integer, timestamp, pgEnum, primaryKey, check,
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
-import { products } from './catalog'
-import { users } from './auth'
+import { products } from './catalog.js'
+import { users } from './auth.js'
 
 export const warehouseTypeEnum = pgEnum('warehouse_type', ['main', 'partner', 'other'])
 

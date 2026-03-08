@@ -1,6 +1,6 @@
 import { pgTable, uuid, text, integer, jsonb, timestamp, pgEnum, boolean } from 'drizzle-orm/pg-core'
-import { products } from './catalog'
-import { users } from './auth'
+import { products } from './catalog.js'
+import { users } from './auth.js'
 
 export const storePlatformEnum = pgEnum('store_platform', ['woocommerce', 'direct', 'other'])
 

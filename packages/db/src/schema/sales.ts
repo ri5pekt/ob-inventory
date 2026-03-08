@@ -1,8 +1,8 @@
 import { pgTable, uuid, text, integer, numeric, timestamp, pgEnum } from 'drizzle-orm/pg-core'
-import { warehouses } from './inventory'
-import { stores } from './integrations'
-import { products } from './catalog'
-import { users } from './auth'
+import { warehouses } from './inventory.js'
+import { stores } from './integrations.js'
+import { products } from './catalog.js'
+import { users } from './auth.js'
 
 export const saleTypeEnum = pgEnum('sale_type', ['direct', 'partner', 'woocommerce'])
 export const saleStatusEnum = pgEnum('sale_status', ['completed', 'cancelled', 'refunded'])

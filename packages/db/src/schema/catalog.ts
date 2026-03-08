@@ -1,7 +1,7 @@
 import {
   pgTable, uuid, text, boolean, integer, numeric, timestamp, pgEnum, primaryKey, unique, date,
 } from 'drizzle-orm/pg-core'
-import { users } from './auth'
+import { users } from './auth.js'
 
 export const attributeInputTypeEnum = pgEnum('attribute_input_type', ['select', 'text', 'number'])
 
