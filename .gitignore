@@ -39,3 +39,9 @@ drizzle/
 # Caddy
 caddy_data/
 caddy_config/
+
+# Uploaded files (product images etc.)
+apps/api/uploads/
+
+# Server / deployment secrets
+VPS/

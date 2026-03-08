@@ -3,6 +3,7 @@
     <div class="view-header">
       <h2 class="view-title">Warehouses</h2>
       <div class="header-actions">
+        <Button label="Clear All" icon="pi pi-trash" size="small" severity="danger" text @click="showClearConfirm = true" />
         <Button label="Import Products" icon="pi pi-file-import" size="small" severity="secondary" @click="showImport = true" />
         <Button label="Add Warehouse" icon="pi pi-plus" size="small" @click="showDialog = true" />
       </div>
@@ -82,6 +83,19 @@
     <!-- Import Products Modal -->
     <ImportProductsModal v-model="showImport" @done="queryClient.invalidateQueries({ queryKey: ['warehouses'] })" />
 
+    <!-- Clear All Confirmation -->
+    <Dialog v-model:visible="showClearConfirm" header="Clear All Products" modal :draggable="false" style="width: 420px">
+      <div class="clear-confirm-body">
+        <i class="pi pi-exclamation-triangle clear-warn-icon" />
+        <p>This will permanently delete <strong>all products, stock, transfers, sales, brands and categories</strong>.</p>
+        <p class="clear-sub">Warehouses and users will not be affected.</p>
+      </div>
+      <template #footer>
+        <Button label="Cancel" severity="secondary" text @click="showClearConfirm = false" />
+        <Button label="Yes, clear everything" severity="danger" icon="pi pi-trash" :loading="clearing" @click="clearAll" />
+      </template>
+    </Dialog>
+
     <!-- Add Warehouse Dialog -->
     <Dialog v-model:visible="showDialog" header="Add Warehouse" modal style="width: 420px" :draggable="false">
       <form class="dialog-form" @submit.prevent="handleCreate">
@@ -126,6 +140,7 @@ import Select from 'primevue/select'
 import Textarea from 'primevue/textarea'
 import { useToast } from 'primevue/usetoast'
 import { getWarehouses, createWarehouse } from '@/api/warehouses'
+import { useAuthStore } from '@/stores/auth'
 import type { WarehouseType } from '@ob-inventory/types'
 
 const router = useRouter()
@@ -140,8 +155,28 @@ const { data: warehouses, isLoading } = useQuery({
 const mainWarehouses = computed(() => warehouses.value?.filter(w => w.type === 'main') ?? [])
 const partnerWarehouses = computed(() => warehouses.value?.filter(w => w.type !== 'main') ?? [])
 
-const showDialog = ref(false)
-const showImport = ref(false)
+const showDialog       = ref(false)
+const showImport       = ref(false)
+const showClearConfirm = ref(false)
+const clearing         = ref(false)
+
+async function clearAll() {
+  clearing.value = true
+  try {
+    const res = await fetch('/api/import/clear-all', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${useAuthStore().accessToken}` },
+    })
+    if (!res.ok) throw new Error('Failed')
+    await queryClient.invalidateQueries({ queryKey: ['warehouses'] })
+    showClearConfirm.value = false
+    toast.add({ severity: 'success', summary: 'All products cleared', life: 3000 })
+  } catch {
+    toast.add({ severity: 'error', summary: 'Clear failed', life: 4000 })
+  } finally {
+    clearing.value = false
+  }
+}
 const form = ref({ name: '', type: 'main' as WarehouseType, notes: '' })
 
 const typeOptions = [
@@ -365,6 +400,27 @@ function typeSeverity(type: string) {
   color: #94a3b8;
   margin: 0 0 20px;
 }
+
+/* Clear confirm */
+.clear-confirm-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0 4px;
+  text-align: center;
+}
+.clear-warn-icon {
+  font-size: 38px;
+  color: #f59e0b;
+}
+.clear-confirm-body p {
+  margin: 0;
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.5;
+}
+.clear-sub { font-size: 13px; color: #94a3b8 !important; }
 
 /* Dialog */
 .dialog-form {

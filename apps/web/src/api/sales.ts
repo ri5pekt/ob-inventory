@@ -12,8 +12,10 @@ export interface Sale {
   storeId:       string | null
   storeName:     string | null
   wooOrderId:    string | null
-  customerName:  string | null
-  customerEmail: string | null
+  customerName:    string | null
+  customerEmail:   string | null
+  customerPhone:   string | null
+  customerAddress: string | null
   totalPrice:    string | null
   currency:      string
   notes:         string | null
@@ -45,13 +47,15 @@ export interface CreateSaleItemInput {
 }
 
 export interface CreateSaleRequest {
-  saleType:      'direct' | 'partner'
-  warehouseId?:  string
-  customerName?: string
-  customerEmail?:string
-  currency?:     string
-  notes?:        string
-  items:         CreateSaleItemInput[]
+  saleType:         'direct' | 'partner'
+  warehouseId?:     string
+  customerName?:    string
+  customerEmail?:   string
+  customerPhone?:   string
+  customerAddress?: string
+  currency?:        string
+  notes?:           string
+  items:            CreateSaleItemInput[]
 }
 
 export async function getSales(params?: {
@@ -73,4 +77,8 @@ export async function getSale(id: string): Promise<SaleDetail> {
 export async function createSale(payload: CreateSaleRequest): Promise<{ id: string }> {
   const { data } = await apiClient.post<{ id: string }>('/sales', payload)
   return data
+}
+
+export async function deleteSale(id: string, reason?: string): Promise<void> {
+  await apiClient.delete(`/sales/${id}`, { data: { reason } })
 }

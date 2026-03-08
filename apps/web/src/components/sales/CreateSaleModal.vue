@@ -3,10 +3,11 @@
     v-model:visible="visible"
     modal
     header="New Sale"
-    :style="{ width: '760px', maxWidth: '95vw' }"
+    :style="{ width: '820px', maxWidth: '95vw' }"
     @hide="resetForm"
   >
     <div class="create-sale-form">
+
       <!-- Type + Warehouse row -->
       <div class="form-row">
         <div class="field">
@@ -20,21 +21,26 @@
               :severity="form.saleType === opt.value ? undefined : 'secondary'"
               :outlined="form.saleType !== opt.value"
               size="small"
-              @click="form.saleType = opt.value"
+              @click="onTypeChange(opt.value as 'direct' | 'partner')"
             />
           </div>
         </div>
 
-        <div v-if="form.saleType === 'partner'" class="field">
-          <label>Partner Warehouse <span class="required">*</span></label>
+        <div class="field">
+          <label>
+            {{ form.saleType === 'partner' ? 'Partner Warehouse' : 'Warehouse' }}
+            <span v-if="form.saleType === 'partner'" class="required">*</span>
+          </label>
           <Select
             v-model="form.warehouseId"
-            :options="partnerWarehouses"
+            :options="warehouseOptions"
             option-label="name"
             option-value="id"
-            placeholder="Select warehouse"
+            :placeholder="form.saleType === 'partner' ? 'Select partner warehouse…' : 'Select warehouse…'"
             :loading="loadingWarehouses"
+            show-clear
             fluid
+            @change="clearItems"
           />
         </div>
       </div>
@@ -49,97 +55,120 @@
           <label>Customer Email</label>
           <InputText v-model="form.customerEmail" type="email" placeholder="Optional" fluid />
         </div>
+        <div class="field">
+          <label>Customer Phone</label>
+          <InputText v-model="form.customerPhone" type="tel" placeholder="Optional" fluid />
+        </div>
         <div class="field field-sm">
           <label>Currency</label>
           <InputText v-model="form.currency" placeholder="ILS" fluid />
         </div>
       </div>
 
-      <!-- Items table -->
-      <div class="items-section">
+      <!-- Customer address -->
+      <div class="field">
+        <label>Customer Address</label>
+        <InputText v-model="form.customerAddress" placeholder="Optional — street, city, zip…" fluid />
+      </div>
+
+      <!-- Product search -->
+      <ProductSearchInput
+        :warehouse-id="form.warehouseId"
+        :added-ids="addedProductIds"
+        @select="addItem"
+      />
+
+      <!-- Items list -->
+      <div v-if="form.items.length > 0" class="items-section">
         <div class="items-header">
           <span class="items-title">Items</span>
-          <Button label="Add Item" icon="pi pi-plus" size="small" text @click="addItem" />
+          <span class="items-count">{{ form.items.length }} product{{ form.items.length !== 1 ? 's' : '' }}</span>
         </div>
 
-        <div class="items-table-wrap">
-          <table class="items-table">
-            <thead>
-              <tr>
-                <th style="width:110px">SKU</th>
-                <th>Product Name</th>
-                <th style="width:70px">Qty</th>
-                <th style="width:90px">Unit Price</th>
-                <th style="width:90px">Total</th>
-                <th style="width:36px"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="form.items.length === 0">
-                <td colspan="6" class="empty-row">No items yet — click "Add Item" to start</td>
-              </tr>
-              <tr v-for="(item, idx) in form.items" :key="idx">
-                <td>
-                  <InputText
-                    v-model="item.sku"
-                    placeholder="SKU"
-                    size="small"
-                    fluid
-                  />
-                </td>
-                <td>
-                  <InputText
-                    v-model="item.name"
-                    placeholder="Product name"
-                    size="small"
-                    fluid
-                  />
-                </td>
-                <td>
-                  <InputNumber
-                    v-model="item.quantity"
-                    :min="1"
-                    :max="99999"
-                    size="small"
-                    fluid
-                    :use-grouping="false"
-                  />
-                </td>
-                <td>
-                  <InputNumber
-                    v-model="item.unitPrice"
-                    :min-fraction-digits="2"
-                    :max-fraction-digits="2"
-                    :min="0"
-                    size="small"
-                    fluid
-                    placeholder="0.00"
-                  />
-                </td>
-                <td class="line-total">
-                  {{ lineTotal(item) !== null ? lineTotal(item)!.toFixed(2) : '—' }}
-                </td>
-                <td>
-                  <Button
-                    icon="pi pi-trash"
-                    text
-                    rounded
-                    severity="danger"
-                    size="small"
-                    @click="removeItem(idx)"
-                  />
-                </td>
-              </tr>
-            </tbody>
-            <tfoot v-if="form.items.length > 0">
-              <tr>
-                <td colspan="4" class="total-label">Grand Total</td>
-                <td class="grand-total">{{ grandTotal.toFixed(2) }} {{ form.currency }}</td>
-                <td></td>
-              </tr>
-            </tfoot>
-          </table>
+        <div class="items-list">
+          <div class="items-list-head">
+            <span class="col-product">Product</span>
+            <span class="col-qty">Qty</span>
+            <span class="col-price">Unit Price</span>
+            <span class="col-total">Total</span>
+            <span class="col-remove"></span>
+          </div>
+
+          <div v-for="(item, idx) in form.items" :key="item.productId" class="item-row">
+            <!-- Product info -->
+            <div class="item-info col-product">
+              <span class="item-sku">{{ item.sku }}</span>
+              <span class="item-name">{{ item.name }}</span>
+              <span v-if="item.model || item.size || item.color" class="item-attrs">
+                {{ [item.model, item.size, item.color].filter(Boolean).join(' · ') }}
+              </span>
+            </div>
+
+            <!-- Qty stepper -->
+            <div class="col-qty-wrap">
+              <div class="qty-stepper">
+                <button
+                  class="qty-btn"
+                  :disabled="item.quantity <= 1"
+                  @click="item.quantity = Math.max(1, item.quantity - 1)"
+                >−</button>
+                <input
+                  v-model.number="item.quantity"
+                  type="number"
+                  class="qty-input"
+                  :min="1"
+                  :max="item.availableQty"
+                  @blur="clampQty(idx)"
+                />
+                <button
+                  class="qty-btn"
+                  :disabled="item.quantity >= item.availableQty"
+                  @click="item.quantity = Math.min(item.availableQty, item.quantity + 1)"
+                >+</button>
+              </div>
+              <span class="item-available">/ {{ item.availableQty }}</span>
+            </div>
+
+            <!-- Unit price -->
+            <div class="col-price">
+              <InputNumber
+                v-model="item.unitPrice"
+                :min-fraction-digits="2"
+                :max-fraction-digits="2"
+                :min="0"
+                size="small"
+                placeholder="0.00"
+                class="price-input"
+              />
+            </div>
+
+            <!-- Line total -->
+            <span class="line-total col-total">
+              {{ item.unitPrice != null ? (item.unitPrice * item.quantity).toFixed(2) : '—' }}
+            </span>
+
+            <!-- Remove -->
+            <div class="col-remove">
+              <Button
+                icon="pi pi-times"
+                text rounded
+                severity="secondary"
+                size="small"
+                @click="removeItem(idx)"
+              />
+            </div>
+          </div>
         </div>
+
+        <div class="grand-total-row">
+          <span class="grand-total-label">Grand Total</span>
+          <span class="grand-total-value">{{ grandTotal.toFixed(2) }} {{ form.currency }}</span>
+        </div>
+      </div>
+
+      <div v-else class="items-empty">
+        <i class="pi pi-inbox" />
+        <span>No items yet — use the search above to add products</span>
       </div>
 
       <!-- Notes -->
@@ -155,21 +184,78 @@
         <Message severity="warn" :closable="false">
           <strong>Insufficient stock:</strong>
           <ul class="stock-error-list">
-            <li v-for="item in insufficientItems" :key="item.sku">
-              {{ item.sku }} — requested {{ item.requested }}, available {{ item.available }}
+            <li v-for="it in insufficientItems" :key="it.sku">
+              {{ it.sku }} — requested {{ it.requested }}, available {{ it.available }}
             </li>
           </ul>
         </Message>
       </template>
     </div>
 
+      <template #footer>
+      <div class="footer-row">
+        <span v-if="form.items.length > 0" class="footer-summary">
+          {{ form.items.length }} product{{ form.items.length !== 1 ? 's' : '' }} ·
+          {{ grandTotal.toFixed(2) }} {{ form.currency }}
+        </span>
+        <div class="footer-actions">
+          <Button label="Cancel" severity="secondary" outlined @click="visible = false" />
+          <Button
+            label="Create Sale"
+            icon="pi pi-check"
+            :disabled="!canSubmit"
+            @click="openConfirm"
+          />
+        </div>
+      </div>
+    </template>
+  </Dialog>
+
+  <!-- Confirmation dialog -->
+  <Dialog
+    v-model:visible="showConfirm"
+    modal
+    header="Confirm Sale"
+    :style="{ width: '420px' }"
+    :closable="!submitting"
+  >
+    <div class="confirm-body">
+      <div class="confirm-meta">
+        <div class="confirm-type-badge">
+          <i :class="form.saleType === 'direct' ? 'pi pi-user' : 'pi pi-building'" />
+          {{ form.saleType === 'direct' ? 'Direct Sale' : 'Partner Sale' }}
+        </div>
+        <div v-if="confirmWarehouseName" class="confirm-warehouse-row">
+          <span class="confirm-label">Warehouse</span>
+          <strong>{{ confirmWarehouseName }}</strong>
+        </div>
+        <div v-if="form.customerName" class="confirm-warehouse-row">
+          <span class="confirm-label">Customer</span>
+          <strong>{{ form.customerName }}</strong>
+        </div>
+        <div v-if="form.customerPhone" class="confirm-warehouse-row">
+          <span class="confirm-label">Phone</span>
+          <strong>{{ form.customerPhone }}</strong>
+        </div>
+      </div>
+
+      <div class="confirm-stats">
+        <span><strong>{{ form.items.length }}</strong> product{{ form.items.length !== 1 ? 's' : '' }}</span>
+        <span class="confirm-dot">·</span>
+        <span><strong>{{ confirmTotalQty }}</strong> units</span>
+        <span class="confirm-dot">·</span>
+        <span><strong>{{ grandTotal.toFixed(2) }}</strong> {{ form.currency }}</span>
+      </div>
+
+      <p class="confirm-question">Are you sure you want to create this sale?</p>
+    </div>
+
     <template #footer>
-      <Button label="Cancel" severity="secondary" outlined @click="visible = false" />
+      <Button label="Cancel" severity="secondary" outlined :disabled="submitting" @click="showConfirm = false" />
       <Button
-        label="Create Sale"
+        label="Confirm & Create"
         icon="pi pi-check"
         :loading="submitting"
-        :disabled="!canSubmit"
         @click="submit"
       />
     </template>
@@ -181,10 +267,15 @@ import { ref, computed, watch } from 'vue'
 import { useQueryClient } from '@tanstack/vue-query'
 import { getWarehouses } from '@/api/warehouses'
 import { createSale, type CreateSaleItemInput } from '@/api/sales'
+import { type ProductSearchResult } from '@/api/transfers'
 import type { WarehouseDTO } from '@ob-inventory/types'
+import ProductSearchInput from '@/components/transfers/ProductSearchInput.vue'
 
 const props = defineProps<{ modelValue: boolean }>()
-const emit  = defineEmits<{ (e: 'update:modelValue', v: boolean): void }>()
+const emit  = defineEmits<{
+  (e: 'update:modelValue', v: boolean): void
+  (e: 'created'): void
+}>()
 
 const visible = computed({
   get: () => props.modelValue,
@@ -193,86 +284,128 @@ const visible = computed({
 
 const queryClient = useQueryClient()
 
-// ── Warehouse list (for partner type) ────────────────────────────────────────
+// ── Warehouses ────────────────────────────────────────────────────────────────
 
-const warehouses         = ref<WarehouseDTO[]>([])
-const loadingWarehouses  = ref(false)
+const warehouses        = ref<WarehouseDTO[]>([])
+const loadingWarehouses = ref(false)
 
-const partnerWarehouses = computed(() =>
-  warehouses.value.filter(w => w.type !== 'main'),
+const mainWarehouse = computed(() => warehouses.value.find(w => w.type === 'main') ?? null)
+
+const warehouseOptions = computed(() =>
+  form.value.saleType === 'partner'
+    ? warehouses.value.filter(w => w.type !== 'main')
+    : warehouses.value,
 )
 
+function applyMainWarehouse() {
+  if (form.value.saleType === 'direct' && mainWarehouse.value) {
+    form.value.warehouseId = mainWarehouse.value.id
+  }
+}
+
 watch(visible, async (open) => {
-  if (!open) return
-  if (warehouses.value.length > 0) return
+  if (!open || warehouses.value.length > 0) return
   loadingWarehouses.value = true
   try {
     warehouses.value = await getWarehouses()
+    applyMainWarehouse()
   } finally {
     loadingWarehouses.value = false
   }
-}, { immediate: false })
+})
 
 // ── Form state ────────────────────────────────────────────────────────────────
 
-interface ItemRow {
-  sku:        string
-  name:       string
-  quantity:   number | null
-  unitPrice:  number | null
+interface SaleItemRow extends ProductSearchResult {
+  quantity:  number
+  unitPrice: number | null
 }
 
 const defaultForm = () => ({
-  saleType:      'direct' as 'direct' | 'partner',
-  warehouseId:   null as string | null,
-  customerName:  '',
-  customerEmail: '',
-  currency:      'ILS',
-  notes:         '',
-  items:         [] as ItemRow[],
+  saleType:         'direct' as 'direct' | 'partner',
+  warehouseId:      null as string | null,
+  customerName:     '',
+  customerEmail:    '',
+  customerPhone:    '',
+  customerAddress:  '',
+  currency:         'ILS',
+  notes:            '',
+  items:            [] as SaleItemRow[],
 })
 
 const form              = ref(defaultForm())
 const submitting        = ref(false)
 const error             = ref<string | null>(null)
 const insufficientItems = ref<{ sku: string; requested: number; available: number }[]>([])
+const showConfirm       = ref(false)
+
+const confirmWarehouseName = computed(() =>
+  warehouses.value.find(w => w.id === form.value.warehouseId)?.name ?? '',
+)
+const confirmTotalQty = computed(() =>
+  form.value.items.reduce((s, i) => s + i.quantity, 0),
+)
 
 const typeOptions = [
-  { value: 'direct',  label: 'Direct Sale',  icon: 'pi pi-user' },
+  { value: 'direct',  label: 'Direct Sale',  icon: 'pi pi-user'     },
   { value: 'partner', label: 'Partner Sale',  icon: 'pi pi-building' },
 ]
 
-function addItem() {
-  form.value.items.push({ sku: '', name: '', quantity: 1, unitPrice: null })
-}
-
-function removeItem(idx: number) {
-  form.value.items.splice(idx, 1)
-}
-
-function lineTotal(item: ItemRow): number | null {
-  if (item.unitPrice == null || item.quantity == null) return null
-  return item.unitPrice * item.quantity
-}
+const addedProductIds = computed(() => form.value.items.map(i => i.productId))
 
 const grandTotal = computed(() =>
   form.value.items.reduce((sum, item) => {
-    const lt = lineTotal(item)
-    return lt != null ? sum + lt : sum
+    return item.unitPrice != null ? sum + item.unitPrice * item.quantity : sum
   }, 0),
 )
 
 const canSubmit = computed(() => {
   if (form.value.items.length === 0) return false
   if (form.value.saleType === 'partner' && !form.value.warehouseId) return false
-  return form.value.items.every(i => i.sku.trim() && i.name.trim() && (i.quantity ?? 0) > 0)
+  return form.value.items.every(i => i.quantity > 0)
 })
+
+function onTypeChange(type: 'direct' | 'partner') {
+  form.value.saleType    = type
+  form.value.warehouseId = null
+  form.value.items       = []
+  if (type === 'direct') applyMainWarehouse()
+}
+
+function clearItems() {
+  form.value.items = []
+}
+
+function addItem(result: ProductSearchResult) {
+  if (addedProductIds.value.includes(result.productId)) return
+  form.value.items.push({ ...result, quantity: 1, unitPrice: null })
+}
+
+function removeItem(idx: number) {
+  form.value.items.splice(idx, 1)
+}
+
+function clampQty(idx: number) {
+  const item = form.value.items[idx]
+  if (!item) return
+  if (item.quantity < 1) item.quantity = 1
+  if (item.quantity > item.availableQty) item.quantity = item.availableQty
+}
 
 function resetForm() {
   form.value = defaultForm()
   error.value = null
   insufficientItems.value = []
   submitting.value = false
+}
+
+// ── Submit ────────────────────────────────────────────────────────────────────
+
+function openConfirm() {
+  if (!canSubmit.value) return
+  error.value = null
+  insufficientItems.value = []
+  showConfirm.value = true
 }
 
 async function submit() {
@@ -284,27 +417,31 @@ async function submit() {
 
   try {
     const items: CreateSaleItemInput[] = form.value.items.map(i => ({
-      sku:       i.sku.trim(),
-      name:      i.name.trim(),
-      quantity:  i.quantity!,
+      sku:       i.sku,
+      name:      i.name,
+      quantity:  i.quantity,
       unitPrice: i.unitPrice ?? undefined,
-      lineTotal: lineTotal(i) ?? undefined,
+      lineTotal: i.unitPrice != null ? i.unitPrice * i.quantity : undefined,
     }))
 
     await createSale({
-      saleType:      form.value.saleType,
-      warehouseId:   form.value.warehouseId ?? undefined,
-      customerName:  form.value.customerName.trim() || undefined,
-      customerEmail: form.value.customerEmail.trim() || undefined,
-      currency:      form.value.currency.trim() || 'ILS',
-      notes:         form.value.notes.trim() || undefined,
+      saleType:         form.value.saleType,
+      warehouseId:      form.value.warehouseId      ?? undefined,
+      customerName:     form.value.customerName.trim()     || undefined,
+      customerEmail:    form.value.customerEmail.trim()    || undefined,
+      customerPhone:    form.value.customerPhone.trim()    || undefined,
+      customerAddress:  form.value.customerAddress.trim()  || undefined,
+      currency:         form.value.currency.trim()         || 'ILS',
+      notes:            form.value.notes.trim()            || undefined,
       items,
     })
 
-    queryClient.invalidateQueries({ queryKey: ['sales'] })
+    showConfirm.value = false
     visible.value = false
+    emit('created')
   } catch (err: unknown) {
     const axiosErr = err as { response?: { data?: { error?: string; code?: string; items?: typeof insufficientItems.value } } }
+    showConfirm.value = false
     if (axiosErr.response?.data?.code === 'INSUFFICIENT_STOCK') {
       insufficientItems.value = axiosErr.response.data.items ?? []
     } else {
@@ -336,116 +473,289 @@ async function submit() {
   flex: 1;
 }
 
-.field-sm {
-  flex: 0 0 100px;
-}
+.field-sm { flex: 0 0 100px; }
 
 label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--p-text-muted-color);
+  font-size: 12px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.4px;
+  color: var(--p-text-muted-color);
 }
 
-.required {
-  color: var(--p-red-500);
-}
+.required { color: var(--p-red-500); }
 
-.type-toggle {
-  display: flex;
-  gap: 8px;
-}
+.type-toggle { display: flex; gap: 8px; }
 
-/* Items table */
+/* ── Items ── */
 .items-section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .items-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--p-surface-100, #f8fafc);
+  border-bottom: 1px solid var(--p-content-border-color);
 }
 
 .items-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--p-text-muted-color);
+}
+
+.items-count {
+  font-size: 12px;
+  color: var(--p-text-muted-color);
+}
+
+.items-list { display: flex; flex-direction: column; }
+
+.items-list-head {
+  display: grid;
+  grid-template-columns: 1fr 160px 110px 80px 36px;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--p-surface-50, #f8fafc);
+  border-bottom: 1px solid var(--p-content-border-color);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--p-text-muted-color);
+}
+
+.item-row {
+  display: grid;
+  grid-template-columns: 1fr 160px 110px 80px 36px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--p-content-border-color);
+}
+
+.item-row:last-child { border-bottom: none; }
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.item-sku {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--p-text-color);
+}
+
+.item-name {
+  font-size: 13px;
+  color: var(--p-text-muted-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-attrs {
+  font-size: 11px;
+  color: var(--p-text-muted-color);
+  opacity: 0.7;
+}
+
+/* Qty stepper (same as transfers) */
+.qty-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  height: 32px;
+}
+
+.qty-btn {
+  width: 28px;
+  height: 100%;
+  border: none;
+  background: var(--p-surface-100, #f1f5f9);
+  color: var(--p-text-color);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition: background 0.12s;
+  flex-shrink: 0;
+}
+
+.qty-btn:hover:not(:disabled) { background: var(--p-surface-200, #e2e8f0); }
+.qty-btn:disabled { opacity: 0.4; cursor: default; }
+
+.qty-input {
+  width: 44px;
+  height: 100%;
+  border: none;
+  border-left: 1px solid var(--p-content-border-color);
+  border-right: 1px solid var(--p-content-border-color);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--p-text-color);
+  background: var(--p-surface-0, #fff);
+  outline: none;
+  -moz-appearance: textfield;
+}
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.price-input { width: 100%; }
+
+.col-product  { min-width: 0; }
+.col-qty-wrap { display: flex; align-items: center; gap: 6px; }
+.col-qty      { justify-self: start; }
+.col-price    { justify-self: stretch; }
+.col-total    { justify-self: end; }
+.col-remove   { justify-self: center; }
+
+.item-available {
+  font-size: 11px;
+  color: var(--p-text-muted-color);
+  white-space: nowrap;
+}
+
+.line-total {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--p-text-color);
+  text-align: right;
+}
+
+.grand-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 10px 14px;
+  background: var(--p-surface-50, #f8fafc);
+  border-top: 2px solid var(--p-content-border-color);
+}
+
+.grand-total-label {
   font-size: 13px;
   font-weight: 600;
   color: var(--p-text-muted-color);
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.04em;
 }
 
-.items-table-wrap {
-  border: 1px solid var(--p-content-border-color);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.items-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-.items-table thead th {
-  background: var(--p-surface-100);
-  padding: 8px 10px;
-  text-align: left;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--p-text-muted-color);
-  border-bottom: 1px solid var(--p-content-border-color);
-}
-
-.items-table tbody td {
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--p-content-border-color);
-  vertical-align: middle;
-}
-
-.items-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.items-table .empty-row {
-  text-align: center;
-  color: var(--p-text-muted-color);
-  padding: 20px;
-  font-style: italic;
-}
-
-.items-table .line-total {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  color: var(--p-text-color);
-}
-
-.items-table tfoot td {
-  padding: 8px 10px;
-  background: var(--p-surface-50);
-  border-top: 2px solid var(--p-content-border-color);
-}
-
-.total-label {
-  text-align: right;
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--p-text-muted-color);
-}
-
-.grand-total {
-  text-align: right;
+.grand-total-value {
+  font-size: 16px;
   font-weight: 700;
-  font-size: 15px;
   color: var(--p-primary-color);
   font-variant-numeric: tabular-nums;
 }
 
-.stock-error-list {
-  margin: 4px 0 0;
-  padding-left: 18px;
+.items-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  color: var(--p-text-muted-color);
+  font-size: 14px;
+  border: 1px dashed var(--p-content-border-color);
+  border-radius: 10px;
+}
+
+.items-empty .pi { font-size: 18px; opacity: 0.5; }
+
+/* Footer */
+.footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.footer-summary {
+  font-size: 13px;
+  color: var(--p-text-muted-color);
+  font-weight: 500;
+}
+
+.footer-actions { display: flex; gap: 8px; }
+
+.stock-error-list { margin: 4px 0 0; padding-left: 18px; }
+
+/* Confirmation dialog */
+.confirm-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.confirm-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.confirm-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--p-primary-50, #eff6ff);
+  color: var(--p-primary-color);
+  font-size: 13px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.confirm-warehouse-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.confirm-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--p-text-muted-color);
+  min-width: 70px;
+}
+
+.confirm-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  padding: 10px 14px;
+  background: var(--p-surface-50, #f8fafc);
+  border-radius: 8px;
+  border: 1px solid var(--p-content-border-color);
+}
+
+.confirm-dot { color: var(--p-text-muted-color); }
+
+.confirm-question {
+  font-size: 14px;
+  color: var(--p-text-color);
+  margin: 0;
 }
 </style>

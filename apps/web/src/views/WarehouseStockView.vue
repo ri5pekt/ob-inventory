@@ -135,13 +135,14 @@ const filteredStock = computed(() => {
   const q = search.value.trim().toLowerCase()
   if (!q) return stockItems.value
   return stockItems.value.filter(s =>
-    (s.sku      ?? '').toLowerCase().includes(q) ||
-    (s.name     ?? '').toLowerCase().includes(q) ||
-    (s.brand    ?? '').toLowerCase().includes(q) ||
-    (s.category ?? '').toLowerCase().includes(q) ||
-    (s.model    ?? '').toLowerCase().includes(q) ||
-    (s.color    ?? '').toLowerCase().includes(q) ||
-    (s.size     ?? '').toLowerCase().includes(q) ||
+    (s.sku       ?? '').toLowerCase().includes(q) ||
+    (s.wooTitle  ?? '').toLowerCase().includes(q) ||
+    (s.name      ?? '').toLowerCase().includes(q) ||
+    (s.brand     ?? '').toLowerCase().includes(q) ||
+    (s.category  ?? '').toLowerCase().includes(q) ||
+    (s.model     ?? '').toLowerCase().includes(q) ||
+    (s.color     ?? '').toLowerCase().includes(q) ||
+    (s.size      ?? '').toLowerCase().includes(q) ||
     (s.boxNumber ?? '').toLowerCase().includes(q),
   )
 })

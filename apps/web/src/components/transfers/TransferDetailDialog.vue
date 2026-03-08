@@ -49,22 +49,93 @@
     <div v-else class="loading-detail">
       <i class="pi pi-spin pi-spinner" />
     </div>
+
+    <template #footer>
+      <div class="detail-footer">
+        <Button
+          label="Delete Transfer"
+          icon="pi pi-trash"
+          severity="danger"
+          outlined
+          size="small"
+          :disabled="!transfer"
+          @click="showConfirm = true"
+        />
+        <Button label="Close" severity="secondary" outlined size="small" @click="$emit('update:visible', false)" />
+      </div>
+    </template>
+  </Dialog>
+
+  <!-- Delete confirmation -->
+  <Dialog
+    v-model:visible="showConfirm"
+    modal
+    header="Delete Transfer"
+    :style="{ width: '400px' }"
+    :closable="!deleting"
+  >
+    <div class="confirm-body">
+      <i class="pi pi-exclamation-triangle confirm-icon" />
+      <p>Are you sure you want to delete this transfer?</p>
+      <p class="confirm-sub">Stock will be reversed — quantities returned to the source warehouse and removed from the destination. Ledger entries will be added.</p>
+      <div class="confirm-reason">
+        <label class="reason-label">Reason <span class="reason-optional">(optional)</span></label>
+        <Textarea
+          v-model="deleteReason"
+          rows="2"
+          placeholder="e.g. Transfer created by mistake…"
+          fluid
+          :disabled="deleting"
+        />
+      </div>
+      <Message v-if="deleteError" severity="error" :closable="false" class="confirm-error">{{ deleteError }}</Message>
+    </div>
+    <template #footer>
+      <Button label="Cancel" severity="secondary" outlined :disabled="deleting" @click="showConfirm = false" />
+      <Button label="Delete" icon="pi pi-trash" severity="danger" :loading="deleting" @click="confirmDelete" />
+    </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import Dialog   from 'primevue/dialog'
+import { ref, computed } from 'vue'
+import Dialog    from 'primevue/dialog'
 import DataTable from 'primevue/datatable'
-import Column   from 'primevue/column'
+import Column    from 'primevue/column'
 import type { TransferDetail } from '@/api/transfers'
+import { deleteTransfer } from '@/api/transfers'
 
 const props = defineProps<{
   visible:  boolean
   transfer: TransferDetail | null
 }>()
 
-defineEmits<{ 'update:visible': [val: boolean] }>()
+const emit = defineEmits<{
+  'update:visible': [val: boolean]
+  'deleted': []
+}>()
+
+const showConfirm  = ref(false)
+const deleting     = ref(false)
+const deleteError  = ref<string | null>(null)
+const deleteReason = ref('')
+
+async function confirmDelete() {
+  if (!props.transfer) return
+  deleting.value = true
+  deleteError.value = null
+  try {
+    await deleteTransfer(props.transfer.id, deleteReason.value.trim() || undefined)
+    showConfirm.value = false
+    deleteReason.value = ''
+    emit('update:visible', false)
+    emit('deleted')
+  } catch {
+    deleteError.value = 'Failed to delete transfer. Please try again.'
+  } finally {
+    deleting.value = false
+  }
+}
 
 const dialogHeader = computed(() => {
   if (!props.transfer) return 'Transfer Details'
@@ -115,4 +186,44 @@ function formatDate(iso: string) {
 .qty-badge { font-weight: 700; color: var(--p-primary-color); }
 
 .loading-detail { display: flex; justify-content: center; padding: 40px; font-size: 24px; color: var(--p-primary-color); }
+
+.detail-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.confirm-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  text-align: center;
+}
+
+.confirm-icon { font-size: 36px; color: var(--p-red-500); }
+.confirm-body p { margin: 0; font-size: 15px; }
+.confirm-sub { font-size: 13px; color: var(--p-text-muted-color); }
+
+.confirm-reason {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+  text-align: left;
+}
+
+.reason-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--p-text-muted-color);
+}
+
+.reason-optional { font-weight: 400; text-transform: none; letter-spacing: 0; }
+.confirm-error { width: 100%; }
 </style>

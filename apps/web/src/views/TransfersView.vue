@@ -83,8 +83,8 @@
       </DataTable>
     </div>
 
-    <TransferDetailDialog v-model:visible="showDetail" :transfer="selectedTransfer" />
-    <CreateTransferModal v-model="showCreate" />
+    <TransferDetailDialog v-model:visible="showDetail" :transfer="selectedTransfer" @deleted="onTransferDeleted" />
+    <CreateTransferModal v-model="showCreate" @created="onTransferCreated" />
   </div>
 </template>
 
@@ -101,15 +101,29 @@ const showDetail       = ref(false)
 const selectedTransfer = ref<TransferDetail | null>(null)
 const search           = ref('')
 const dateRange        = ref<{ from: Date; to: Date } | null>(null)
+const refreshKey       = ref(0)
 
 const { data: transfersData, isLoading } = useQuery({
-  queryKey: computed(() => ['transfers', dateRange.value?.from.toISOString(), dateRange.value?.to.toISOString()]),
+  queryKey: computed(() => ['transfers', dateRange.value?.from.toISOString(), dateRange.value?.to.toISOString(), refreshKey.value]),
   queryFn:  () => getTransfers({
     limit:    1000,
     dateFrom: dateRange.value?.from.toISOString(),
     dateTo:   dateRange.value?.to.toISOString(),
   }),
 })
+
+function onTransferDeleted() {
+  selectedTransfer.value = null
+  refreshKey.value++
+}
+
+function onTransferCreated() {
+  if (dateRange.value) {
+    // Push dateTo 60s into the future to cover any client/server clock skew
+    dateRange.value = { from: dateRange.value.from, to: new Date(Date.now() + 60_000) }
+  }
+  refreshKey.value++
+}
 
 const transfers = computed(() => transfersData.value ?? [])
 

@@ -235,4 +235,78 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
 
     return reply.status(201).send(result)
   })
+
+  // ── Delete transfer (reverse stock + ledger) ────────────────────────────────
+  fastify.delete<{ Params: { id: string } }>('/api/transfers/:id', auth, async (request, reply) => {
+    const { id } = request.params
+    const jwtPayload = (request as { user?: { sub?: string } }).user
+    const userId = jwtPayload?.sub ?? null
+
+    const bodySchema = z.object({ reason: z.string().optional() })
+    const { reason } = bodySchema.parse(request.body ?? {})
+
+    const [transfer] = await db.select().from(transfers).where(eq(transfers.id, id))
+    if (!transfer) return reply.status(404).send({ error: 'Transfer not found' })
+
+    const items = await db
+      .select()
+      .from(transferItems)
+      .where(eq(transferItems.transferId, id))
+
+    const [fromWh, toWh] = await Promise.all([
+      db.select().from(warehouses).where(eq(warehouses.id, transfer.fromWarehouseId)).then(r => r[0]),
+      db.select().from(warehouses).where(eq(warehouses.id, transfer.toWarehouseId)).then(r => r[0]),
+    ])
+
+    await db.transaction(async (tx) => {
+      for (const item of items) {
+        const note = `Transfer deleted — stock reversed${reason ? ` — ${reason}` : ''}`
+
+        // Restore stock to source warehouse
+        await tx
+          .update(inventoryStock)
+          .set({ quantity: sql`${inventoryStock.quantity} + ${item.quantity}`, updatedAt: sql`now()` })
+          .where(and(
+            eq(inventoryStock.productId,   item.productId),
+            eq(inventoryStock.warehouseId, transfer.fromWarehouseId),
+          ))
+
+        await tx.insert(inventoryLedger).values({
+          productId:     item.productId,
+          warehouseId:   transfer.fromWarehouseId,
+          actionType:    'transfer_in',
+          quantityDelta: item.quantity,
+          referenceId:   transfer.id,
+          referenceType: 'transfer',
+          notes:         `${note} (returned to ${fromWh?.name ?? 'source'})`,
+          createdBy:     userId,
+        })
+
+        // Deduct stock from destination warehouse
+        await tx
+          .update(inventoryStock)
+          .set({ quantity: sql`GREATEST(0, ${inventoryStock.quantity} - ${item.quantity})`, updatedAt: sql`now()` })
+          .where(and(
+            eq(inventoryStock.productId,   item.productId),
+            eq(inventoryStock.warehouseId, transfer.toWarehouseId),
+          ))
+
+        await tx.insert(inventoryLedger).values({
+          productId:     item.productId,
+          warehouseId:   transfer.toWarehouseId,
+          actionType:    'transfer_out',
+          quantityDelta: -item.quantity,
+          referenceId:   transfer.id,
+          referenceType: 'transfer',
+          notes:         `${note} (removed from ${toWh?.name ?? 'destination'})`,
+          createdBy:     userId,
+        })
+      }
+
+      // Delete transfer (cascade removes transfer_items)
+      await tx.delete(transfers).where(eq(transfers.id, id))
+    })
+
+    return reply.status(200).send({ ok: true })
+  })
 }

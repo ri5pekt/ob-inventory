@@ -97,11 +97,15 @@
       <div class="report-summary">
         <div class="summary-card summary-card--imported">
           <div class="summary-num">{{ report!.imported }}</div>
-          <div class="summary-label">Products imported</div>
+          <div class="summary-label">New products</div>
+        </div>
+        <div class="summary-card summary-card--updated" v-if="report!.updated > 0">
+          <div class="summary-num">{{ report!.updated }}</div>
+          <div class="summary-label">Duplicate SKUs</div>
         </div>
         <div class="summary-card summary-card--skipped" v-if="report!.skipped > 0">
           <div class="summary-num">{{ report!.skipped }}</div>
-          <div class="summary-label">Skipped</div>
+          <div class="summary-label">Skipped (blank SKU)</div>
         </div>
         <div class="summary-card summary-card--image" v-if="report!.imagesFailed > 0">
           <div class="summary-num">{{ report!.imagesFailed }}</div>
@@ -113,15 +117,36 @@
         </div>
       </div>
 
-      <!-- Error list -->
-      <div v-if="report!.errors.length > 0" class="error-list-wrap">
-        <div class="error-list-label">
-          <i class="pi pi-exclamation-circle" /> Import errors
+      <!-- Errors -->
+      <div v-if="report!.errors.length > 0" class="problem-list-wrap problem-list-wrap--error">
+        <div class="problem-list-label"><i class="pi pi-times-circle" /> Import errors</div>
+        <div class="problem-list">
+          <div v-for="e in report!.errors" :key="`err-${e.row}`" class="problem-row">
+            <span class="problem-row-num">row {{ e.row }}</span>
+            <code class="problem-sku">{{ e.sku }}</code>
+            <span class="problem-reason">{{ e.reason }}</span>
+          </div>
         </div>
-        <div class="error-list">
-          <div v-for="e in report!.errors" :key="e.sku" class="error-row">
-            <code class="error-sku">{{ e.sku }}</code>
-            <span class="error-reason">{{ e.reason }}</span>
+      </div>
+
+      <!-- Duplicates -->
+      <div v-if="report!.duplicates.length > 0" class="problem-list-wrap problem-list-wrap--dup">
+        <div class="problem-list-label"><i class="pi pi-copy" /> Duplicate SKUs (last row wins)</div>
+        <div class="problem-list">
+          <div v-for="d in report!.duplicates" :key="d.sku" class="problem-row">
+            <code class="problem-sku">{{ d.sku }}</code>
+            <span class="problem-reason">rows {{ d.rows.join(', ') }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blank SKUs -->
+      <div v-if="report!.blanks.length > 0" class="problem-list-wrap problem-list-wrap--blank">
+        <div class="problem-list-label"><i class="pi pi-minus-circle" /> Blank SKU rows (skipped)</div>
+        <div class="problem-list">
+          <div v-for="b in report!.blanks" :key="b.row" class="problem-row">
+            <span class="problem-row-num">row {{ b.row }}</span>
+            <span class="problem-reason">No SKU — row was skipped</span>
           </div>
         </div>
       </div>
@@ -155,10 +180,16 @@ import { getWarehouses } from '@/api/warehouses'
 
 type Phase = 'setup' | 'progress' | 'report' | 'fatal'
 
+interface ErrorDetail    { sku: string; row: number; reason: string }
+interface DuplicateDetail { sku: string; rows: number[] }
+interface BlankDetail     { row: number }
 interface ImportResult {
   imported: number
+  updated: number
   skipped: number
-  errors: { sku: string; reason: string }[]
+  errors: ErrorDetail[]
+  duplicates: DuplicateDetail[]
+  blanks: BlankDetail[]
   imagesFailed: number
 }
 
@@ -481,41 +512,46 @@ watch(visible, v => { if (v) reset() })
 .summary-label { font-size: 11px; font-weight: 500; margin-top: 2px; opacity: 0.8; }
 
 .summary-card--imported { background: #dcfce7; color: #15803d; }
+.summary-card--updated  { background: #fef3c7; color: #92400e; }
 .summary-card--skipped  { background: #f1f5f9; color: #475569; }
 .summary-card--image    { background: #fef3c7; color: #92400e; }
 .summary-card--error    { background: #fee2e2; color: #dc2626; }
 
-.error-list-wrap {
-  background: #fff8f8;
-  border: 1px solid #fecaca;
+.problem-list-wrap {
   border-radius: 8px;
   overflow: hidden;
+  border: 1px solid;
 }
-.error-list-label {
-  padding: 8px 14px;
+.problem-list-wrap--error { border-color: #fecaca; }
+.problem-list-wrap--dup   { border-color: #fed7aa; }
+.problem-list-wrap--blank { border-color: #e2e8f0; }
+
+.problem-list-label {
+  padding: 7px 14px;
   font-size: 12px;
   font-weight: 600;
-  color: #dc2626;
-  background: #fee2e2;
   display: flex;
   align-items: center;
   gap: 6px;
 }
-.error-list {
-  max-height: 180px;
-  overflow-y: auto;
-}
-.error-row {
+.problem-list-wrap--error .problem-list-label { background: #fee2e2; color: #dc2626; }
+.problem-list-wrap--dup   .problem-list-label { background: #ffedd5; color: #c2410c; }
+.problem-list-wrap--blank .problem-list-label { background: #f1f5f9; color: #475569; }
+
+.problem-list { max-height: 160px; overflow-y: auto; }
+
+.problem-row {
   display: flex;
   align-items: baseline;
-  gap: 10px;
-  padding: 6px 14px;
-  border-bottom: 1px solid #fee2e2;
+  gap: 8px;
+  padding: 5px 14px;
+  border-bottom: 1px solid #f1f5f9;
   font-size: 12px;
 }
-.error-row:last-child { border-bottom: none; }
-.error-sku { font-family: monospace; color: #0369a1; flex-shrink: 0; }
-.error-reason { color: #7f1d1d; }
+.problem-row:last-child { border-bottom: none; }
+.problem-row-num { font-size: 11px; color: #94a3b8; flex-shrink: 0; min-width: 44px; }
+.problem-sku     { font-family: monospace; color: #0369a1; flex-shrink: 0; }
+.problem-reason  { color: #64748b; }
 
 /* ── Fatal phase ─────────────────────────────────────── */
 .fatal-body {

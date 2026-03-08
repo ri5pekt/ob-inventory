@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, sql } from 'drizzle-orm'
 import { randomUUID } from 'node:crypto'
 import { mkdirSync, existsSync } from 'node:fs'
 import { join, dirname } from 'node:path'
@@ -8,7 +8,7 @@ import { parse } from 'csv-parse/sync'
 import sharp from 'sharp'
 import { db } from '../db.js'
 import {
-  products, categories, inventoryStock, inventoryLedger,
+  products, brands, categories, inventoryStock, inventoryLedger,
   productAttributes, attributeDefinitions, attributeOptions, warehouses,
 } from '@ob-inventory/db'
 
@@ -20,11 +20,16 @@ if (!existsSync(UPLOADS_DIR)) mkdirSync(UPLOADS_DIR, { recursive: true })
 
 // ─── In-memory job store ────────────────────────────────────────────────────
 
-interface ErrorDetail { sku: string; reason: string }
+interface ErrorDetail    { sku: string; row: number; reason: string }
+interface DuplicateDetail { sku: string; rows: number[] }
+interface BlankDetail     { row: number }
 interface ImportResult {
   imported: number
+  updated: number
   skipped: number
   errors: ErrorDetail[]
+  duplicates: DuplicateDetail[]
+  blanks: BlankDetail[]
   imagesFailed: number
 }
 interface ImportJob {
@@ -89,10 +94,34 @@ async function downloadImage(url: string, sku: string): Promise<string | null> {
   }
 }
 
-// ─── CSV column indices ──────────────────────────────────────────────────────
-// 0  product  | 1 Color | 2 SIZE | 3 Type/Model | 4 (category data) | 5 catagory
-// 6  SKU      | 7 type  | 8 name(he) | 9 desc | 10 in_stock | 11 qty | 12 price
-// 13 categories(he) | 14 tags | 15 Images | 16 attr_name | 17 attr_val | 18 parent
+// ─── Safe date parser ────────────────────────────────────────────────────────
+// Returns YYYY-MM-DD or null for anything it can't parse with a valid year
+
+function parseDate(raw: string): string | null {
+  if (!raw || raw.toLowerCase() === 'bc') return null
+  try {
+    const d = new Date(raw)
+    if (isNaN(d.getTime())) return null
+    const year = d.getFullYear()
+    if (year < 2000 || year > 2100) return null
+    return d.toISOString().slice(0, 10)
+  } catch {
+    return null
+  }
+}
+
+// ─── Header-based column resolver ───────────────────────────────────────────
+
+function buildColMap(headerRow: string[]): (names: string[]) => number {
+  const norm = headerRow.map(h => h?.trim().toLowerCase().replace(/\s+/g, ' ') ?? '')
+  return (candidates: string[]) => {
+    for (const c of candidates) {
+      const idx = norm.indexOf(c.toLowerCase())
+      if (idx !== -1) return idx
+    }
+    return -1
+  }
+}
 
 // ─── Import processor ────────────────────────────────────────────────────────
 
@@ -121,20 +150,66 @@ async function runImport(job: ImportJob, csvBuffer: Buffer, warehouseId: string)
     return
   }
 
-  // Filter: skip "variable" parent rows and blank SKUs
-  const importable = rows.slice(1).filter(r => {
-    const sku  = r[6]?.trim()
-    const type = r[7]?.trim().toLowerCase()
-    return sku && type !== 'variable'
+  // Resolve columns by header name (handles any column order / format) -------
+  const col = buildColMap(rows[0])
+
+  const C = {
+    sku:       col(['sku']),
+    title:     col(['title', 'name', 'שם']),
+    brand:     col(['brand']),
+    category:  col(['class', 'category', 'catagory', 'קטגוריות']),
+    model:     col(['model', 'type/ model', 'type/model']),
+    size:      col(['size', 'size ']),
+    color:     col(['color', 'colour']),
+    qty:       col(['qty', 'quantity', 'מלאי']),
+    price:     col(['price', 'מחיר רגיל', 'base price']),
+    image:     col(['image', 'images', 'picture']),
+    box:       col(['box#', 'box']),
+    dateAdded: col(['date added', 'date']),
+    unit:      col(['unit']),
+    rowType:   col(['סוג', 'type']),   // WooCommerce format only
+  }
+
+  if (C.sku === -1) {
+    job.status = 'error'
+    job.errorMessage = 'CSV is missing a "SKU" column'
+    emit(job, 'error', { message: job.errorMessage })
+    return
+  }
+
+  // Build importable list keeping original CSV row number (row 1 = header, row 2 = first data row)
+  // Also collect blank-SKU rows up front so they appear in the report
+  const blanksEarly: BlankDetail[] = []
+  const importable: Array<{ row: string[]; csvRow: number }> = []
+
+  rows.slice(1).forEach((row, idx) => {
+    const csvRow = idx + 2 // 1-indexed; +1 for header, +1 for 0-base
+    const sku    = row[C.sku]?.trim()
+    const type   = C.rowType !== -1 ? row[C.rowType]?.trim().toLowerCase() : ''
+    if (type === 'variable') return          // WooCommerce parent – skip silently
+    if (!sku) { blanksEarly.push({ row: csvRow }); return }
+    importable.push({ row, csvRow })
   })
 
   job.total = importable.length
   emit(job, 'start', { total: importable.length })
 
-  // ── Caches to minimise round-trips ──────────────────────────────────────
-  const catCache = new Map<string, string>()   // name  → id
-  const defCache = new Map<string, string>()   // name  → id
-  const optCache = new Map<string, string>()   // defId:code → id
+  // ── Lookup caches ──────────────────────────────────────────────────────────
+  const brandCache = new Map<string, string>()
+  const catCache   = new Map<string, string>()
+  const defCache   = new Map<string, string>()
+  const optCache   = new Map<string, string>()
+
+  async function getOrCreateBrand(name: string): Promise<string> {
+    const n = name.trim()
+    if (brandCache.has(n)) return brandCache.get(n)!
+    const [row] = await db.select({ id: brands.id }).from(brands).where(eq(brands.name, n))
+    if (row) { brandCache.set(n, row.id); return row.id }
+    const [ins] = await db.insert(brands).values({ name: n })
+      .onConflictDoUpdate({ target: brands.name, set: { name: n } }).returning()
+    brandCache.set(n, ins.id)
+    return ins.id
+  }
 
   async function getOrCreateCategory(name: string): Promise<string> {
     const n = name.trim()
@@ -148,13 +223,19 @@ async function runImport(job: ImportJob, csvBuffer: Buffer, warehouseId: string)
   }
 
   async function getOrCreateDef(name: string): Promise<string> {
-    const n = name.toLowerCase().trim()
-    if (defCache.has(n)) return defCache.get(n)!
-    const [row] = await db.select({ id: attributeDefinitions.id }).from(attributeDefinitions).where(eq(attributeDefinitions.name, n))
-    if (row) { defCache.set(n, row.id); return row.id }
-    const [ins] = await db.insert(attributeDefinitions).values({ name: n, inputType: 'select', sortOrder: 0 })
-      .onConflictDoUpdate({ target: attributeDefinitions.name, set: { name: n } }).returning()
-    defCache.set(n, ins.id)
+    const key = name.toLowerCase().trim()
+    if (defCache.has(key)) return defCache.get(key)!
+    // Case-insensitive lookup so "size" and "Size" resolve to the same definition
+    const [row] = await db.select({ id: attributeDefinitions.id, name: attributeDefinitions.name })
+      .from(attributeDefinitions)
+      .where(sql`lower(${attributeDefinitions.name}) = ${key}`)
+    if (row) { defCache.set(key, row.id); return row.id }
+    // Normalise to title-case when inserting a brand-new definition
+    const titleName = key.charAt(0).toUpperCase() + key.slice(1)
+    const [ins] = await db.insert(attributeDefinitions)
+      .values({ name: titleName, inputType: 'select', sortOrder: 0 })
+      .onConflictDoUpdate({ target: attributeDefinitions.name, set: { name: titleName } }).returning()
+    defCache.set(key, ins.id)
     return ins.id
   }
 
@@ -168,7 +249,6 @@ async function runImport(job: ImportJob, csvBuffer: Buffer, warehouseId: string)
       .values({ definitionId: defId, code, label: code, sortOrder: 0 })
       .onConflictDoNothing().returning()
     if (!ins) {
-      // Race / conflict – fetch again
       const [fetched] = await db.select({ id: attributeOptions.id }).from(attributeOptions)
         .where(and(eq(attributeOptions.definitionId, defId), eq(attributeOptions.code, code)))
       optCache.set(key, fetched.id)
@@ -178,39 +258,59 @@ async function runImport(job: ImportJob, csvBuffer: Buffer, warehouseId: string)
     return ins.id
   }
 
-  // ── Process rows ──────────────────────────────────────────────────────────
-  const result: ImportResult = { imported: 0, skipped: 0, errors: [], imagesFailed: 0 }
+  // ── Process rows ───────────────────────────────────────────────────────────
+  const result: ImportResult = {
+    imported: 0, updated: 0, skipped: blanksEarly.length,
+    errors: [], duplicates: [], blanks: blanksEarly, imagesFailed: 0,
+  }
+  const seenSkus = new Map<string, number[]>() // sku → csvRow[]
+
+  function cell(row: string[], idx: number): string {
+    return idx !== -1 ? (row[idx]?.trim() ?? '') : ''
+  }
 
   for (let i = 0; i < importable.length; i++) {
-    const row = importable[i]
-    const sku = row[6]?.trim().toUpperCase()
+    const { row, csvRow } = importable[i]
+    const sku = cell(row, C.sku).toUpperCase()
 
-    job.current   = i + 1
+    job.current    = i + 1
     job.currentSku = sku
 
-    // Emit progress every 5 rows (plus first and last)
     if (i === 0 || i === importable.length - 1 || (i + 1) % 5 === 0) {
       emit(job, 'progress', { current: i + 1, total: importable.length, sku })
     }
 
+    // Track duplicates
+    if (seenSkus.has(sku)) {
+      seenSkus.get(sku)!.push(csvRow)
+    } else {
+      seenSkus.set(sku, [csvRow])
+    }
+
     try {
-      // Name: strip Hebrew when mixed (take the English part before the first comma)
-      const rawName = row[8]?.trim() ?? ''
-      const name = /[\u0590-\u05FF]/.test(rawName)
+      const rawName  = cell(row, C.title)
+      // Strip Hebrew if mixed (take English part before first comma)
+      const name     = /[\u0590-\u05FF]/.test(rawName)
         ? (rawName.split(',')[0].trim() || sku)
         : (rawName || sku)
 
-      // Category: col 4 (data field under empty header) or col 5 (catagory)
-      const catRaw   = row[4]?.trim() || row[5]?.trim()
-      const qty      = Math.max(0, parseInt(row[11] ?? '0', 10) || 0)
-      const price    = parseFloat(row[12] ?? '') || null
-      const imageUrl = row[15]?.trim()
-      const colorCode = row[1]?.trim()
-      const sizeVal   = row[2]?.trim()
-      const modelVal  = row[3]?.trim()
+      const brandRaw = cell(row, C.brand)
+      const catRaw   = cell(row, C.category)
+      const modelVal = cell(row, C.model)
+      const sizeVal  = cell(row, C.size)
+      const colorVal = cell(row, C.color)
+      const qty      = Math.max(0, parseInt(cell(row, C.qty) || '0', 10) || 0)
+      const price    = parseFloat(cell(row, C.price)) || null
+      const imageUrl = cell(row, C.image)
+      const boxNum   = cell(row, C.box) || null
+      const dateAdded = parseDate(cell(row, C.dateAdded))
+      const unitVal   = cell(row, C.unit)
 
+      // Brand / category
+      let brandId:    string | null = null
       let categoryId: string | null = null
-      if (catRaw) categoryId = await getOrCreateCategory(catRaw)
+      if (brandRaw) brandId    = await getOrCreateBrand(brandRaw)
+      if (catRaw)   categoryId = await getOrCreateCategory(catRaw)
 
       // Image
       let picturePath: string | null = null
@@ -221,21 +321,15 @@ async function runImport(job: ImportJob, csvBuffer: Buffer, warehouseId: string)
 
       // Upsert product
       const [product] = await db.insert(products)
-        .values({
-          sku,
-          name,
-          categoryId,
-          basePrice: price != null ? String(price) : null,
-          picture: picturePath,
-        })
+        .values({ sku, name, brandId, categoryId, basePrice: price != null ? String(price) : null, picture: picturePath, dateAdded })
         .onConflictDoUpdate({
           target: products.sku,
-          set: { name, categoryId, basePrice: price != null ? String(price) : null, picture: picturePath },
+          set: { name, brandId, categoryId, basePrice: price != null ? String(price) : null, picture: picturePath, dateAdded },
         })
         .returning()
 
-      // Attributes (color, size, model)
-      for (const [defName, value] of [['color', colorCode], ['size', sizeVal], ['model', modelVal]] as const) {
+      // Attributes: color, size, model, unit
+      for (const [defName, value] of [['color', colorVal], ['size', sizeVal], ['model', modelVal], ['unit', unitVal]] as const) {
         if (!value) continue
         const defId = await getOrCreateDef(defName)
         const optId = await getOrCreateOpt(defId, value)
@@ -244,15 +338,14 @@ async function runImport(job: ImportJob, csvBuffer: Buffer, warehouseId: string)
           .onConflictDoNothing()
       }
 
-      // Stock row (always, even qty=0 so product appears in warehouse view)
+      // Stock (always create a row, even qty=0, so product appears in warehouse)
       await db.insert(inventoryStock)
-        .values({ productId: product.id, warehouseId, quantity: qty })
+        .values({ productId: product.id, warehouseId, quantity: qty, boxNumber: boxNum })
         .onConflictDoUpdate({
           target: [inventoryStock.productId, inventoryStock.warehouseId],
-          set: { quantity: qty },
+          set: { quantity: qty, boxNumber: boxNum },
         })
 
-      // Ledger entry only when there is stock to receive
       if (qty > 0) {
         await db.insert(inventoryLedger).values({
           productId: product.id,
@@ -260,14 +353,24 @@ async function runImport(job: ImportJob, csvBuffer: Buffer, warehouseId: string)
           actionType: 'receive',
           quantityDelta: qty,
           reason: 'CSV import',
-          notes: `Opening stock imported from CSV`,
+          notes: 'Opening stock imported from CSV',
         })
       }
 
-      result.imported++
+      const isDup = (seenSkus.get(sku)?.length ?? 0) > 1
+      if (isDup) {
+        result.updated++
+      } else {
+        result.imported++
+      }
     } catch (err: unknown) {
-      result.errors.push({ sku, reason: err instanceof Error ? err.message : String(err) })
+      result.errors.push({ sku, row: csvRow, reason: err instanceof Error ? err.message : String(err) })
     }
+  }
+
+  // Build duplicate summary (skus that appeared more than once)
+  for (const [sku, rows] of seenSkus) {
+    if (rows.length > 1) result.duplicates.push({ sku, rows })
   }
 
   job.status = 'done'
@@ -370,6 +473,24 @@ export const importRoutes: FastifyPluginAsync = async (fastify) => {
       })
 
       reply.hijack()
+    },
+  )
+
+  // DELETE /api/import/clear-all ─────────────────────────────────────────────
+  fastify.delete(
+    '/api/import/clear-all',
+    { onRequest: [fastify.authenticate] },
+    async (_request, reply) => {
+      await db.execute(
+        `TRUNCATE TABLE
+          sale_items, sales,
+          transfer_items, transfers,
+          inventory_ledger, inventory_stock,
+          product_attributes, products,
+          brands, categories
+         CASCADE`
+      )
+      return reply.send({ ok: true })
     },
   )
 }

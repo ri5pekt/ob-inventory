@@ -25,21 +25,7 @@
         </div>
 
         <div class="field">
-          <label class="field-label">Product Name <span class="req">*</span></label>
-          <InputText
-            v-model="form.name"
-            placeholder="e.g. Boxing Gloves Pro"
-            :invalid="touched.name && !form.name"
-            class="w-full"
-          />
-          <span v-if="touched.name && !form.name" class="field-error">Required</span>
-        </div>
-
-        <div class="field full-col">
-          <label class="field-label">
-            WooCommerce Title
-            <span class="field-hint-inline">How the product name appears on the WooCommerce website</span>
-          </label>
+          <label class="field-label">Name</label>
           <InputText
             v-model="form.wooTitle"
             placeholder="e.g. Pro Boxing Gloves – Red/Black 8oz"
@@ -227,35 +213,34 @@ const catalogLoading = computed(() => brandsLoading.value || catsLoading.value |
 const brands     = computed(() => brandsData.value     ?? [])
 const categories = computed(() => categoriesData.value ?? [])
 
-const sizeOptions  = computed(() => attributesData.value?.find(a => a.name === 'Size')?.options  ?? [])
-const colorOptions = computed(() => attributesData.value?.find(a => a.name === 'Color')?.options ?? [])
-const unitOptions  = computed(() => attributesData.value?.find(a => a.name === 'Unit')?.options  ?? [])
+const sizeOptions  = computed(() => attributesData.value?.find(a => a.name.toLowerCase() === 'size')?.options  ?? [])
+const colorOptions = computed(() => attributesData.value?.find(a => a.name.toLowerCase() === 'color')?.options ?? [])
+const unitOptions  = computed(() => attributesData.value?.find(a => a.name.toLowerCase() === 'unit')?.options  ?? [])
 
 // ── Form state ────────────────────────────────────────────────────────────────
 const emptyForm = () => ({
-  sku:          '',
-  name:         '',
-  wooTitle:     '',
-  brandId:      null as string | null,
-  categoryId:   null as string | null,
-  boxNumber:    '',
-  dateAdded:    null as Date | null,
-  quantity:     0,
-  model:        '',
-  sizeOptionId: null as string | null,
-  colorOptionId:null as string | null,
-  unitOptionId: null as string | null,
+  sku:           '',
+  wooTitle:      '',
+  brandId:       null as string | null,
+  categoryId:    null as string | null,
+  boxNumber:     '',
+  dateAdded:     null as Date | null,
+  quantity:      0,
+  model:         '',
+  sizeOptionId:  null as string | null,
+  colorOptionId: null as string | null,
+  unitOptionId:  null as string | null,
 })
 
 const form     = ref(emptyForm())
-const touched  = ref({ sku: false, name: false })
+const touched  = ref({ sku: false })
 const submitting = ref(false)
 const errorMsg   = ref('')
 
 watch(() => props.visible, (v) => {
   if (v) {
-    form.value  = emptyForm()
-    touched.value = { sku: false, name: false }
+    form.value    = emptyForm()
+    touched.value = { sku: false }
     errorMsg.value = ''
   }
 })
@@ -273,17 +258,18 @@ function toISODate(d: Date): string {
 const queryClient = useQueryClient()
 
 async function submit() {
-  touched.value = { sku: true, name: true }
-  if (!form.value.sku || !form.value.name) return
+  touched.value = { sku: true }
+  if (!form.value.sku) return
 
   submitting.value = true
   errorMsg.value   = ''
 
   try {
+    const displayName = form.value.wooTitle?.trim() || form.value.sku.trim()
     await addProductToWarehouse(props.warehouseId, {
       sku:          form.value.sku.trim(),
-      name:         form.value.name.trim(),
-      wooTitle:     form.value.wooTitle     || null,
+      name:         displayName,
+      wooTitle:     form.value.wooTitle?.trim() || null,
       brandId:      form.value.brandId      || null,
       categoryId:   form.value.categoryId   || null,
       boxNumber:    form.value.boxNumber    || null,

@@ -41,7 +41,7 @@
     </Column>
 
     <Column field="name" header="Name" frozen sortable style="width: 160px">
-      <template #body="{ data }"><span class="col-name">{{ data.name ?? '—' }}</span></template>
+      <template #body="{ data }"><span class="col-name">{{ data.wooTitle ?? data.name ?? '—' }}</span></template>
     </Column>
 
     <!-- Scrollable middle -->
@@ -118,8 +118,9 @@ function formatDate(iso: string | null | undefined): string {
 
 /* Frozen columns must have an opaque background */
 :deep(.p-datatable-tbody .p-frozen-column),
-:deep(.p-datatable-thead .p-frozen-column) { background: inherit; }
-:deep(tr.p-row-odd .p-frozen-column) { background: var(--p-datatable-row-striped-background, #fafafa); }
+:deep(.p-datatable-thead .p-frozen-column) { background: #fff; }
+:deep(tr.p-row-odd .p-frozen-column)       { background: var(--p-datatable-row-striped-background, #fafafa); }
+:deep(tr:hover .p-frozen-column)           { background: var(--p-datatable-row-hover-background, #f1f5f9); }
 
 .table-empty { display: flex; align-items: center; gap: 8px; color: #94a3b8; font-size: 14px; padding: 32px; justify-content: center; }
 

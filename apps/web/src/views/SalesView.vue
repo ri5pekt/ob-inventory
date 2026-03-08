@@ -115,8 +115,8 @@
       </DataTable>
     </div>
 
-    <SaleDetailDialog v-model:visible="showDetail" :sale="selectedSale" />
-    <CreateSaleModal v-model="showCreate" />
+    <SaleDetailDialog v-model:visible="showDetail" :sale="selectedSale" @deleted="onSaleDeleted" />
+    <CreateSaleModal v-model="showCreate" @created="onSaleCreated" />
   </div>
 </template>
 
@@ -141,11 +141,25 @@ const search       = ref('')
 const showCreate   = ref(false)
 const showDetail   = ref(false)
 const selectedSale = ref<SaleDetail | null>(null)
+const refreshKey   = ref(0)
 
 const { data: salesData, isLoading } = useQuery({
-  queryKey: computed(() => ['sales', dateRange.value?.from, dateRange.value?.to]),
+  queryKey: computed(() => ['sales', dateRange.value?.from, dateRange.value?.to, refreshKey.value]),
   queryFn:  () => getSales({ dateFrom: dateRange.value?.from, dateTo: dateRange.value?.to, limit: 1000 }),
 })
+
+function onSaleCreated() {
+  if (dateRange.value) {
+    const to = new Date(Date.now() + 60_000)
+    dateRange.value = { from: dateRange.value.from, to: to.toISOString() }
+  }
+  refreshKey.value++
+}
+
+function onSaleDeleted() {
+  selectedSale.value = null
+  refreshKey.value++
+}
 
 const sales = computed(() => salesData.value ?? [])
 

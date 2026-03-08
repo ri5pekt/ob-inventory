@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify'
-import { eq, desc, count, and, sql, inArray, gte, lte } from 'drizzle-orm'
+import { eq, desc, count, and, sql, inArray, gte, lte, isNotNull } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../db.js'
 import {
@@ -41,13 +41,15 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         storeId:      sales.storeId,
         storeName:    stores.name,
         wooOrderId:   sales.wooOrderId,
-        customerName: sales.customerName,
-        customerEmail:sales.customerEmail,
-        totalPrice:   sales.totalPrice,
-        currency:     sales.currency,
-        notes:        sales.notes,
-        createdAt:    sales.createdAt,
-        itemCount:    count(saleItems.id),
+        customerName:    sales.customerName,
+        customerEmail:   sales.customerEmail,
+        customerPhone:   sales.customerPhone,
+        customerAddress: sales.customerAddress,
+        totalPrice:      sales.totalPrice,
+        currency:        sales.currency,
+        notes:           sales.notes,
+        createdAt:       sales.createdAt,
+        itemCount:       count(saleItems.id),
       })
       .from(sales)
       .leftJoin(warehouses, eq(sales.warehouseId, warehouses.id))
@@ -74,13 +76,15 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         storeId:      sales.storeId,
         storeName:    stores.name,
         wooOrderId:   sales.wooOrderId,
-        customerName: sales.customerName,
-        customerEmail:sales.customerEmail,
-        totalPrice:   sales.totalPrice,
-        currency:     sales.currency,
-        notes:        sales.notes,
-        createdAt:    sales.createdAt,
-        updatedAt:    sales.updatedAt,
+        customerName:    sales.customerName,
+        customerEmail:   sales.customerEmail,
+        customerPhone:   sales.customerPhone,
+        customerAddress: sales.customerAddress,
+        totalPrice:      sales.totalPrice,
+        currency:        sales.currency,
+        notes:           sales.notes,
+        createdAt:       sales.createdAt,
+        updatedAt:       sales.updatedAt,
       })
       .from(sales)
       .leftJoin(warehouses, eq(sales.warehouseId, warehouses.id))
@@ -103,10 +107,12 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
     const bodySchema = z.object({
       saleType:      z.enum(['direct', 'partner']),
       warehouseId:   z.string().uuid().optional(),  // required for partner; direct → main warehouse
-      customerName:  z.string().optional(),
-      customerEmail: z.string().optional(),
-      currency:      z.string().default('ILS'),
-      notes:         z.string().optional(),
+      customerName:    z.string().optional(),
+      customerEmail:   z.string().optional(),
+      customerPhone:   z.string().optional(),
+      customerAddress: z.string().optional(),
+      currency:        z.string().default('ILS'),
+      notes:           z.string().optional(),
       items: z.array(z.object({
         sku:       z.string().min(1),
         name:      z.string().min(1),
@@ -190,8 +196,10 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         saleType:      d.saleType,
         status:        'completed',
         warehouseId:   warehouseId!,
-        customerName:  d.customerName ?? null,
-        customerEmail: d.customerEmail ?? null,
+        customerName:    d.customerName    ?? null,
+        customerEmail:   d.customerEmail   ?? null,
+        customerPhone:   d.customerPhone   ?? null,
+        customerAddress: d.customerAddress ?? null,
         totalPrice:    totalPrice > 0 ? String(totalPrice) : null,
         currency:      d.currency,
         notes:         d.notes ?? null,
@@ -244,5 +252,59 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
     })
 
     return reply.status(201).send(result)
+  })
+
+  // ── Delete sale (restore stock + ledger) ───────────────────────────────────
+  fastify.delete<{ Params: { id: string } }>('/api/sales/:id', auth, async (request, reply) => {
+    const { id } = request.params
+    const jwtPayload = (request as { user?: { sub?: string } }).user
+    const userId = jwtPayload?.sub ?? null
+
+    const bodySchema = z.object({ reason: z.string().optional() })
+    const { reason } = bodySchema.parse(request.body ?? {})
+
+    // Load the sale + its items in one go
+    const [sale] = await db.select().from(sales).where(eq(sales.id, id))
+    if (!sale) return reply.status(404).send({ error: 'Sale not found' })
+
+    const items = await db
+      .select()
+      .from(saleItems)
+      .where(and(eq(saleItems.saleId, id), isNotNull(saleItems.productId)))
+
+    await db.transaction(async (tx) => {
+      for (const item of items) {
+        if (!item.productId) continue
+
+        // Restore stock
+        await tx
+          .update(inventoryStock)
+          .set({
+            quantity:  sql`${inventoryStock.quantity} + ${item.quantity}`,
+            updatedAt: sql`now()`,
+          })
+          .where(and(
+            eq(inventoryStock.productId,   item.productId),
+            eq(inventoryStock.warehouseId, sale.warehouseId),
+          ))
+
+        // Ledger entry
+        await tx.insert(inventoryLedger).values({
+          productId:     item.productId,
+          warehouseId:   sale.warehouseId,
+          actionType:    'return',
+          quantityDelta: item.quantity,
+          referenceId:   sale.id,
+          referenceType: 'sale',
+          notes:         `Sale deleted — stock restored (${sale.saleType} sale)${reason ? ` — ${reason}` : ''}`,
+          createdBy:     userId,
+        })
+      }
+
+      // Delete sale (cascade removes sale_items)
+      await tx.delete(sales).where(eq(sales.id, id))
+    })
+
+    return reply.status(200).send({ ok: true })
   })
 }

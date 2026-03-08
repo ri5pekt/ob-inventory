@@ -24,21 +24,7 @@
         </div>
 
         <div class="field">
-          <label class="field-label">Product Name <span class="req">*</span></label>
-          <InputText
-            v-model="form.name"
-            placeholder="e.g. Boxing Gloves Pro"
-            :invalid="touched.name && !form.name"
-            class="w-full"
-          />
-          <span v-if="touched.name && !form.name" class="field-error">Required</span>
-        </div>
-
-        <div class="field full-col">
-          <label class="field-label">
-            WooCommerce Title
-            <span class="field-hint-inline">How the product name appears on the WooCommerce website</span>
-          </label>
+          <label class="field-label">Name</label>
           <InputText
             v-model="form.wooTitle"
             placeholder="e.g. Pro Boxing Gloves – Red/Black 8oz"
@@ -261,9 +247,9 @@ const { data: attributesData, isLoading: attrsLoading  } = useQuery({ queryKey: 
 const catalogLoading = computed(() => brandsLoading.value || catsLoading.value || attrsLoading.value)
 const brands         = computed(() => brandsData.value     ?? [])
 const categories     = computed(() => categoriesData.value ?? [])
-const sizeOptions    = computed(() => attributesData.value?.find(a => a.name === 'Size')?.options  ?? [])
-const colorOptions   = computed(() => attributesData.value?.find(a => a.name === 'Color')?.options ?? [])
-const unitOptions    = computed(() => attributesData.value?.find(a => a.name === 'Unit')?.options  ?? [])
+const sizeOptions    = computed(() => attributesData.value?.find(a => a.name.toLowerCase() === 'size')?.options  ?? [])
+const colorOptions   = computed(() => attributesData.value?.find(a => a.name.toLowerCase() === 'color')?.options ?? [])
+const unitOptions    = computed(() => attributesData.value?.find(a => a.name.toLowerCase() === 'unit')?.options  ?? [])
 
 // ── Form state ────────────────────────────────────────────────────────────────
 function parseDate(iso: string | null | undefined): Date | null {
@@ -280,8 +266,7 @@ function toISODate(d: Date): string {
 
 const buildForm = (item: StockItemDTO | null) => ({
   sku:           item?.sku           ?? '',
-  name:          item?.name          ?? '',
-  wooTitle:      item?.wooTitle      ?? '',
+  wooTitle:      item?.wooTitle      ?? item?.name ?? '',
   brandId:       item?.brandId       ?? null as string | null,
   categoryId:    item?.categoryId    ?? null as string | null,
   boxNumber:     item?.boxNumber     ?? '',
@@ -345,14 +330,14 @@ function onDrop(e: DragEvent) {
 }
 
 const form       = ref(buildForm(null))
-const touched    = ref({ sku: false, name: false })
+const touched    = ref({ sku: false })
 const submitting = ref(false)
 const errorMsg   = ref('')
 
-watch(() => props.visible, (v) => {
-  if (v && props.item) {
+watch(() => [props.visible, props.item] as const, ([visible]) => {
+  if (visible && props.item) {
     form.value     = buildForm(props.item)
-    touched.value  = { sku: false, name: false }
+    touched.value  = { sku: false }
     errorMsg.value = ''
   }
 })
@@ -365,17 +350,18 @@ const quantityDelta = computed(() =>
 const queryClient = useQueryClient()
 
 async function submit() {
-  touched.value = { sku: true, name: true }
-  if (!form.value.sku || !form.value.name || !props.item) return
+  touched.value = { sku: true }
+  if (!form.value.sku || !props.item) return
 
   submitting.value = true
   errorMsg.value   = ''
 
   try {
+    const displayName = form.value.wooTitle?.trim() || form.value.sku.trim()
     await updateWarehouseStock(props.warehouseId, props.item.productId, {
       sku:           form.value.sku.trim(),
-      name:          form.value.name.trim(),
-      wooTitle:      form.value.wooTitle      || null,
+      name:          displayName,
+      wooTitle:      form.value.wooTitle?.trim() || null,
       brandId:       form.value.brandId       || null,
       categoryId:    form.value.categoryId    || null,
       boxNumber:     form.value.boxNumber     || null,

@@ -124,13 +124,25 @@ class OB_Inventory_Webhooks {
             ];
         }
 
+        // Compose a single address string from billing fields
+        $address_parts = array_filter( [
+            $order->get_billing_address_1(),
+            $order->get_billing_address_2(),
+            $order->get_billing_city(),
+            $order->get_billing_state(),
+            $order->get_billing_postcode(),
+            $order->get_billing_country(),
+        ] );
+        $address = implode( ', ', $address_parts );
+
         return [
             'woo_order_id' => $order->get_id(),
             'status'       => $order->get_status(),
             'customer'     => [
-                'name'  => $order->get_formatted_billing_full_name(),
-                'email' => $order->get_billing_email(),
-                'phone' => $order->get_billing_phone(),
+                'name'    => $order->get_formatted_billing_full_name(),
+                'email'   => $order->get_billing_email(),
+                'phone'   => $order->get_billing_phone(),
+                'address' => $address,
             ],
             'total'    => (float) $order->get_total(),
             'currency' => $order->get_currency(),

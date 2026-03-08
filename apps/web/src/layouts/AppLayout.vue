@@ -11,7 +11,10 @@
       <div class="sidebar-brand">
         <RouterLink :to="mainWarehouseLink" class="brand-link" @click="sidebarOpen = false">
           <div class="brand-icon"><i class="pi pi-box"></i></div>
-          <span class="brand-name">OB Inventory</span>
+          <div class="brand-text">
+            <span class="brand-name">OB Inventory</span>
+            <span class="brand-version">v{{ appVersion }}</span>
+          </div>
         </RouterLink>
         <!-- Close button (mobile only) -->
         <button class="sidebar-close" @click="sidebarOpen = false">
@@ -93,6 +96,9 @@ import { useQuery } from '@tanstack/vue-query'
 import { getWarehouses } from '@/api/warehouses'
 import StoreSelector from '@/components/layout/StoreSelector.vue'
 import UserMenu from '@/components/layout/UserMenu.vue'
+
+declare const __APP_VERSION__: string
+const appVersion = __APP_VERSION__
 
 const route       = useRoute()
 const sidebarOpen = ref(false)
@@ -221,7 +227,9 @@ const pageTitle = computed(() => {
   flex-shrink: 0;
 }
 
-.brand-name { font-size: 15px; font-weight: 600; color: #f8fafc; letter-spacing: 0.01em; flex: 1; }
+.brand-text    { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+.brand-name    { font-size: 15px; font-weight: 600; color: #f8fafc; letter-spacing: 0.01em; line-height: 1.2; }
+.brand-version { font-size: 10px; font-weight: 500; color: #475569; letter-spacing: 0.04em; }
 
 .sidebar-close {
   display: none;

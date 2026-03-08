@@ -24,9 +24,17 @@
           <span class="meta-label">Woo Order</span>
           <span>#{{ sale.wooOrderId }}</span>
         </div>
-        <div v-if="sale.customerName" class="meta-row">
+        <div v-if="sale.customerName || sale.customerEmail" class="meta-row">
           <span class="meta-label">Customer</span>
           <span>{{ sale.customerName }}<span v-if="sale.customerEmail"> ({{ sale.customerEmail }})</span></span>
+        </div>
+        <div v-if="sale.customerPhone" class="meta-row">
+          <span class="meta-label">Phone</span>
+          <span>{{ sale.customerPhone }}</span>
+        </div>
+        <div v-if="sale.customerAddress" class="meta-row">
+          <span class="meta-label">Address</span>
+          <span>{{ sale.customerAddress }}</span>
         </div>
         <div v-if="sale.totalPrice" class="meta-row">
           <span class="meta-label">Total</span>
@@ -65,23 +73,92 @@
     <div v-else class="loading-detail">
       <i class="pi pi-spin pi-spinner" />
     </div>
+
+    <template #footer>
+      <div class="detail-footer">
+        <Button
+          label="Delete Sale"
+          icon="pi pi-trash"
+          severity="danger"
+          outlined
+          size="small"
+          :disabled="!sale"
+          @click="showConfirm = true"
+        />
+        <Button label="Close" severity="secondary" outlined size="small" @click="$emit('update:visible', false)" />
+      </div>
+    </template>
+  </Dialog>
+
+  <!-- Delete confirmation -->
+  <Dialog
+    v-model:visible="showConfirm"
+    modal
+    header="Delete Sale"
+    :style="{ width: '400px' }"
+    :closable="!deleting"
+  >
+    <div class="confirm-body">
+      <i class="pi pi-exclamation-triangle confirm-icon" />
+      <p>Are you sure you want to delete this sale?</p>
+      <p class="confirm-sub">Stock will be restored for all matched products and a return entry will be added to the inventory log.</p>
+      <div class="confirm-reason">
+        <label class="reason-label">Reason <span class="reason-optional">(optional)</span></label>
+        <Textarea
+          v-model="deleteReason"
+          rows="2"
+          placeholder="e.g. Customer cancelled, duplicate entry…"
+          fluid
+          :disabled="deleting"
+        />
+      </div>
+      <Message v-if="deleteError" severity="error" :closable="false" class="confirm-error">{{ deleteError }}</Message>
+    </div>
+    <template #footer>
+      <Button label="Cancel" severity="secondary" outlined :disabled="deleting" @click="showConfirm = false" />
+      <Button label="Delete" icon="pi pi-trash" severity="danger" :loading="deleting" @click="confirmDelete" />
+    </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import type { SaleDetail, SaleType } from '@/api/sales'
+import { deleteSale } from '@/api/sales'
 
 const props = defineProps<{
   visible: boolean
   sale: SaleDetail | null
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'update:visible', v: boolean): void
+  (e: 'deleted'): void
 }>()
 
-const dialogHeader = computed(() => {
+const showConfirm = ref(false)
+const deleting    = ref(false)
+const deleteError = ref<string | null>(null)
+const deleteReason = ref('')
+
+async function confirmDelete() {
+  if (!props.sale) return
+  deleting.value = true
+  deleteError.value = null
+  try {
+    await deleteSale(props.sale.id, deleteReason.value.trim() || undefined)
+    showConfirm.value = false
+    deleteReason.value = ''
+    emit('update:visible', false)
+    emit('deleted')
+  } catch {
+    deleteError.value = 'Failed to delete sale. Please try again.'
+  } finally {
+    deleting.value = false
+  }
+}
+
+const dialogHeader = computed<string>(() => {
   if (!props.sale) return 'Sale Details'
   const type = typeLabel(props.sale.saleType)
   const ref  = props.sale.wooOrderId ? ` — Order #${props.sale.wooOrderId}` : ''
@@ -164,4 +241,57 @@ function formatDate(iso: string) {
   font-size: 24px;
   color: var(--p-primary-color);
 }
+
+.detail-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.confirm-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  text-align: center;
+}
+
+.confirm-icon {
+  font-size: 36px;
+  color: var(--p-red-500);
+}
+
+.confirm-body p { margin: 0; font-size: 15px; }
+
+.confirm-sub {
+  font-size: 13px;
+  color: var(--p-text-muted-color);
+}
+
+.confirm-reason {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+  text-align: left;
+}
+
+.reason-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--p-text-muted-color);
+}
+
+.reason-optional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.confirm-error { width: 100%; }
 </style>

@@ -90,12 +90,56 @@
           <Button
             label="Execute Transfer"
             icon="pi pi-arrow-right"
-            :loading="submitting"
             :disabled="!canSubmit"
-            @click="submit"
+            @click="openConfirm"
           />
         </div>
       </div>
+    </template>
+  </Dialog>
+
+  <!-- Confirmation dialog -->
+  <Dialog
+    v-model:visible="showConfirm"
+    modal
+    header="Confirm Transfer"
+    :style="{ width: '400px' }"
+    :closable="!submitting"
+  >
+    <div class="confirm-body">
+      <div class="confirm-route">
+        <div class="confirm-warehouse">
+          <span class="confirm-label">From</span>
+          <strong>{{ fromWarehouseName }}</strong>
+        </div>
+        <i class="pi pi-arrow-right confirm-arrow-icon" />
+        <div class="confirm-warehouse">
+          <span class="confirm-label">To</span>
+          <strong>{{ toWarehouseName }}</strong>
+        </div>
+      </div>
+
+      <div class="confirm-stats">
+        <span><strong>{{ form.items.length }}</strong> product{{ form.items.length !== 1 ? 's' : '' }}</span>
+        <span class="confirm-dot">·</span>
+        <span><strong>{{ totalQty }}</strong> units</span>
+        <template v-if="form.reference.trim()">
+          <span class="confirm-dot">·</span>
+          <span>Ref: <strong>{{ form.reference.trim() }}</strong></span>
+        </template>
+      </div>
+
+      <p class="confirm-question">Are you sure you want to proceed with this transfer?</p>
+    </div>
+
+    <template #footer>
+      <Button label="Cancel" severity="secondary" outlined :disabled="submitting" @click="showConfirm = false" />
+      <Button
+        label="Confirm & Execute"
+        icon="pi pi-check"
+        :loading="submitting"
+        @click="submit"
+      />
     </template>
   </Dialog>
 </template>
@@ -111,7 +155,10 @@ import TransferItemsList from './TransferItemsList.vue'
 import type { TransferItemRow } from './TransferItemsList.vue'
 
 const props = defineProps<{ modelValue: boolean }>()
-const emit  = defineEmits<{ (e: 'update:modelValue', v: boolean): void }>()
+const emit  = defineEmits<{
+  (e: 'update:modelValue', v: boolean): void
+  (e: 'created'): void
+}>()
 
 const visible = computed({
   get: () => props.modelValue,
@@ -148,6 +195,17 @@ const form              = ref(defaultForm())
 const submitting        = ref(false)
 const errorMsg          = ref<string | null>(null)
 const insufficientItems = ref<{ sku: string; requested: number; available: number }[]>([])
+const showConfirm       = ref(false)
+
+const fromWarehouseName = computed(() => warehouses.value.find(w => w.id === form.value.fromWarehouseId)?.name ?? '')
+const toWarehouseName   = computed(() => warehouses.value.find(w => w.id === form.value.toWarehouseId)?.name ?? '')
+
+function openConfirm() {
+  if (!canSubmit.value) return
+  errorMsg.value = null
+  insufficientItems.value = []
+  showConfirm.value = true
+}
 
 const addedIds  = computed(() => form.value.items.map(i => i.productId))
 const totalQty  = computed(() => form.value.items.reduce((s, i) => s + i.quantity, 0))
@@ -187,8 +245,6 @@ function resetForm() {
 // ── Submit ────────────────────────────────────────────────────────────────────
 async function submit() {
   if (!canSubmit.value) return
-  errorMsg.value = null
-  insufficientItems.value = []
   submitting.value = true
 
   try {
@@ -199,11 +255,12 @@ async function submit() {
       notes:           form.value.notes.trim()     || undefined,
       items:           form.value.items.map(i => ({ productId: i.productId, quantity: i.quantity })),
     })
-    queryClient.invalidateQueries({ queryKey: ['transfers'] })
-    queryClient.invalidateQueries({ queryKey: ['warehouses'] })
+    showConfirm.value = false
     visible.value = false
+    emit('created')
   } catch (err: unknown) {
     const e = err as { response?: { data?: { error?: string; code?: string; items?: typeof insufficientItems.value } } }
+    showConfirm.value = false
     if (e.response?.data?.code === 'INSUFFICIENT_STOCK') {
       insufficientItems.value = e.response.data.items ?? []
     } else {
@@ -257,4 +314,64 @@ label {
 .footer-actions { display: flex; gap: 8px; }
 
 .stock-error-list { margin: 4px 0 0; padding-left: 18px; }
+
+/* ── Confirmation dialog ── */
+.confirm-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 4px 0 8px;
+}
+
+.confirm-route {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--p-surface-50, #f8fafc);
+  border: 1px solid var(--p-surface-200, #e2e8f0);
+  border-radius: 10px;
+  padding: 14px 18px;
+}
+
+.confirm-warehouse {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.confirm-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--p-text-muted-color, #94a3b8);
+}
+
+.confirm-warehouse strong {
+  font-size: 15px;
+  color: var(--p-text-color, #0f172a);
+}
+
+.confirm-arrow-icon {
+  font-size: 16px;
+  color: var(--p-primary-color);
+  flex-shrink: 0;
+}
+
+.confirm-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--p-text-muted-color, #64748b);
+}
+
+.confirm-dot { color: var(--p-surface-300, #cbd5e1); }
+
+.confirm-question {
+  margin: 0;
+  font-size: 14px;
+  color: var(--p-text-color, #0f172a);
+}
 </style>

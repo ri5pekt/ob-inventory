@@ -78,6 +78,10 @@ export async function getTransfer(id: string): Promise<TransferDetail> {
   return data
 }
 
+export async function deleteTransfer(id: string, reason?: string): Promise<void> {
+  await apiClient.delete(`/transfers/${id}`, { data: { reason } })
+}
+
 export async function createTransfer(payload: CreateTransferRequest): Promise<{ id: string }> {
   const { data } = await apiClient.post<{ id: string }>('/transfers', payload)
   return data

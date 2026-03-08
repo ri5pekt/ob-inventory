@@ -17,6 +17,8 @@ export const sales = pgTable('sales', {
   wooOrderId: text('woo_order_id'),
   customerName: text('customer_name'),
   customerEmail: text('customer_email'),
+  customerPhone:   text('customer_phone'),
+  customerAddress: text('customer_address'),
   totalPrice: numeric('total_price', { precision: 10, scale: 2 }),
   currency: text('currency').notNull().default('ILS'),
   notes: text('notes'),
