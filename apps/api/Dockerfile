@@ -27,6 +27,10 @@ RUN pnpm --filter @ob-inventory/types build \
     && pnpm --filter @ob-inventory/db build \
     && pnpm --filter @ob-inventory/api build
 
+# Copy migration SQL files into the build so they land in dist/migrations
+RUN mkdir -p apps/api/dist/migrations
+COPY packages/db/src/migrations/*.sql apps/api/dist/migrations/
+
 # ─── Production image ───────────────────────────────────
 FROM node:22-alpine AS runner
 WORKDIR /app
