@@ -205,23 +205,33 @@ export const storeRoutes: FastifyPluginAsync = async (fastify) => {
       .innerJoin(warehouses, eq(inventoryStock.warehouseId, warehouses.id))
       .where(eq(warehouses.type, 'main'))
 
-    // ── Match by SKU ────────────────────────────────────────────────────────
-    const obMap  = new Map(obStock.map(s => [s.sku, s]))
-    const wooMap = new Map(wooProducts.map(p => [p.sku, p]))
+    // ── Match by SKU (case-insensitive, trimmed) ─────────────────────────────
+    // WooCommerce SKUs sometimes differ in casing or have extra whitespace
+    const norm = (sku: string) => sku.trim().toLowerCase()
+
+    // Filter out products with blank SKUs (e.g. WooCommerce parent-level records)
+    const obFiltered  = obStock.filter(s => s.sku?.trim())
+    const wooFiltered = wooProducts.filter(p => p.sku?.trim())
+
+    const obMap  = new Map(obFiltered.map(s => [norm(s.sku), s]))
+    const wooMap = new Map(wooFiltered.map(p => [norm(p.sku), p]))
 
     type SyncStatus = 'synced' | 'qty_mismatch' | 'ob_only' | 'woo_only' | 'untracked'
 
-    const allSkus = new Set([...obMap.keys(), ...wooMap.keys()])
+    const allKeys = new Set([...obMap.keys(), ...wooMap.keys()])
 
-    const items = [...allSkus].map(sku => {
-      const ob  = obMap.get(sku)
-      const woo = wooMap.get(sku)
+    const items = [...allKeys].map(key => {
+      const ob  = obMap.get(key)
+      const woo = wooMap.get(key)
+
+      // Prefer the canonical casing from OB; fall back to WooCommerce as-is
+      const sku = ob?.sku ?? woo?.sku ?? key
 
       let status: SyncStatus
       if (ob && woo) {
-        if (!woo.manage_stock)         status = 'untracked'
-        else if (ob.quantity === woo.quantity) status = 'synced'
-        else                           status = 'qty_mismatch'
+        if (!woo.manage_stock)                 status = 'untracked'
+        else if (ob.quantity === woo.quantity)  status = 'synced'
+        else                                   status = 'qty_mismatch'
       } else if (ob) {
         status = 'ob_only'
       } else {
@@ -254,7 +264,7 @@ export const storeRoutes: FastifyPluginAsync = async (fastify) => {
         wooOnly:    count('woo_only'),
         untracked:  count('untracked'),
       },
-      meta: { wooTotal: wooProducts.length, obTotal: obStock.length },
+      meta: { wooTotal: wooFiltered.length, obTotal: obFiltered.length },
     }
   })
 
