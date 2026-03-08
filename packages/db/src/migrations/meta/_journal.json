@@ -50,6 +50,13 @@
       "when": 1741478400000,
       "tag": "0006_add_stores_secret_token",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1741564800000,
+      "tag": "0007_schema_sync",
+      "breakpoints": true
     }
   ]
 }
