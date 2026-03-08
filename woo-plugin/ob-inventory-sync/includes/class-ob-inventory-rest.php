@@ -144,12 +144,13 @@ class OB_Inventory_REST {
         $page     = (int) $request->get_param( 'page' );
         $per_page = (int) $request->get_param( 'per_page' );
 
-        $total_products = (int) wc_get_products( [
+        // count() the IDs array — (int) cast of an array always returns 1 in PHP
+        $total_products = count( wc_get_products( [
             'status' => 'publish',
             'type'   => [ 'simple', 'variable' ],
             'return' => 'ids',
             'limit'  => -1,
-        ] );
+        ] ) );
 
         $woo_products = wc_get_products( [
             'status'  => 'publish',
