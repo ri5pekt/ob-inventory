@@ -97,17 +97,17 @@ async function downloadImage(url: string, sku: string): Promise<string | null> {
 // ─── Safe date parser ────────────────────────────────────────────────────────
 // Returns YYYY-MM-DD or null for anything it can't parse with a valid year
 
-function parseDate(raw: string): string | null {
-  if (!raw || raw.toLowerCase() === 'bc') return null
-  try {
-    const d = new Date(raw)
-    if (isNaN(d.getTime())) return null
-    const year = d.getFullYear()
-    if (year < 2000 || year > 2100) return null
-    return d.toISOString().slice(0, 10)
-  } catch {
-    return null
+function parseDate(raw: string): string {
+  if (raw && raw.toLowerCase() !== 'bc') {
+    try {
+      const d = new Date(raw)
+      if (!isNaN(d.getTime())) {
+        const year = d.getFullYear()
+        if (year >= 2000 && year <= 2100) return d.toISOString().slice(0, 10)
+      }
+    } catch { /* fall through */ }
   }
+  return '2001-01-01'
 }
 
 // ─── Header-based column resolver ───────────────────────────────────────────
