@@ -10,6 +10,11 @@
     reverse_proxy api:3000
   }
 
+  # Uploaded product images — served by Fastify static
+  handle /uploads/* {
+    reverse_proxy api:3000
+  }
+
   # Frontend — proxy to nginx serving the Vue build
   handle {
     reverse_proxy web:80

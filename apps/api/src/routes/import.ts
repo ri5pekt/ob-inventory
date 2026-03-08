@@ -15,7 +15,8 @@ import {
 const __filename = fileURLToPath(import.meta.url)
 const __dirname  = dirname(__filename)
 
-const UPLOADS_DIR = join(__dirname, '../../uploads/products')
+// Must align with the fastify-static root defined in index.ts: join(__dirname, '../uploads')
+const UPLOADS_DIR = join(__dirname, '../uploads/products')
 if (!existsSync(UPLOADS_DIR)) mkdirSync(UPLOADS_DIR, { recursive: true })
 
 // ─── In-memory job store ────────────────────────────────────────────────────

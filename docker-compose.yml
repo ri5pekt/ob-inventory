@@ -66,6 +66,8 @@ services:
       WOO_API_SECRET: ${WOO_API_SECRET}
       WOO_WEBHOOK_SECRET: ${WOO_WEBHOOK_SECRET}
       WOO_PLUGIN_API_KEY: ${WOO_PLUGIN_API_KEY}
+    volumes:
+      - uploads_data:/app/apps/api/uploads
     expose:
       - "3000"
     healthcheck:
@@ -136,3 +138,4 @@ volumes:
   redis_data:
   caddy_data:
   caddy_config:
+  uploads_data:
