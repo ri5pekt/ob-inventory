@@ -27,9 +27,10 @@ RUN pnpm --filter @ob-inventory/types build \
     && pnpm --filter @ob-inventory/db build \
     && pnpm --filter @ob-inventory/api build
 
-# Copy migration SQL files into the build so they land in dist/migrations
-RUN mkdir -p apps/api/dist/migrations
-COPY packages/db/src/migrations/*.sql apps/api/dist/migrations/
+# Copy migration files (SQL + meta/) into the build so they land in dist/migrations
+RUN mkdir -p apps/api/dist/migrations/meta
+COPY packages/db/src/migrations/*.sql    apps/api/dist/migrations/
+COPY packages/db/src/migrations/meta/    apps/api/dist/migrations/meta/
 
 # Patch package.json exports to point to compiled dist (not TypeScript source)
 # This fixes Node.js module resolution in the production image

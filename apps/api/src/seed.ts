@@ -33,5 +33,4 @@ await db.insert(stores).values({
 console.log('✅  admin@local / admin123')
 console.log('✅  Store: Active Brands')
 
-await (db as any).$client?.end?.()
 process.exit(0)
