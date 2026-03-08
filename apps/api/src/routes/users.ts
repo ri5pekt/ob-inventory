@@ -5,7 +5,7 @@ import argon2 from 'argon2'
 import { db } from '../db.js'
 import { users, refreshTokens } from '@ob-inventory/db'
 
-const adminOnly = async (request: Parameters<FastifyPluginAsync>[0] & { user?: { role?: string } }, reply: Parameters<FastifyPluginAsync>[1]) => {
+const adminOnly = async (request: Parameters<FastifyPluginAsync>[0] & { user?: { role?: string } }, reply: { status: (code: number) => { send: (body: unknown) => unknown } }) => {
   if ((request.user as { role: string })?.role !== 'admin') {
     return reply.status(403).send({ error: 'Admin access required', code: 'FORBIDDEN' })
   }

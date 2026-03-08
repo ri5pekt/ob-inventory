@@ -210,7 +210,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
 
       for (const item of d.items) {
         const product = productBySku.get(item.sku)
-        const lt = item.lineTotal ?? (item.unitPrice != null ? String(item.unitPrice * item.quantity) : null)
+        const lt: string | null = item.lineTotal != null ? String(item.lineTotal) : (item.unitPrice != null ? String(item.unitPrice * item.quantity) : null)
 
         itemsToInsert.push({
           saleId:    sale.id,
