@@ -320,13 +320,17 @@ async function runImport(job: ImportJob, csvBuffer: Buffer, warehouseId: string)
         if (!picturePath) result.imagesFailed++
       }
 
-      // Upsert product
+      // Upsert product — only overwrite picture if a new image was successfully fetched
+      const updateSet: Record<string, unknown> = {
+        name, brandId, categoryId,
+        basePrice: price != null ? String(price) : null,
+        dateAdded,
+      }
+      if (picturePath !== null) updateSet.picture = picturePath
+
       const [product] = await db.insert(products)
         .values({ sku, name, brandId, categoryId, basePrice: price != null ? String(price) : null, picture: picturePath, dateAdded })
-        .onConflictDoUpdate({
-          target: products.sku,
-          set: { name, brandId, categoryId, basePrice: price != null ? String(price) : null, picture: picturePath, dateAdded },
-        })
+        .onConflictDoUpdate({ target: products.sku, set: updateSet })
         .returning()
 
       // Attributes: color, size, model, unit
