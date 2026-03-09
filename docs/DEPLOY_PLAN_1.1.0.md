@@ -60,6 +60,8 @@ cd /opt/ob-inventory
 docker compose exec -T postgres pg_dump -U ob_user -d ob_inventory -F c -f /tmp/ob_inventory_backup.dump
 # Copy to host (host path may not be writable from inside container)
 docker compose cp postgres:/tmp/ob_inventory_backup.dump /root/backups/ob-inventory/ob_inventory_$(date +%Y%m%d_%H%M%S).dump
+# Housekeeping: remove temp dump from container
+docker compose exec -T postgres rm -f /tmp/ob_inventory_backup.dump
 ```
 **Fallback** if `docker compose cp` is unavailable: `docker cp $(docker compose ps -q postgres):/tmp/ob_inventory_backup.dump /root/backups/ob-inventory/ob_inventory_$(date +%Y%m%d_%H%M%S).dump`
 
@@ -108,11 +110,11 @@ ssh root@187.124.160.50
 ```bash
 cd /opt/ob-inventory
 git fetch origin
-git checkout main
+git checkout -B main origin/main
 git reset --hard origin/main
 git rev-parse HEAD            # Print deployed commit SHA (record this)
 ```
-**Why reset --hard:** Avoids local drift and detached HEAD; server should match `origin/main` exactly.
+**Why checkout -B:** Creates `main` if it doesn't exist locally; avoids failure on fresh clones. **Why reset --hard:** Server should match `origin/main` exactly.
 
 ### 3.3 Stop app services only (keep Postgres and Redis running)
 ```bash
@@ -211,6 +213,7 @@ cd /opt/ob-inventory
 # Backup is on host; copy into container first (replace TIMESTAMP with your backup file)
 docker compose cp /root/backups/ob-inventory/ob_inventory_TIMESTAMP.dump postgres:/tmp/restore.dump
 docker compose exec -T postgres pg_restore -U ob_user -d ob_inventory -c /tmp/restore.dump
+docker compose exec -T postgres rm -f /tmp/restore.dump
 
 # Redeploy previous version
 git checkout 5c08d54          # Previous known-good commit
@@ -243,7 +246,7 @@ docker compose up -d
 ```bash
 cd /opt/ob-inventory
 git fetch origin
-git checkout main
+git checkout -B main origin/main
 git reset --hard origin/main
 git rev-parse HEAD
 docker compose stop web api worker caddy
