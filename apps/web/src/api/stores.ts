@@ -22,6 +22,7 @@ export type SyncStatus = 'synced' | 'qty_mismatch' | 'ob_only' | 'woo_only' | 'u
 
 export interface SyncItem {
   sku:         string
+  obProductId: string | null
   obName:      string | null
   wooName:     string | null
   wooAttrs:    string | null
@@ -93,5 +94,15 @@ export async function testWooConnection(id: string): Promise<WooTestResult> {
 
 export async function getSyncPreview(id: string): Promise<SyncPreview> {
   const { data } = await apiClient.get<SyncPreview>(`/stores/${id}/woo/sync-preview`)
+  return data
+}
+
+export interface SyncQuantityResponse {
+  ok: boolean
+  jobId: string | null
+}
+
+export async function syncProductQuantity(productId: string): Promise<SyncQuantityResponse> {
+  const { data } = await apiClient.post<SyncQuantityResponse>(`/inventory/products/${productId}/sync-quantity`)
   return data
 }

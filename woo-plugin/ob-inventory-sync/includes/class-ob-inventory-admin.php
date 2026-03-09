@@ -20,7 +20,7 @@ class OB_Inventory_Admin {
         add_action( 'admin_menu',    [ $this, 'add_menu' ] );
         add_action( 'admin_init',    [ $this, 'register_settings' ] );
         add_action( 'admin_notices', [ $this, 'show_notices' ] );
-        add_action( 'admin_enqueue_scripts',             [ $this, 'enqueue_scripts' ] );
+        add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
         add_action( 'wp_ajax_ob_inventory_test_connection', [ $this, 'ajax_test_connection' ] );
     }
 
@@ -215,6 +215,10 @@ JS;
                 <tr>
                     <th><?php esc_html_e( 'Products list', 'ob-inventory-sync' ); ?></th>
                     <td><code><?php echo esc_html( $products_url ); ?></code></td>
+                </tr>
+                <tr>
+                    <th><?php esc_html_e( 'Stock update (OB → Woo)', 'ob-inventory-sync' ); ?></th>
+                    <td><code><?php echo esc_html( get_rest_url( null, 'ob-inventory/v1/stock' ) ); ?></code> <small>PUT</small></td>
                 </tr>
             </table>
         </div>

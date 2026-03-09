@@ -167,6 +167,7 @@ const pageTitle = computed(() => {
 .app-shell {
   display: flex;
   height: 100vh;
+  height: 100dvh; /* real mobile: visible viewport, not full screen */
   overflow: hidden;
   background: #f1f5f9;
 }
@@ -375,6 +376,7 @@ const pageTitle = computed(() => {
     top: 0;
     left: 0;
     height: 100vh;
+    height: 100dvh;
     width: 260px;
     transform: translateX(-100%);
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);

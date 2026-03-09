@@ -1,0 +1,35 @@
+/**
+ * OB Inventory Sync – product meta box notes list styles.
+ */
+
+.ob-inventory-sync-notes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.ob-inventory-sync-notes li {
+    padding: 0.5em 0.75em;
+    margin-bottom: 0.5em;
+    background: #f6f7f7;
+    border-left: 3px solid #2271b1;
+    border-radius: 0 2px 2px 0;
+}
+
+.ob-inventory-sync-notes li:last-child {
+    margin-bottom: 0;
+}
+
+.ob-inventory-sync-notes .ob-sync-note-time {
+    display: block;
+    font-size: 11px;
+    color: #646970;
+    margin-bottom: 0.25em;
+}
+
+.ob-inventory-sync-notes .ob-sync-note-text {
+    font-size: 13px;
+    line-height: 1.4;
+}

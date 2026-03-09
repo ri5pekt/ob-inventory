@@ -56,7 +56,10 @@
       </div>
       <div class="stat-card stat-products">
         <div class="stat-top">
-          <span class="stat-label">Avg Products / Transfer</span>
+          <span class="stat-label">
+            <span class="stat-label-long">Avg Products / Transfer</span>
+            <span class="stat-label-short">Avg / Transfer</span>
+          </span>
           <i class="pi pi-tags stat-icon" />
         </div>
         <span class="stat-count">{{ avgProducts }}</span>
@@ -164,17 +167,54 @@ const avgProducts = computed(() => {
 .fade-enter-active, .fade-leave-active { transition: opacity 0.15s, transform 0.15s; }
 .fade-enter-from,   .fade-leave-to     { opacity: 0; transform: translateX(-6px); }
 
-.stats-cards { display: flex; gap: 12px; }
+.stats-cards { display: flex; gap: 12px; flex-wrap: wrap; }
 .stat-card {
-  flex: 1; border-radius: 10px; padding: 12px 16px;
+  flex: 1; min-width: 100px; border-radius: 10px; padding: 12px 16px;
   display: flex; flex-direction: column; gap: 2px; border: 1px solid transparent;
 }
 .stat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-label-short { display: none; }
 .stat-icon  { font-size: 14px; opacity: 0.5; }
 .stat-count { font-size: 28px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
 
 .stat-total    { background: #f8fafc; border-color: #e2e8f0; color: #0f172a; }
 .stat-units    { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
 .stat-products { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+
+@media (max-width: 768px) {
+  .stats-section { padding: 10px 12px; gap: 10px; }
+  .period-bar { gap: 8px; }
+  .period-chip { padding: 3px 10px; font-size: 11px; }
+  .period-desc { font-size: 10px; }
+
+  .stats-cards {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .stat-card {
+    flex: none;
+    min-width: 0;
+    width: 100%;
+    padding: 10px 12px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .stat-top {
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .stat-label { font-size: 10px; line-height: 1.2; white-space: nowrap; }
+  .stat-label-long { display: none; }
+  .stat-label-short { display: inline; }
+
+  .stat-icon { flex-shrink: 0; }
+  .stat-count { font-size: 22px; flex-shrink: 0; }
+}
 </style>

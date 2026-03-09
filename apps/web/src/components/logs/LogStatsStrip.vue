@@ -22,17 +22,20 @@ const props = defineProps<{ logs: LogEntry[] }>()
 
 const stats = computed(() => {
   const l = props.logs
-  const received  = l.filter(x => x.actionType === 'receive').reduce((s, x) => s + x.quantityDelta, 0)
-  const sold      = l.filter(x => x.actionType === 'sale').reduce((s, x) => s + Math.abs(x.quantityDelta), 0)
-  const transfers = l.filter(x => x.actionType === 'transfer_in' || x.actionType === 'transfer_out').length
-  const adjusts   = l.filter(x => x.actionType === 'adjustment').length
+  const ledger = l.filter(x => x.actionType !== 'woo_push_success' && x.actionType !== 'woo_push_failed')
+  const received  = ledger.filter(x => x.actionType === 'receive').reduce((s, x) => s + x.quantityDelta, 0)
+  const sold      = ledger.filter(x => x.actionType === 'sale').reduce((s, x) => s + Math.abs(x.quantityDelta), 0)
+  const transfers = ledger.filter(x => x.actionType === 'transfer_in' || x.actionType === 'transfer_out').length
+  const adjusts   = ledger.filter(x => x.actionType === 'adjustment').length
+  const wooSyncs  = l.filter(x => x.actionType === 'woo_push_success' || x.actionType === 'woo_push_failed').length
 
   return [
-    { icon: 'pi pi-list',          label: 'Total Events',  value: l.length },
+    { icon: 'pi pi-list',          label: 'Total Events',   value: l.length },
     { icon: 'pi pi-download',      label: 'Units Received', value: received },
     { icon: 'pi pi-shopping-cart', label: 'Units Sold',    value: sold },
-    { icon: 'pi pi-arrows-h',      label: 'Transfers',     value: transfers },
-    { icon: 'pi pi-pencil',        label: 'Adjustments',   value: adjusts },
+    { icon: 'pi pi-arrows-h',      label: 'Transfers',      value: transfers },
+    { icon: 'pi pi-pencil',        label: 'Adjustments',    value: adjusts },
+    { icon: 'pi pi-cloud-upload',  label: 'Woo Syncs',      value: wooSyncs },
   ]
 })
 </script>
@@ -52,4 +55,22 @@ const stats = computed(() => {
 .stat-body  { display: flex; flex-direction: column; }
 .stat-value { font-size: 20px; font-weight: 700; line-height: 1.2; }
 .stat-label { font-size: 11px; color: var(--p-text-muted-color); text-transform: uppercase; letter-spacing: 0.04em; }
+
+@media (max-width: 768px) {
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .stat-card {
+    min-width: 0;
+    padding: 6px 8px;
+    gap: 6px;
+  }
+
+  .stat-icon { font-size: 14px; }
+  .stat-value { font-size: 15px; }
+  .stat-label { font-size: 10px; }
+}
 </style>

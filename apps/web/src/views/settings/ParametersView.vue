@@ -13,12 +13,12 @@
 
       <TabPanels>
         <TabPanel value="static">
-          <div style="padding-top: 20px">
+          <div class="tab-panel-pad">
             <StaticParamsTab />
           </div>
         </TabPanel>
         <TabPanel value="attributes">
-          <div style="padding-top: 20px">
+          <div class="tab-panel-pad">
             <CustomAttributesTab />
           </div>
         </TabPanel>
@@ -41,7 +41,16 @@ const activeTab = ref('static')
 </script>
 
 <style scoped>
-.params-view { display: flex; flex-direction: column; gap: 20px; }
+.params-view { display: flex; flex-direction: column; gap: 20px; padding: 0; }
 .params-title { font-size: 20px; font-weight: 600; color: #0f172a; margin: 0 0 4px; }
 .params-desc  { font-size: 13px; color: #64748b; margin: 0; }
+
+.tab-panel-pad { padding-top: 20px; }
+
+@media (max-width: 768px) {
+  .params-view { gap: 14px; }
+  .params-title { font-size: 18px; }
+  .params-desc { font-size: 12px; }
+  .tab-panel-pad { padding-top: 14px; }
+}
 </style>

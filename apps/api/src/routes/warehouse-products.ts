@@ -2,6 +2,7 @@ import type { FastifyPluginAsync } from 'fastify'
 import { eq, and, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../db.js'
+import { enqueueSyncWooStock } from '../queue.js'
 import {
   warehouses,
   inventoryStock,
@@ -108,6 +109,17 @@ export const warehouseProductRoutes: FastifyPluginAsync = async (fastify) => {
       await db.insert(inventoryLedger).values({ productId: product.id, warehouseId, actionType: 'receive', quantityDelta: d.quantity, notes: 'Manual entry via UI' })
     }
 
+    const [wh] = await db.select({ type: warehouses.type }).from(warehouses).where(eq(warehouses.id, warehouseId))
+    if (wh?.type === 'main') {
+      request.log.info({ productId: product.id, sku: d.sku, quantity: d.quantity }, '[sync-woo-stock] Quantity update request received')
+      try {
+        const jobId = await enqueueSyncWooStock(product.id)
+        request.log.info({ productId: product.id, jobId }, '[sync-woo-stock] Job enqueued')
+      } catch (err) {
+        request.log.warn({ err, productId: product.id }, '[sync-woo-stock] Failed to enqueue')
+      }
+    }
+
     return reply.status(201).send({ productId: product.id })
   })
 
@@ -160,6 +172,17 @@ export const warehouseProductRoutes: FastifyPluginAsync = async (fastify) => {
         quantityDelta,
         notes:         `Manual edit via UI (${quantityDelta > 0 ? '+' : ''}${quantityDelta})`,
       })
+    }
+
+    const [wh] = await db.select({ type: warehouses.type }).from(warehouses).where(eq(warehouses.id, warehouseId))
+    if (wh?.type === 'main') {
+      request.log.info({ productId, sku: d.sku, quantity: d.quantity }, '[sync-woo-stock] Quantity update request received')
+      try {
+        const jobId = await enqueueSyncWooStock(productId)
+        request.log.info({ productId, jobId }, '[sync-woo-stock] Job enqueued')
+      } catch (err) {
+        request.log.warn({ err, productId }, '[sync-woo-stock] Failed to enqueue')
+      }
     }
 
     return { ok: true }

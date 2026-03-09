@@ -3,7 +3,9 @@
     :visible="visible"
     modal
     :header="dialogHeader"
-    :style="{ width: '680px', maxWidth: '95vw' }"
+    :style="{ width: '680px', maxWidth: '96vw', maxHeight: '92vh' }"
+    :breakpoints="{ '768px': 'calc(100vw - 24px)', '480px': 'calc(100vw - 16px)' }"
+    content-style="overflow-y: auto;"
     @update:visible="$emit('update:visible', $event)"
   >
     <div v-if="sale" class="detail-body">
@@ -96,6 +98,7 @@
     modal
     header="Delete Sale"
     :style="{ width: '400px' }"
+    :breakpoints="{ '768px': 'calc(100vw - 24px)', '480px': 'calc(100vw - 16px)' }"
     :closable="!deleting"
   >
     <div class="confirm-body">
@@ -115,8 +118,10 @@
       <Message v-if="deleteError" severity="error" :closable="false" class="confirm-error">{{ deleteError }}</Message>
     </div>
     <template #footer>
-      <Button label="Cancel" severity="secondary" outlined :disabled="deleting" @click="showConfirm = false" />
-      <Button label="Delete" icon="pi pi-trash" severity="danger" :loading="deleting" @click="confirmDelete" />
+      <div class="delete-confirm-footer">
+        <Button label="Cancel" severity="secondary" outlined :disabled="deleting" @click="showConfirm = false" />
+        <Button label="Delete" icon="pi pi-trash" severity="danger" :loading="deleting" @click="confirmDelete" />
+      </div>
     </template>
   </Dialog>
 </template>
@@ -247,6 +252,26 @@ function formatDate(iso: string) {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .detail-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .detail-footer .p-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .detail-meta { padding: 12px; }
+  .meta-row { font-size: 13px; }
+  .meta-label { width: 80px; }
+
+  .loading-detail { padding: 24px; font-size: 20px; }
 }
 
 .confirm-body {
@@ -294,4 +319,23 @@ function formatDate(iso: string) {
 }
 
 .confirm-error { width: 100%; }
+
+.delete-confirm-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .delete-confirm-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .delete-confirm-footer .p-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
 </style>

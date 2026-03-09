@@ -47,7 +47,7 @@
   </div>
 
   <!-- Attribute definition dialog -->
-  <Dialog v-model:visible="attrDialog" :header="attrEdit ? 'Edit Attribute' : 'New Attribute'" modal style="width: 420px">
+  <Dialog v-model:visible="attrDialog" :header="attrEdit ? 'Edit Attribute' : 'New Attribute'" modal :style="{ width: '420px' }" :breakpoints="{ '480px': 'calc(100vw - 16px)' }">
     <div class="fields">
       <div class="field">
         <label>Name</label>
@@ -69,7 +69,7 @@
   </Dialog>
 
   <!-- Option dialog -->
-  <Dialog v-model:visible="optDialog" :header="optEdit ? 'Edit Option' : 'Add Option'" modal style="width: 380px">
+  <Dialog v-model:visible="optDialog" :header="optEdit ? 'Edit Option' : 'Add Option'" modal :style="{ width: '380px' }" :breakpoints="{ '480px': 'calc(100vw - 16px)' }">
     <div class="fields">
       <div class="field">
         <label>Code <span class="hint">(short key, e.g. BK)</span></label>
@@ -221,6 +221,12 @@ function confirmDeleteOption(opt: AttributeOption) {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 14px;
   align-items: start;
+}
+
+@media (max-width: 768px) {
+  .attr-list { grid-template-columns: 1fr; gap: 12px; }
+  .attr-card-header { padding: 10px 12px; flex-wrap: wrap; gap: 8px; }
+  .options-section { padding: 10px 12px; }
 }
 
 .attr-card {

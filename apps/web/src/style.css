@@ -12,6 +12,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
   /* Prevent horizontal overflow on mobile */
   overflow-x: hidden;
+  height: 100%;
 }
 
 /* Proper mobile viewport */
@@ -21,7 +22,7 @@ html {
 
 #app {
   height: 100vh;
-  height: 100dvh; /* dynamic viewport on mobile browsers */
+  height: 100dvh; /* real mobile: visible viewport */
 }
 
 /* Smaller base font on mobile */
@@ -29,6 +30,21 @@ html {
   html, body {
     font-size: 15px;
   }
+}
+
+/* ── Select/Dropdown overlay above modals ── */
+.p-select-overlay,
+.p-overlay-select,
+[data-pc-section="overlay"] {
+  z-index: 9999 !important;
+}
+
+/* ── Dialog content scroll (ensure long forms are scrollable) ── */
+.p-dialog .p-dialog-content,
+[data-pc-section="content"] {
+  overflow-y: auto !important;
+  max-height: 70vh !important;
+  padding-bottom: 12px;
 }
 
 /* ── Global DataTable header style ── */
@@ -40,4 +56,55 @@ html {
   white-space: nowrap !important;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+/* ── Paginator: compact, single row, smaller bottom padding ── */
+.p-paginator {
+  padding: 6px 8px 0 !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+  min-height: 0 !important;
+  overflow-x: auto !important;
+}
+
+.p-paginator > *,
+.p-paginator [data-pc-section],
+.p-paginator [class*="p-paginator-"] {
+  flex-shrink: 0 !important;
+  flex-wrap: nowrap !important;
+}
+
+.p-paginator .p-paginator-pages {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+}
+
+.p-paginator .p-paginator-pages .p-button,
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-last {
+  min-width: 28px !important;
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 4px !important;
+}
+
+.p-paginator .p-paginator-current,
+.p-paginator .p-dropdown {
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+}
+
+/* RowsPerPageDropdown: prevent full-width / wrapping */
+.p-paginator .p-dropdown,
+.p-paginator [data-pc-section="rowPerPageDropdown"],
+.p-paginator [data-pc-name="rowperpagedropdown"] {
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  max-width: 80px !important;
 }

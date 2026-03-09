@@ -2,6 +2,7 @@
   <div class="sales-view">
     <div class="view-header">
       <div class="header-left">
+        <Button icon="pi pi-arrow-left" text rounded size="small" @click="router.push('/inventory')" />
         <i class="pi pi-shopping-cart header-icon" />
         <div>
           <h2 class="view-title">Sales</h2>
@@ -17,33 +18,36 @@
 
     <!-- Filter chips + search -->
     <div class="filter-bar">
-      <button
-        v-for="f in typeFilters"
-        :key="f.value ?? 'all'"
-        class="chip"
-        :class="{ active: activeFilter === f.value }"
-        @click="activeFilter = f.value"
-      >
-        <i :class="f.icon" />
-        {{ f.label }}
-      </button>
-      <div style="flex:1" />
+      <div class="filter-chips">
+        <button
+          v-for="f in typeFilters"
+          :key="f.value ?? 'all'"
+          class="chip"
+          :class="{ active: activeFilter === f.value }"
+          @click="activeFilter = f.value"
+        >
+          <i :class="f.icon" />
+          {{ f.label }}
+        </button>
+      </div>
       <InputText
         v-model="search"
         placeholder="Search customer, SKU, order…"
         size="small"
-        style="width: 260px"
+        class="filter-search"
       />
     </div>
 
     <!-- Table -->
     <div class="table-card">
       <DataTable
+        class="sales-datatable"
         :value="filteredSales"
         :loading="isLoading"
         striped-rows
         size="small"
         paginator
+        paginator-template="RowsPerPageDropdown FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
         :rows="50"
         :rows-per-page-options="[25, 50, 100]"
         scrollable
@@ -122,6 +126,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import { getSales, getSale, type Sale, type SaleDetail, type SaleType } from '@/api/sales'
 import SalePeriodStats from '@/components/sales/SalePeriodStats.vue'
@@ -163,6 +168,7 @@ function onSaleDeleted() {
 
 const sales = computed(() => salesData.value ?? [])
 
+const router = useRouter()
 const typeFilters = [
   { value: undefined,                  label: 'All',         icon: 'pi pi-list' },
   { value: 'woocommerce' as SaleType,  label: 'WooCommerce', icon: 'pi pi-globe' },
@@ -221,8 +227,8 @@ function statusSeverity(status: string) {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 24px;
-  gap: 16px;
+  padding: 0;
+  gap: 12px;
 }
 
 .view-header {
@@ -231,14 +237,16 @@ function statusSeverity(status: string) {
   justify-content: space-between;
 }
 
-.header-left { display: flex; align-items: center; gap: 14px; }
+.header-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
 
 .header-icon { font-size: 26px; color: var(--p-primary-color); }
 
 .view-title    { margin: 0; font-size: 22px; font-weight: 700; }
 .view-subtitle { font-size: 13px; color: var(--p-text-muted-color); }
 
-.filter-bar { display: flex; align-items: center; gap: 8px; }
+.filter-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-search { flex: 1; min-width: 180px; }
 
 .chip {
   display: inline-flex;
@@ -285,4 +293,37 @@ function statusSeverity(status: string) {
 
 .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.3; }
 .empty-sub  { font-size: 13px; }
+
+:deep(.sales-datatable .p-datatable-tbody td),
+:deep(.sales-datatable .p-datatable-thead th) { padding: 6px 8px; }
+:deep(.sales-datatable .p-paginator) { padding: 6px 8px; }
+
+/* ═══════════════════════════════════════════════
+   MOBILE  ≤ 768px
+════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .sales-view { gap: 10px; }
+
+  .header-left .header-icon { display: none; }
+
+  .view-title { font-size: 18px; }
+  .view-subtitle { font-size: 12px; }
+
+  .header-actions .p-button-label { display: none; }
+
+  .filter-bar { flex-direction: column; align-items: stretch; gap: 6px; }
+  .filter-chips { width: 100%; }
+  .filter-search { min-width: 0; width: 100%; }
+
+  .chip { padding: 4px 10px; font-size: 12px; }
+
+  .empty-state { padding: 40px 16px; }
+  .empty-icon { font-size: 32px; }
+
+  :deep(.sales-datatable .p-datatable-tbody td),
+  :deep(.sales-datatable .p-datatable-thead th) {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+}
 </style>

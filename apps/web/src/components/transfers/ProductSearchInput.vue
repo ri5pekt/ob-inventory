@@ -27,9 +27,11 @@
           <div class="result-main">
             <span class="result-sku">{{ result.sku }}</span>
             <span class="result-name">{{ result.name }}</span>
-            <span v-if="result.model" class="result-attr">{{ result.model }}</span>
-            <span v-if="result.size"  class="result-attr">{{ result.size }}</span>
-            <span v-if="result.color" class="result-attr">{{ result.color }}</span>
+            <div v-if="result.model || result.size || result.color" class="result-attrs">
+              <span v-if="result.model" class="result-attr">{{ result.model }}</span>
+              <span v-if="result.size"  class="result-attr">{{ result.size }}</span>
+              <span v-if="result.color" class="result-attr">{{ result.color }}</span>
+            </div>
           </div>
           <div class="result-meta">
             <span v-if="result.brandName" class="result-brand">{{ result.brandName }}</span>
@@ -191,7 +193,9 @@ label {
 .search-result-row:hover { background: var(--p-surface-hover); }
 .search-result-row.already-added { opacity: 0.5; cursor: default; pointer-events: none; }
 
-.result-main { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.result-main { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; flex-wrap: wrap; }
+
+.result-attrs { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
 .result-sku {
   font-family: monospace;
@@ -231,4 +235,76 @@ label {
 
 .fade-drop-enter-active, .fade-drop-leave-active { transition: opacity 0.15s; }
 .fade-drop-enter-from,   .fade-drop-leave-to     { opacity: 0; }
+
+@media (max-width: 768px) {
+  .search-results,
+  .search-empty {
+    max-height: 220px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .search-result-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 10px 12px;
+    min-width: 0;
+  }
+
+  .result-main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .result-sku {
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .result-name {
+    font-size: 12px;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    line-height: 1.35;
+  }
+
+  .result-attrs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .result-attr {
+    font-size: 10px;
+    padding: 2px 5px;
+  }
+
+  .result-meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .result-brand {
+    font-size: 10px;
+  }
+
+  .result-stock {
+    font-size: 11px;
+  }
+
+  .search-empty {
+    padding: 12px;
+    font-size: 12px;
+  }
+}
 </style>

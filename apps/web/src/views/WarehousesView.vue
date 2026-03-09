@@ -59,6 +59,7 @@
           striped-rows
           size="small"
           paginator
+          paginator-template="RowsPerPageDropdown FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
           :rows="50"
           :rows-per-page-options="[25, 50, 100]"
           filter-display="row"

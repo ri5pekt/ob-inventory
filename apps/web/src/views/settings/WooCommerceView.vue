@@ -12,13 +12,14 @@
 
     <div v-if="wooStores.length > 1" class="store-selector-bar">
       <label class="field-label">Manage store</label>
-      <Select
-        v-model="selectedStoreId"
-        :options="wooStores"
-        option-label="name"
-        option-value="id"
-        style="min-width: 220px"
-      />
+        <Select
+          v-model="selectedStoreId"
+          :options="wooStores"
+          option-label="name"
+          option-value="id"
+          style="min-width: 220px"
+          append-to="body"
+        />
     </div>
 
     <!-- Custom tab bar -->
@@ -94,6 +95,7 @@ watch(selectedStoreId, async (id) => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding: 0;
 }
 
 .page-header { display: flex; align-items: center; gap: 16px; }
@@ -149,5 +151,16 @@ watch(selectedStoreId, async (id) => {
 /* ── Tab panel body ── */
 .tab-body {
   flex: 1;
+}
+
+@media (max-width: 768px) {
+  .woo-view { gap: 14px; }
+  .page-header { gap: 12px; }
+  .page-header-icon { width: 40px; height: 40px; font-size: 18px; }
+  .page-title { font-size: 18px; }
+  .page-subtitle { font-size: 12px; }
+  .store-selector-bar { flex-direction: column; align-items: stretch; }
+  .store-selector-bar .p-select { min-width: 100% !important; }
+  .tab-btn { padding: 8px 14px; font-size: 12px; }
 }
 </style>

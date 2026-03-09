@@ -2,6 +2,7 @@
   <div class="logs-view">
     <div class="view-header">
       <div class="header-left">
+        <Button icon="pi pi-arrow-left" text rounded size="small" @click="router.push('/inventory')" />
         <i class="pi pi-history header-icon" />
         <div>
           <h2 class="view-title">Inventory Logs</h2>
@@ -24,11 +25,13 @@
 
     <div class="table-card">
       <DataTable
+        class="logs-datatable"
         :value="filteredLogs"
         :loading="isLoading"
         striped-rows
         size="small"
         paginator
+        paginator-template="RowsPerPageDropdown FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
         :rows="100"
         :rows-per-page-options="[50, 100, 250]"
         scrollable
@@ -52,13 +55,13 @@
         <Column field="productSku" header="Product" sortable>
           <template #body="{ data }">
             <div class="product-cell">
-              <span class="product-sku">{{ data.productSku }}</span>
-              <span class="product-name">{{ data.productName }}</span>
+              <span class="product-sku">{{ data.productSku ?? '—' }}</span>
+              <span class="product-name">{{ data.productName ?? '' }}</span>
             </div>
           </template>
         </Column>
 
-        <Column field="warehouseName" header="Warehouse" style="width: 160px" sortable>
+        <Column field="warehouseName" header="Warehouse / Store" style="width: 160px" sortable>
           <template #body="{ data }">
             <span class="warehouse-name">{{ data.warehouseName ?? '—' }}</span>
           </template>
@@ -66,7 +69,10 @@
 
         <Column field="quantityDelta" header="Qty Change" style="width: 100px; text-align:right" sortable>
           <template #body="{ data }">
-            <span class="qty-delta" :class="data.quantityDelta > 0 ? 'qty-pos' : 'qty-neg'">
+            <span v-if="isWooType(data.actionType)" class="qty-delta qty-neutral">
+              {{ data.quantityDelta > 0 ? data.quantityDelta : '—' }}
+            </span>
+            <span v-else class="qty-delta" :class="data.quantityDelta > 0 ? 'qty-pos' : 'qty-neg'">
               {{ data.quantityDelta > 0 ? '+' : '' }}{{ data.quantityDelta }}
             </span>
           </template>
@@ -96,13 +102,17 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
+import Button from 'primevue/button'
 import { apiClient } from '@/api/client'
 import { getWarehouses } from '@/api/warehouses'
 import LogFilterBar  from '@/components/logs/LogFilterBar.vue'
 import LogStatsStrip from '@/components/logs/LogStatsStrip.vue'
 
-type ActionType = 'receive' | 'transfer_in' | 'transfer_out' | 'sale' | 'return' | 'adjustment'
+const router = useRouter()
+
+type ActionType = 'receive' | 'transfer_in' | 'transfer_out' | 'sale' | 'return' | 'adjustment' | 'woo_push_success' | 'woo_push_failed'
 
 interface LogEntry {
   id:            string
@@ -115,7 +125,7 @@ interface LogEntry {
   productId:     string
   productSku:    string | null
   productName:   string | null
-  warehouseId:   string
+  warehouseId:   string | null
   warehouseName: string | null
 }
 
@@ -124,50 +134,57 @@ const activeWarehouse = ref<string | undefined>(undefined)
 const search          = ref('')
 
 const { data: logsData, isLoading } = useQuery({
-  queryKey: ['inventory-logs'],
-  queryFn:  () => apiClient.get<LogEntry[]>('/inventory/logs', { params: { limit: 500 } }).then(r => r.data),
+  queryKey: ['inventory-logs', activeAction, activeWarehouse, search],
+  queryFn:  () => apiClient.get<LogEntry[]>('/inventory/logs', {
+    params: {
+      limit: 500,
+      actionType: activeAction.value,
+      warehouseId: activeWarehouse.value,
+      q: search.value.trim() || undefined,
+    },
+  }).then(r => r.data),
   staleTime: 30_000,
 })
 
 const { data: warehousesData } = useQuery({ queryKey: ['warehouses'], queryFn: getWarehouses })
 const warehouseOptions = computed(() => warehousesData.value ?? [])
 const logs             = computed(() => logsData.value ?? [])
-
-const filteredLogs = computed(() => {
-  let list = logs.value
-  if (activeAction.value)    list = list.filter(l => l.actionType  === activeAction.value)
-  if (activeWarehouse.value) list = list.filter(l => l.warehouseId === activeWarehouse.value)
-  const q = search.value.trim().toLowerCase()
-  if (q) list = list.filter(l =>
-    l.productSku?.toLowerCase().includes(q) ||
-    l.productName?.toLowerCase().includes(q) ||
-    l.notes?.toLowerCase().includes(q),
-  )
-  return list
-})
+const filteredLogs     = computed(() => logs.value)
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
+function isWooType(type: ActionType): boolean {
+  return type === 'woo_push_success' || type === 'woo_push_failed'
+}
+
 function actionLabel(type: ActionType): string {
-  const map: Record<ActionType, string> = { receive: 'Receive', sale: 'Sale', transfer_in: 'Transfer In', transfer_out: 'Transfer Out', adjustment: 'Adjustment', return: 'Return' }
+  const map: Record<ActionType, string> = {
+    receive: 'Receive', sale: 'Sale', transfer_in: 'Transfer In', transfer_out: 'Transfer Out',
+    adjustment: 'Adjustment', return: 'Return',
+    woo_push_success: 'Woo Push ✓', woo_push_failed: 'Woo Push ✗',
+  }
   return map[type] ?? type
 }
 
 function actionIcon(type: ActionType): string {
-  const map: Record<ActionType, string> = { receive: 'pi pi-download', sale: 'pi pi-shopping-cart', transfer_in: 'pi pi-arrow-down', transfer_out: 'pi pi-arrow-up', adjustment: 'pi pi-pencil', return: 'pi pi-refresh' }
+  const map: Record<ActionType, string> = {
+    receive: 'pi pi-download', sale: 'pi pi-shopping-cart', transfer_in: 'pi pi-arrow-down',
+    transfer_out: 'pi pi-arrow-up', adjustment: 'pi pi-pencil', return: 'pi pi-refresh',
+    woo_push_success: 'pi pi-check-circle', woo_push_failed: 'pi pi-times-circle',
+  }
   return map[type] ?? 'pi pi-circle'
 }
 </script>
 
 <style scoped>
 .logs-view {
-  display: flex; flex-direction: column; height: 100%; padding: 24px; gap: 14px;
+  display: flex; flex-direction: column; height: 100%; padding: 0; gap: 12px;
 }
 
 .view-header { display: flex; align-items: center; justify-content: space-between; }
-.header-left { display: flex; align-items: center; gap: 14px; }
+.header-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .header-icon { font-size: 26px; color: var(--p-primary-color); }
 .view-title  { margin: 0; font-size: 22px; font-weight: 700; }
 .view-subtitle { font-size: 13px; color: var(--p-text-muted-color); }
@@ -177,6 +194,15 @@ function actionIcon(type: ActionType): string {
   border: 1px solid var(--p-content-border-color);
   border-radius: 12px; overflow: hidden;
   display: flex; flex-direction: column; min-height: 0;
+}
+
+:deep(.logs-datatable .p-datatable-tbody td),
+:deep(.logs-datatable .p-datatable-thead th) {
+  padding: 6px 8px;
+}
+
+:deep(.logs-datatable .p-paginator) {
+  padding: 6px 8px;
 }
 
 .log-date { font-size: 12px; color: var(--p-text-muted-color); font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -191,6 +217,10 @@ function actionIcon(type: ActionType): string {
 .action-transfer_out { background: #fff7ed; color: #c2410c; }
 .action-adjustment   { background: #f5f3ff; color: #6d28d9; }
 .action-return       { background: #f8fafc; color: #475569; }
+.action-woo_push_success { background: #f0fdf4; color: #15803d; }
+.action-woo_push_failed  { background: #fef2f2; color: #dc2626; }
+
+.qty-neutral { color: var(--p-text-muted-color); }
 
 .product-cell { display: flex; flex-direction: column; gap: 1px; }
 .product-sku  { font-family: monospace; font-size: 12px; font-weight: 700; color: var(--p-primary-color); }
@@ -210,4 +240,40 @@ function actionIcon(type: ActionType): string {
 
 .empty-state { display: flex; flex-direction: column; align-items: center; padding: 60px 20px; color: var(--p-text-muted-color); }
 .empty-icon  { font-size: 40px; margin-bottom: 12px; opacity: 0.3; }
+
+/* ═══════════════════════════════════════════════
+   MOBILE  ≤ 768px
+════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .logs-view { gap: 10px; }
+
+  .header-left .header-icon { display: none; }
+
+  .view-title { font-size: 18px; }
+  .view-subtitle { font-size: 12px; }
+
+  .table-card { border-radius: 10px; }
+
+  .product-name { max-width: 140px; }
+
+  .empty-state { padding: 32px 12px; }
+  .empty-icon { font-size: 32px; }
+
+  :deep(.logs-datatable .p-datatable-tbody td),
+  :deep(.logs-datatable .p-datatable-thead th) {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  :deep(.logs-datatable .p-paginator) {
+    padding: 6px 8px;
+    gap: 4px;
+  }
+
+  :deep(.logs-datatable .p-paginator .p-paginator-pages .p-button) {
+    min-width: 28px;
+    height: 28px;
+    padding: 0 4px;
+  }
+}
 </style>

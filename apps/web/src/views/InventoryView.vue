@@ -3,7 +3,6 @@
     <div class="view-header">
       <h2 class="view-title">Warehouses</h2>
       <div class="header-actions">
-        <Button label="Clear All" icon="pi pi-trash" size="small" severity="danger" text @click="showClearConfirm = true" />
         <Button label="Import Products" icon="pi pi-file-import" size="small" severity="secondary" @click="showImport = true" />
         <Button label="Add Warehouse" icon="pi pi-plus" size="small" @click="showDialog = true" />
       </div>
@@ -79,6 +78,13 @@
         </div>
       </div>
     </div>
+
+    <!-- Footer with Clear All (out of the way to avoid accidental taps) -->
+    <footer class="inventory-footer">
+      <button type="button" class="clear-all-link" @click="showClearConfirm = true">
+        <i class="pi pi-trash" /> Clear all products
+      </button>
+    </footer>
 
     <!-- Import Products Modal -->
     <ImportProductsModal v-model="showImport" @done="queryClient.invalidateQueries({ queryKey: ['warehouses'] })" />
@@ -215,6 +221,34 @@ function typeSeverity(type: string) {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-height: 0;
+}
+
+.inventory-footer {
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.clear-all-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.15s;
+}
+
+.clear-all-link:hover {
+  color: #dc2626;
+}
+
+.clear-all-link .pi {
+  font-size: 11px;
 }
 
 .view-header {
@@ -449,5 +483,60 @@ function typeSeverity(type: string) {
   justify-content: flex-end;
   gap: 8px;
   padding-top: 4px;
+}
+
+/* ═══════════════════════════════════════════════
+   MOBILE  ≤ 768px
+════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .inventory-view { gap: 18px; }
+
+  .view-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .view-title { font-size: 18px; }
+
+  .header-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .wh-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .wh-card { padding: 16px; }
+
+  .wh-card-top {
+    margin: -16px -16px 12px;
+    padding: 14px;
+    min-height: 72px;
+  }
+
+  .wh-logo, .wh-icon-fallback {
+    width: 44px;
+    height: 44px;
+  }
+
+  .wh-icon-fallback { font-size: 18px; }
+
+  .wh-header-name { font-size: 13px; }
+
+  .wh-meta { font-size: 12px; }
+
+  .inventory-footer {
+    padding-top: 18px;
+  }
+
+  .empty-state { padding: 40px 16px; }
+
+  .empty-icon { font-size: 36px; }
+
+  .empty-title { font-size: 15px; }
+
+  .empty-sub { font-size: 13px; }
 }
 </style>

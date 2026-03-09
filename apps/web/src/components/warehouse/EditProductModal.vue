@@ -5,8 +5,9 @@
     header="Edit Product"
     :modal="true"
     :closable="!submitting"
-    :style="{ width: '640px' }"
-    :breakpoints="{ '700px': '95vw' }"
+    :style="{ width: '640px', maxWidth: '96vw', maxHeight: '92vh' }"
+    :breakpoints="{ '768px': 'calc(100vw - 24px)', '480px': 'calc(100vw - 16px)' }"
+    content-style="overflow-y: auto;"
   >
     <form @submit.prevent="submit" novalidate>
       <!-- ── Product Details ── -->
@@ -42,6 +43,7 @@
             placeholder="Select brand"
             :loading="catalogLoading"
             show-clear
+            append-to="body"
             class="w-full"
           />
         </div>
@@ -56,6 +58,7 @@
             placeholder="Select category"
             :loading="catalogLoading"
             show-clear
+            append-to="body"
             class="w-full"
           />
         </div>
@@ -78,6 +81,7 @@
             option-value="id"
             placeholder="Select unit"
             show-clear
+            append-to="body"
             class="w-full"
           />
         </div>
@@ -92,6 +96,7 @@
             placeholder="Select size"
             show-clear
             filter
+            append-to="body"
             class="w-full"
           />
         </div>
@@ -106,6 +111,7 @@
             placeholder="Select color"
             show-clear
             filter
+            append-to="body"
             class="w-full"
           />
         </div>
@@ -186,6 +192,9 @@
           <span v-if="quantityDelta !== 0" class="qty-delta" :class="quantityDelta > 0 ? 'delta-pos' : 'delta-neg'">
             {{ quantityDelta > 0 ? '+' : '' }}{{ quantityDelta }} from current
           </span>
+          <p v-if="warehouseType && warehouseType !== 'main'" class="field-hint sync-hint">
+            <i class="pi pi-info-circle" /> WooCommerce sync only runs for the <strong>Main</strong> warehouse. Edit the warehouse to change its type.
+          </p>
         </div>
       </div>
 
@@ -197,13 +206,15 @@
     </form>
 
     <template #footer>
-      <Button label="Cancel" text severity="secondary" :disabled="submitting" @click="handleClose" />
-      <Button
-        label="Save Changes"
-        icon="pi pi-check"
-        :loading="submitting"
-        @click="submit"
-      />
+      <div class="footer-row">
+        <Button label="Cancel" text severity="secondary" :disabled="submitting" @click="handleClose" />
+        <Button
+          label="Save Changes"
+          icon="pi pi-check"
+          :loading="submitting"
+          @click="submit"
+        />
+      </div>
     </template>
   </Dialog>
 </template>
@@ -229,9 +240,10 @@ const SectionLabel = defineComponent({
 })
 
 const props = defineProps<{
-  visible:     boolean
-  warehouseId: string
-  item:        StockItemDTO | null
+  visible:        boolean
+  warehouseId:    string
+  warehouseType?: 'main' | 'partner' | 'other'
+  item:           StockItemDTO | null
 }>()
 
 const emit = defineEmits<{
@@ -436,6 +448,16 @@ function handleClose() {
 .delta-pos { color: #16a34a; }
 .delta-neg { color: #dc2626; }
 
+.sync-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sync-hint .pi { font-size: 14px; flex-shrink: 0; }
+
 /* ── Image upload ── */
 .image-section {
   display: flex;
@@ -531,4 +553,44 @@ function handleClose() {
 }
 
 .w-full { width: 100%; }
+
+.footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+  padding-top: 12px;
+}
+
+/* ═══════════════════════════════════════════════
+   MOBILE  ≤ 768px
+════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .image-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .image-upload-zone {
+    min-width: 0;
+  }
+
+  .footer-row {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .footer-row .p-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
 </style>

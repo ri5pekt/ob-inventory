@@ -20,6 +20,7 @@ import { salesRoutes } from './routes/sales.js'
 import { webhookRoutes } from './routes/webhooks.js'
 import { transferRoutes } from './routes/transfers.js'
 import { logsRoutes } from './routes/logs.js'
+import { inventoryProductRoutes } from './routes/inventory-products.js'
 import { productSearchRoutes } from './routes/product-search.js'
 import { userRoutes } from './routes/users.js'
 import { importRoutes } from './routes/import.js'
@@ -77,6 +78,7 @@ await fastify.register(salesRoutes)
 await fastify.register(webhookRoutes)
 await fastify.register(transferRoutes)
 await fastify.register(logsRoutes)
+await fastify.register(inventoryProductRoutes)
 await fastify.register(productSearchRoutes)
 await fastify.register(userRoutes)
 await fastify.register(importRoutes)

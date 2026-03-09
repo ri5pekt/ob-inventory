@@ -28,6 +28,7 @@ require_once OB_INVENTORY_DIR . 'includes/class-ob-inventory-plugin.php';
 require_once OB_INVENTORY_DIR . 'includes/class-ob-inventory-rest.php';
 require_once OB_INVENTORY_DIR . 'includes/class-ob-inventory-admin.php';
 require_once OB_INVENTORY_DIR . 'includes/class-ob-inventory-webhooks.php';
+require_once OB_INVENTORY_DIR . 'includes/class-ob-inventory-product-meta.php';
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 

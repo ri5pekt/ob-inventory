@@ -63,10 +63,12 @@
     <!-- Results table -->
     <div v-if="syncPreview" class="sync-table-wrap">
       <DataTable
+        class="sync-datatable"
         :value="filteredItems"
         size="small"
         striped-rows
         paginator
+        paginator-template="RowsPerPageDropdown FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
         :rows="50"
         :rows-per-page-options="[25, 50, 100]"
         scrollable
@@ -134,19 +136,30 @@
           </template>
         </Column>
 
-        <Column header="Edit" style="width: 56px; text-align: center">
+        <Column header="Edit" style="width: 120px; text-align: center">
           <template #body="{ data }">
-            <a
-              v-if="data.wooId && store?.url"
-              :href="wooEditUrl(data)"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="woo-edit-link"
-              :title="data.wooParentId ? 'Edit parent product in WooCommerce' : 'Edit in WooCommerce'"
-            >
-              <i class="pi pi-external-link"></i>
-            </a>
-            <span v-else class="muted">—</span>
+            <div class="edit-cell">
+              <Button
+                v-if="canSyncQuantity(data)"
+                label="Sync quantity"
+                size="small"
+                severity="secondary"
+                :loading="syncingProductId === data.obProductId"
+                :disabled="!!syncingProductId"
+                @click="handleSyncQuantity(data)"
+              />
+              <a
+                v-else-if="data.wooId && store?.url"
+                :href="wooEditUrl(data)"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="woo-edit-link"
+                :title="data.wooParentId ? 'Edit parent product in WooCommerce' : 'Edit in WooCommerce'"
+              >
+                <i class="pi pi-external-link"></i>
+              </a>
+              <span v-else class="muted">—</span>
+            </div>
           </template>
         </Column>
       </DataTable>
@@ -163,9 +176,12 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { getSyncPreview } from '@/api/stores'
-import type { Store, SyncPreview, SyncStatus } from '@/api/stores'
+import { useToast } from 'primevue/usetoast'
+import { getSyncPreview, syncProductQuantity } from '@/api/stores'
+import type { Store, SyncPreview, SyncStatus, SyncItem } from '@/api/stores'
 import { useSyncExport } from '@/composables/useSyncExport'
+
+const toast = useToast()
 
 const props = defineProps<{
   store: Store | null
@@ -175,6 +191,7 @@ const syncPreview = ref<SyncPreview | null>(null)
 const syncLoading = ref(false)
 const syncError   = ref('')
 const syncFilter  = ref<SyncStatus | 'all'>('all')
+const syncingProductId = ref<string | null>(null)
 
 const { exporting, exportAllCSV } = useSyncExport(
   () => props.store?.url,
@@ -241,6 +258,60 @@ function statusLabel(s: SyncStatus): string {
     synced: 'Synced', qty_mismatch: 'Mismatch',
     ob_only: 'OB Only', woo_only: 'Woo Only', untracked: 'Not Tracked',
   }[s]
+}
+
+// ── Sync quantity (manual sync for mismatch rows) ───────────────────────────────
+
+function canSyncQuantity(item: SyncItem): boolean {
+  return !!(
+    item.obProductId &&
+    item.status === 'qty_mismatch' &&
+    item.obQty !== null &&
+    item.wooQty !== null &&
+    item.obQty !== item.wooQty
+  )
+}
+
+const POLL_INTERVAL_MS = 2500
+const POLL_TIMEOUT_MS = 30_000
+
+async function handleSyncQuantity(item: SyncItem) {
+  const productId = item.obProductId
+  if (!productId || !props.store) return
+
+  syncingProductId.value = productId
+  try {
+    await syncProductQuantity(productId)
+  } catch (err: unknown) {
+    const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error
+    toast.add({ severity: 'error', summary: 'Sync failed', detail: msg ?? 'Failed to enqueue sync', life: 5000 })
+    syncingProductId.value = null
+    return
+  }
+
+  const start = Date.now()
+  const poll = async () => {
+    if (Date.now() - start > POLL_TIMEOUT_MS) {
+      syncingProductId.value = null
+      toast.add({ severity: 'warn', summary: 'Sync in progress', detail: 'Refresh the page to check status.', life: 4000 })
+      return
+    }
+    try {
+      const fresh = await getSyncPreview(props.store!.id)
+      if (!fresh) return
+      syncPreview.value = fresh
+      const updated = fresh.items.find(i => i.obProductId === productId)
+      if (updated?.status === 'synced') {
+        syncingProductId.value = null
+        toast.add({ severity: 'success', summary: 'Synced', detail: `${updated.sku} quantity updated in WooCommerce.`, life: 3000 })
+        return
+      }
+    } catch {
+      // ignore poll errors, continue
+    }
+    setTimeout(poll, POLL_INTERVAL_MS)
+  }
+  setTimeout(poll, POLL_INTERVAL_MS)
 }
 </script>
 
@@ -359,6 +430,18 @@ function statusLabel(s: SyncStatus): string {
   width: 100%;
 }
 
+.edit-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.edit-cell .p-button {
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
 .woo-edit-link {
   display: inline-flex;
   align-items: center;
@@ -434,4 +517,23 @@ function statusLabel(s: SyncStatus): string {
 .sync-empty-icon  { font-size: 40px; margin-bottom: 8px; color: #cbd5e1; }
 .sync-empty-title { font-size: 15px; font-weight: 600; color: #475569; margin: 0; }
 .sync-empty-sub   { font-size: 13px; margin: 0; text-align: center; max-width: 380px; }
+
+@media (max-width: 768px) {
+  .tab-body { padding-top: 14px; gap: 12px; }
+  .sync-toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .sync-toolbar-left { flex-direction: column; align-items: stretch; gap: 8px; }
+  .sync-toolbar-right { flex-direction: column; align-items: stretch; gap: 8px; }
+  .sync-filter-chips { justify-content: flex-start; }
+  .chip { padding: 6px 10px; font-size: 11px; }
+  .summary-row { grid-template-columns: repeat(2, 1fr); display: grid; gap: 8px; }
+  .summary-card { min-width: 0; padding: 10px 12px; }
+  .summary-num { font-size: 18px; }
+  .summary-label { font-size: 10px; }
+  .sync-table-wrap { overflow-x: auto; }
+  .sync-empty { padding: 40px 16px; }
+  .sync-empty-sub { max-width: 100%; font-size: 12px; }
+  :deep(.sync-datatable .p-datatable-thead th),
+  :deep(.sync-datatable .p-datatable-tbody td) { padding: 6px 8px; font-size: 12px; }
+  :deep(.sync-datatable .p-paginator) { padding: 6px 8px; }
+}
 </style>

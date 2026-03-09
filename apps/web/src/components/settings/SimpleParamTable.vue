@@ -1,17 +1,19 @@
 <template>
   <div class="param-table-card">
     <div class="param-toolbar">
-      <InputText v-model="search" :placeholder="`Search ${rowLabel}s…`" size="small" style="width: 240px" />
+      <InputText v-model="search" :placeholder="`Search ${rowLabel}s…`" size="small" class="param-search" />
       <Button :label="`Add ${rowLabel}`" icon="pi pi-plus" size="small" @click="$emit('add')" />
     </div>
 
     <DataTable
+      class="param-datatable"
       :value="filtered"
       :loading="loading"
       size="small"
       striped-rows
       :rows="50"
       paginator
+      paginator-template="RowsPerPageDropdown FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
       :rows-per-page-options="[25, 50, 100]"
     >
       <template #empty>
@@ -85,9 +87,12 @@ function formatDate(iso: string) {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   padding: 12px 16px;
   border-bottom: 1px solid #f1f5f9;
 }
+
+.param-search { width: 240px; min-width: 0; }
 
 .empty-state {
   display: flex;
@@ -100,4 +105,12 @@ function formatDate(iso: string) {
 
 .row-actions { display: flex; gap: 2px; justify-content: flex-end; }
 .muted { font-size: 12px; color: #94a3b8; }
+
+@media (max-width: 768px) {
+  .param-toolbar { flex-direction: column; align-items: stretch; padding: 10px 12px; gap: 8px; }
+  .param-search { width: 100%; }
+  :deep(.param-datatable .p-datatable-thead th),
+  :deep(.param-datatable .p-datatable-tbody td) { padding: 6px 8px; font-size: 12px; }
+  :deep(.param-datatable .p-paginator) { padding: 6px 8px; }
+}
 </style>

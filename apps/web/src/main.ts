@@ -50,6 +50,10 @@ app.use(PrimeVue, {
     preset: OBTheme,
     options: { darkModeSelector: '.dark' },
   },
+  zIndex: {
+    modal: 1100,
+    overlay: 1200, // Select/dropdown overlays above modals so they're not clipped
+  },
 })
 app.use(ToastService)
 app.use(ConfirmationService)

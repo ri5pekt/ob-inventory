@@ -3,42 +3,47 @@
     <!-- Header -->
     <div class="view-header">
       <div class="header-left">
+        <Button icon="pi pi-arrow-left" text rounded size="small" @click="router.push('/inventory')" />
         <i class="pi pi-arrows-h header-icon" />
         <div>
           <h2 class="view-title">Stock Transfers</h2>
           <span class="view-subtitle">Move inventory between warehouses</span>
         </div>
       </div>
-      <Button label="New Transfer" icon="pi pi-plus" size="small" @click="showCreate = true" />
+      <Button label="New Transfer" icon="pi pi-plus" size="small" class="btn-new-transfer" @click="showCreate = true" />
     </div>
 
     <TransferStatsSection :transfers="transfers" @date-range-change="dateRange = $event" />
 
     <!-- Toolbar -->
     <div class="toolbar">
-      <InputText v-model="search" placeholder="Search by reference, warehouse…" size="small" style="width: 280px" />
+      <div class="search-wrap">
+        <InputText v-model="search" placeholder="Search by reference, warehouse…" size="small" class="search-input" />
+      </div>
     </div>
 
     <!-- Table -->
-    <div class="table-card">
+    <div class="table-card transfers-table-wrap">
       <DataTable
         :value="filteredTransfers"
         :loading="isLoading"
         striped-rows
         size="small"
         paginator
+        paginator-template="RowsPerPageDropdown FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
         :rows="50"
         :rows-per-page-options="[25, 50, 100]"
         scrollable
         scroll-height="flex"
         row-hover
+        class="transfers-datatable"
         @row-click="openDetail($event.data)"
       >
-        <Column field="createdAt" header="Date" style="width: 160px" sortable>
-          <template #body="{ data }">{{ formatDate(data.createdAt) }}</template>
+        <Column field="createdAt" header="Date" :frozen="!isMobile" sortable class="col-date">
+          <template #body="{ data }"><span class="date-text">{{ formatDate(data.createdAt) }}</span></template>
         </Column>
 
-        <Column header="Route" style="min-width: 240px">
+        <Column header="Route" :frozen="!isMobile" class="col-route">
           <template #body="{ data }">
             <div class="route-cell">
               <span class="wh-badge wh-from">{{ data.fromWarehouseName ?? '—' }}</span>
@@ -67,7 +72,7 @@
           </template>
         </Column>
 
-        <Column field="status" header="Status" style="width: 100px">
+        <Column field="status" header="Status" :frozen="!isMobile" align-frozen="right" style="width: 100px">
           <template #body="{ data }">
             <Tag :value="data.status" :severity="data.status === 'completed' ? 'success' : 'danger'" />
           </template>
@@ -89,14 +94,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import { getTransfers, getTransfer, type TransferSummary, type TransferDetail } from '@/api/transfers'
 import TransferStatsSection  from '@/components/transfers/TransferStatsSection.vue'
 import TransferDetailDialog  from '@/components/transfers/TransferDetailDialog.vue'
 import CreateTransferModal   from '@/components/transfers/CreateTransferModal.vue'
 
+const router = useRouter()
 const showCreate       = ref(false)
+const isMobile         = ref(false)
+const mobileQuery      = window.matchMedia('(max-width: 768px)')
+function setMobile() { isMobile.value = mobileQuery.matches }
+onMounted(() => { setMobile(); mobileQuery.addEventListener('change', setMobile) })
+onUnmounted(() => mobileQuery.removeEventListener('change', setMobile))
 const showDetail       = ref(false)
 const selectedTransfer = ref<TransferDetail | null>(null)
 const search           = ref('')
@@ -154,35 +166,122 @@ function formatDate(iso: string) {
 
 <style scoped>
 .transfers-view {
-  display: flex; flex-direction: column; height: 100%; padding: 24px; gap: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.view-header { display: flex; align-items: center; justify-content: space-between; }
-.header-left { display: flex; align-items: center; gap: 14px; }
-.header-icon { font-size: 26px; color: var(--p-primary-color); }
+.view-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.header-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.header-icon { font-size: 26px; color: var(--p-primary-color); flex-shrink: 0; }
 .view-title  { margin: 0; font-size: 22px; font-weight: 700; }
 .view-subtitle { font-size: 13px; color: var(--p-text-muted-color); }
 
+.btn-new-transfer :deep(.p-button-label) { white-space: nowrap; }
+
 .toolbar { display: flex; align-items: center; gap: 8px; }
+.search-wrap { width: 280px; }
+.search-input { width: 100%; }
 
 .table-card {
-  flex: 1; background: var(--p-surface-card);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--p-surface-card);
   border: 1px solid var(--p-content-border-color);
-  border-radius: 12px; overflow: hidden;
-  display: flex; flex-direction: column;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
 }
 
-.route-cell { display: flex; align-items: center; gap: 8px; }
-.wh-badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 6px; white-space: nowrap; }
+/* Table min-width for horizontal scroll */
+:deep(.transfers-datatable .p-datatable-table) {
+  min-width: 920px;
+}
+
+/* Frozen columns opaque background */
+:deep(.transfers-datatable .p-datatable-tbody .p-frozen-column),
+:deep(.transfers-datatable .p-datatable-thead .p-frozen-column) { background: #fff; }
+:deep(.transfers-datatable tr.p-row-odd .p-frozen-column) { background: var(--p-datatable-row-striped-background, #fafafa); }
+:deep(.transfers-datatable tr:hover .p-frozen-column) { background: var(--p-datatable-row-hover-background, #f1f5f9); }
+
+/* Date column: fixed width, wrap */
+:deep(.col-date) { width: 100px; max-width: 100px; }
+.date-text {
+  font-size: 12px;
+  color: var(--p-text-color);
+  display: block;
+  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.3;
+}
+
+/* Route column: fixed width, wrap */
+:deep(.col-route) { width: 140px; max-width: 140px; }
+.route-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.wh-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.3;
+}
 .wh-from { background: var(--p-orange-50, #fff7ed); color: var(--p-orange-700, #c2410c); }
 .wh-to   { background: var(--p-green-50, #f0fdf4);  color: var(--p-green-700, #15803d); }
-.route-arrow { color: var(--p-text-muted-color); font-size: 12px; }
+.route-arrow { color: var(--p-text-muted-color); font-size: 10px; flex-shrink: 0; }
 .ref-text    { font-family: monospace; font-size: 12px; color: var(--p-primary-color); }
 .item-count  { font-weight: 700; }
-.notes-text  { font-size: 12px; color: var(--p-text-muted-color); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 240px; display: block; }
+.notes-text  {
+  font-size: 12px;
+  color: var(--p-text-muted-color);
+  display: block;
+  max-width: 200px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.3;
+}
 .no-value    { color: var(--p-text-muted-color); }
 
 .empty-state { display: flex; flex-direction: column; align-items: center; padding: 60px 20px; color: var(--p-text-muted-color); }
 .empty-icon  { font-size: 40px; margin-bottom: 12px; opacity: 0.3; }
 .empty-sub   { font-size: 13px; }
+
+/* ═══════════════════════════════════════════════
+   MOBILE  ≤ 768px
+════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .transfers-view { gap: 10px; }
+  .view-title { font-size: 18px; }
+  .view-subtitle { font-size: 12px; }
+  .header-left .header-icon { display: none; }
+  .view-header .p-button-label { display: none; }
+
+  .search-wrap { flex: 1; min-width: 0; width: auto; }
+
+  :deep(.transfers-datatable .p-datatable-tbody td),
+  :deep(.transfers-datatable .p-datatable-thead th) { padding: 6px 8px; font-size: 12px; }
+  :deep(.col-date) { width: 80px; max-width: 80px; }
+  :deep(.col-route) { width: 110px; max-width: 110px; }
+  .date-text { font-size: 11px; }
+  .wh-badge { font-size: 10px; padding: 2px 6px; }
+}
+
+@media (max-width: 480px) {
+  .transfers-view { gap: 8px; }
+  .view-title { font-size: 16px; }
+}
 </style>

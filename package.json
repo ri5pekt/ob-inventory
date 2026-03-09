@@ -1,5 +1,6 @@
 {
   "name": "ob-inventory",
+  "version": "1.1.0",
   "private": true,
   "engines": {
     "node": ">=22.0.0",
@@ -17,7 +18,8 @@
     "db:studio": "pnpm --filter @ob-inventory/db studio",
     "import:csv": "tsx scripts/import-csv.ts",
     "db:seed": "tsx --env-file=.env scripts/seed.ts",
-    "db:seed-data": "tsx --env-file=.env scripts/seed-data.ts"
+    "db:seed-data": "tsx --env-file=.env scripts/seed-data.ts",
+    "woo-sync:diagnose": "tsx --env-file=.env scripts/woo-sync-diagnose.ts"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

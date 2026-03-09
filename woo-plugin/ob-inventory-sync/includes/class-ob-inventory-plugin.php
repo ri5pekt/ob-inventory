@@ -14,14 +14,16 @@ class OB_Inventory_Plugin {
     /** @var OB_Inventory_Plugin|null */
     private static ?OB_Inventory_Plugin $instance = null;
 
-    private OB_Inventory_REST      $rest;
-    private OB_Inventory_Admin     $admin;
-    private OB_Inventory_Webhooks  $webhooks;
+    private OB_Inventory_REST          $rest;
+    private OB_Inventory_Admin        $admin;
+    private OB_Inventory_Webhooks     $webhooks;
+    private OB_Inventory_Product_Meta $product_meta;
 
     private function __construct() {
-        $this->rest     = new OB_Inventory_REST();
-        $this->admin    = new OB_Inventory_Admin();
-        $this->webhooks = new OB_Inventory_Webhooks();
+        $this->rest         = new OB_Inventory_REST();
+        $this->admin        = new OB_Inventory_Admin();
+        $this->webhooks     = new OB_Inventory_Webhooks();
+        $this->product_meta = new OB_Inventory_Product_Meta();
     }
 
     public static function instance(): self {

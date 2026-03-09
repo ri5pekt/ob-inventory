@@ -2,6 +2,7 @@ import type { FastifyPluginAsync } from 'fastify'
 import { eq, and, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../db.js'
+import { enqueueSyncWooStock } from '../queue.js'
 import {
   stores,
   warehouses,
@@ -185,6 +186,14 @@ export const webhookRoutes: FastifyPluginAsync = async (fastify) => {
 
       return { sale, unresolvedSkus: unresolved }
     })
+
+    for (const p of foundProducts) {
+      try {
+        await enqueueSyncWooStock(p.id)
+      } catch (err) {
+        request.log.warn({ err, productId: p.id }, 'Failed to enqueue sync-woo-stock')
+      }
+    }
 
     return reply.status(201).send({
       saleId:        result.sale.id,

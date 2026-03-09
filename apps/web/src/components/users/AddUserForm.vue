@@ -33,7 +33,7 @@
 
         <div class="field">
           <label class="field-label">Role</label>
-          <Select v-model="form.role" :options="roleOptions" option-label="label" option-value="value" class="w-full" />
+          <Select v-model="form.role" :options="roleOptions" option-label="label" option-value="value" class="w-full" append-to="body" />
         </div>
       </div>
 
@@ -95,7 +95,11 @@ async function submit() {
 .card-title { font-size: 14px; font-weight: 600; color: #0f172a; margin: 0 0 16px; }
 
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; margin-bottom: 16px; }
-@media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+@media (max-width: 768px) {
+  .add-card { padding: 14px 16px 18px; }
+  .form-grid { grid-template-columns: 1fr; gap: 12px 0; margin-bottom: 14px; }
+}
 
 .field { display: flex; flex-direction: column; gap: 5px; }
 .field-label { font-size: 13px; font-weight: 500; color: #475569; }

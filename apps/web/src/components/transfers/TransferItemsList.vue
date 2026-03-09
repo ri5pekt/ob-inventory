@@ -183,4 +183,39 @@ defineEmits<{
   font-size: 13px;
 }
 .items-empty .pi { font-size: 18px; opacity: 0.5; }
+
+@media (max-width: 768px) {
+  .items-header { padding: 8px 12px; }
+  .items-title,
+  .items-count { font-size: 11px; }
+
+  .item-row {
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .item-info {
+    flex: 1 1 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .item-sku { font-size: 11px; }
+  .item-name { font-size: 12px; white-space: normal; word-break: break-word; }
+  .item-attrs { font-size: 10px; white-space: normal; }
+
+  .item-controls {
+    flex: 1 1 100%;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .qty-stepper { height: 28px; }
+  .qty-btn { width: 24px; }
+  .qty-input { width: 34px; font-size: 12px; }
+
+  .items-empty { padding: 14px 12px; font-size: 12px; }
+}
 </style>

@@ -17,6 +17,7 @@
 
       <div class="table-wrap">
         <DataTable
+          class="users-datatable"
           :value="users"
           :loading="loading"
           size="small"
@@ -83,7 +84,8 @@
       header="Edit User"
       :modal="true"
       :style="{ width: '460px' }"
-      :breakpoints="{ '520px': '95vw' }"
+      :breakpoints="{ '768px': 'calc(100vw - 24px)', '480px': 'calc(100vw - 16px)' }"
+      content-style="overflow-y: auto;"
     >
       <form @submit.prevent="submitEdit" novalidate class="edit-form">
         <div class="field">
@@ -96,7 +98,7 @@
         </div>
         <div class="field">
           <label class="field-label">Role</label>
-          <Select v-model="editForm.role" :options="roleOptions" option-label="label" option-value="value" class="w-full" />
+          <Select v-model="editForm.role" :options="roleOptions" option-label="label" option-value="value" class="w-full" append-to="body" />
         </div>
         <div class="field">
           <label class="field-label">New Password <span class="muted">(leave blank to keep current)</span></label>
@@ -128,6 +130,7 @@
       header="Delete User"
       :modal="true"
       :style="{ width: '400px' }"
+      :breakpoints="{ '480px': 'calc(100vw - 16px)' }"
     >
       <p style="margin:0; font-size:14px; color:#475569">
         Are you sure you want to deactivate <strong>{{ deleteTarget?.name }}</strong>?
@@ -242,6 +245,7 @@ function formatDate(iso: string) {
   gap: 24px;
   overflow-y: auto;
   height: 100%;
+  padding: 0;
 }
 
 /* ── Header ── */
@@ -301,4 +305,15 @@ function formatDate(iso: string) {
 }
 
 .w-full { width: 100%; }
+
+@media (max-width: 768px) {
+  .users-view { gap: 16px; }
+  .page-title { font-size: 18px; }
+  .page-desc { font-size: 12px; }
+  .table-section { gap: 10px; }
+  .table-empty { padding: 24px 16px; font-size: 13px; }
+  :deep(.users-datatable .p-datatable-thead th),
+  :deep(.users-datatable .p-datatable-tbody td) { padding: 6px 8px; font-size: 12px; }
+  :deep(.users-datatable .p-paginator) { padding: 6px 8px; }
+}
 </style>

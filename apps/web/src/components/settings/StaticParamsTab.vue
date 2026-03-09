@@ -34,7 +34,7 @@
   </div>
 
   <!-- Add / Edit dialog -->
-  <Dialog v-model:visible="nameDialog" :header="nameDialogTitle" modal style="width: 380px">
+  <Dialog v-model:visible="nameDialog" :header="nameDialogTitle" modal :style="{ width: '380px' }" :breakpoints="{ '480px': 'calc(100vw - 16px)' }">
     <div class="field">
       <label>Name</label>
       <InputText v-model="nameForm" autofocus style="width: 100%" @keyup.enter="saveName" />
@@ -145,6 +145,11 @@ function confirmDelete(type: SimpleType, row: { id: string; name: string }) {
   background: var(--p-content-border-color, #e2e8f0);
   align-self: stretch;
   margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .static-grid { grid-template-columns: 1fr; gap: 20px 0; }
+  .static-divider { width: 100%; height: 1px; min-height: 1px; margin: 0; }
 }
 
 .static-col-header { margin-bottom: 12px; }

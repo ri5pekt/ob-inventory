@@ -81,6 +81,7 @@
     <EditProductModal
       :visible="showEditProduct"
       :warehouse-id="warehouseId"
+      :warehouse-type="warehouse?.type"
       :item="editItem"
       @close="showEditProduct = false"
     />

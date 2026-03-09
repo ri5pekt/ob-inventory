@@ -1,9 +1,11 @@
 <template>
   <DataTable
+    class="stock-datatable"
     :value="items"
     striped-rows
     size="small"
     paginator
+    paginator-template="RowsPerPageDropdown FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
     :rows="50"
     :rows-per-page-options="[25, 50, 100]"
     scrollable
@@ -16,7 +18,7 @@
       </div>
     </template>
 
-    <!-- Frozen left: edit icon -->
+    <!-- Edit icon (frozen) -->
     <Column header="" frozen style="width: 40px; text-align: center; padding: 0 4px">
       <template #body="{ data }">
         <Button
@@ -28,7 +30,7 @@
       </template>
     </Column>
 
-    <!-- Frozen left: thumbnail -->
+    <!-- Thumbnail (frozen) -->
     <Column header="" frozen style="width: 44px; padding: 3px 4px; text-align: center">
       <template #body="{ data }">
         <img v-if="data.image" :src="data.image" class="row-thumb" alt="" />
@@ -36,11 +38,12 @@
       </template>
     </Column>
 
-    <Column field="sku" header="SKU" frozen sortable style="width: 140px">
+    <!-- SKU (frozen) -->
+    <Column field="sku" header="SKU" frozen sortable class="col-sku">
       <template #body="{ data }"><span class="sku-text">{{ data.sku }}</span></template>
     </Column>
 
-    <Column field="name" header="Name" frozen sortable style="width: 160px">
+    <Column field="name" header="Name" sortable style="width: 160px">
       <template #body="{ data }"><span class="col-name">{{ data.wooTitle ?? data.name ?? '—' }}</span></template>
     </Column>
 
@@ -113,7 +116,7 @@ function formatDate(iso: string | null | undefined): string {
 <style scoped>
 /* Force the inner table to be wide enough to trigger horizontal scroll */
 :deep(.p-datatable-table) {
-  min-width: 1126px; /* 40(edit)+44(img)+140+160+90+110+120+70+90+70+110+72+60 */
+  min-width: 1106px; /* 40(edit)+44(img)+120(sku)+160+90+110+120+70+90+70+110+72+60 */
 }
 
 /* Frozen columns must have an opaque background */
@@ -130,7 +133,18 @@ function formatDate(iso: string | null | undefined): string {
 :deep(.edit-btn) { width: 28px !important; height: 28px !important; padding: 0 !important; color: #94a3b8 !important; }
 :deep(.edit-btn:hover) { color: #0891b2 !important; background: #e0f2fe !important; }
 
-.sku-text { font-family: 'Courier New', monospace; font-size: 12px; color: #334155; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+:deep(.col-sku) { width: 120px; max-width: 120px; }
+.sku-text {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #334155;
+  display: block;
+  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.3;
+}
 .col-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #64748b; font-size: 13px; }
 
 .box-badge { background: #f8fafc; border: 1px solid #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-family: monospace; color: #475569; }
@@ -147,7 +161,14 @@ function formatDate(iso: string | null | undefined): string {
 .qty-zero { color: #dc2626; }
 
 @media (max-width: 768px) {
-  :deep(.p-datatable-tbody td),
-  :deep(.p-datatable-thead th) { padding: 6px 8px; font-size: 12px; }
+  :deep(.stock-datatable .p-datatable-tbody td),
+  :deep(.stock-datatable .p-datatable-thead th) { padding: 6px 8px; font-size: 12px; }
+  /* Tighter padding on frozen columns (edit, thumb, SKU) to remove visible gaps */
+  :deep(.stock-datatable .p-datatable-tbody td.p-frozen-column),
+  :deep(.stock-datatable .p-datatable-thead th.p-frozen-column) {
+    padding: 6px 2px !important;
+  }
+  :deep(.col-sku) { width: 88px; max-width: 88px; }
+  .sku-text { font-size: 11px; }
 }
 </style>

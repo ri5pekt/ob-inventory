@@ -3,7 +3,9 @@
     v-model:visible="visible"
     modal
     header="New Stock Transfer"
+    class="create-transfer-dialog"
     :style="{ width: '820px', maxWidth: '96vw', maxHeight: '92vh' }"
+    :breakpoints="{ '768px': 'calc(100vw - 24px)', '480px': 'calc(100vw - 16px)' }"
     content-style="overflow-y: auto;"
     @hide="resetForm"
   >
@@ -21,6 +23,7 @@
             placeholder="Select source…"
             :loading="loadingWarehouses"
             fluid
+            appendTo="body"
             @change="clearItems"
           />
         </div>
@@ -37,6 +40,7 @@
             placeholder="Select destination…"
             :loading="loadingWarehouses"
             fluid
+            appendTo="body"
           />
         </div>
 
@@ -103,7 +107,9 @@
     v-model:visible="showConfirm"
     modal
     header="Confirm Transfer"
+    class="confirm-transfer-dialog"
     :style="{ width: '400px' }"
+    :breakpoints="{ '768px': 'calc(100vw - 24px)', '480px': 'calc(100vw - 16px)' }"
     :closable="!submitting"
   >
     <div class="confirm-body">
@@ -223,7 +229,7 @@ function clearItems() {
 
 function addItem(result: ProductSearchResult) {
   if (addedIds.value.includes(result.productId)) return
-  form.value.items.push({ ...result, quantity: 1 })
+  form.value.items.unshift({ ...result, quantity: 1 })
 }
 
 function removeItem(idx: number) {
@@ -373,5 +379,57 @@ label {
   margin: 0;
   font-size: 14px;
   color: var(--p-text-color, #0f172a);
+}
+
+/* ═══════════════════════════════════════════════
+   MOBILE  ≤ 768px
+════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .transfer-form { gap: 16px; }
+
+  .warehouse-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .transfer-arrow {
+    padding: 0;
+    justify-content: center;
+    transform: rotate(90deg);
+  }
+
+  .field-ref { max-width: none; }
+
+  .footer-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .footer-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .footer-actions .p-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .confirm-route {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px;
+  }
+
+  .confirm-arrow-icon {
+    transform: rotate(90deg);
+  }
+
+  .confirm-stats {
+    flex-wrap: wrap;
+  }
 }
 </style>

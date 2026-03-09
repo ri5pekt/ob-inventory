@@ -2,6 +2,7 @@ import type { FastifyPluginAsync } from 'fastify'
 import { eq, desc, count, and, gt, gte, lte, inArray, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../db.js'
+import { enqueueSyncWooStock } from '../queue.js'
 import {
   transfers,
   transferItems,
@@ -233,6 +234,20 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
       return transfer
     })
 
+    const [mainWh] = await db.select({ id: warehouses.id }).from(warehouses).where(eq(warehouses.type, 'main'))
+    if (mainWh) {
+      const affectedProductIds = d.items.map(i => i.productId)
+      if (d.fromWarehouseId === mainWh.id || d.toWarehouseId === mainWh.id) {
+        for (const pid of affectedProductIds) {
+          try {
+            await enqueueSyncWooStock(pid)
+          } catch (err) {
+            (request as { log?: { warn: (o: object, msg: string) => void } }).log?.warn?.({ err, productId: pid }, 'Failed to enqueue sync-woo-stock')
+          }
+        }
+      }
+    }
+
     return reply.status(201).send(result)
   })
 
@@ -306,6 +321,17 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
       // Delete transfer (cascade removes transfer_items)
       await tx.delete(transfers).where(eq(transfers.id, id))
     })
+
+    const [mainWh] = await db.select({ id: warehouses.id }).from(warehouses).where(eq(warehouses.type, 'main'))
+    if (mainWh && (transfer.fromWarehouseId === mainWh.id || transfer.toWarehouseId === mainWh.id)) {
+      for (const item of items) {
+        try {
+          await enqueueSyncWooStock(item.productId)
+        } catch (err) {
+          (request as { log?: { warn: (o: object, msg: string) => void } }).log?.warn?.({ err, productId: item.productId }, 'Failed to enqueue sync-woo-stock')
+        }
+      }
+    }
 
     return reply.status(200).send({ ok: true })
   })

@@ -271,4 +271,38 @@ function formatRevenue(amount: number) {
 .stat-woo     { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
 .stat-direct  { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
 .stat-partner { background: #fff7ed; border-color: #fed7aa; color: #c2410c; }
+
+@media (max-width: 768px) {
+  .stats-section { padding: 8px 10px; gap: 8px; }
+  .period-bar { gap: 6px; }
+  .period-chip { padding: 2px 8px; font-size: 10px; }
+  .period-desc { font-size: 10px; }
+
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .stat-card {
+    flex: none;
+    min-width: 0;
+    padding: 6px 8px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .stat-top {
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .stat-label { font-size: 9px; white-space: nowrap; }
+  .stat-icon { font-size: 12px; flex-shrink: 0; }
+  .stat-count { font-size: 16px; flex-shrink: 0; }
+  .stat-revenue { font-size: 10px; display: none; }
+}
 </style>

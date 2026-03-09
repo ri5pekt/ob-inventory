@@ -199,7 +199,7 @@ export const storeRoutes: FastifyPluginAsync = async (fastify) => {
 
     // ── Load main warehouse stock from DB ───────────────────────────────────
     const obStock = await db
-      .select({ sku: products.sku, name: products.name, quantity: inventoryStock.quantity })
+      .select({ productId: products.id, sku: products.sku, name: products.name, quantity: inventoryStock.quantity })
       .from(inventoryStock)
       .innerJoin(products,   eq(inventoryStock.productId,   products.id))
       .innerJoin(warehouses, eq(inventoryStock.warehouseId, warehouses.id))
@@ -213,7 +213,7 @@ export const storeRoutes: FastifyPluginAsync = async (fastify) => {
     const obFiltered  = obStock.filter(s => s.sku?.trim())
     const wooFiltered = wooProducts.filter(p => p.sku?.trim())
 
-    const obMap  = new Map(obFiltered.map(s => [norm(s.sku), s]))
+    const obMap  = new Map(obFiltered.map(s => [norm(s.sku!), s]))
     const wooMap = new Map(wooFiltered.map(p => [norm(p.sku), p]))
 
     type SyncStatus = 'synced' | 'qty_mismatch' | 'ob_only' | 'woo_only' | 'untracked'
@@ -240,6 +240,7 @@ export const storeRoutes: FastifyPluginAsync = async (fastify) => {
 
       return {
         sku,
+        obProductId: ob?.productId ?? null,
         obName:      ob?.name   ?? null,
         wooName:     woo?.name  ?? null,
         wooAttrs:    woo?.attrs ?? null,

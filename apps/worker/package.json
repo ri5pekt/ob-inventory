@@ -5,7 +5,7 @@
   "type": "module",
   "main": "./dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch --env-file=../../.env src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },
@@ -13,6 +13,7 @@
     "@ob-inventory/db": "workspace:*",
     "@ob-inventory/types": "workspace:*",
     "bullmq": "^5.0.0",
+    "drizzle-orm": "^0.38.0",
     "ioredis": "^5.4.0",
     "zod": "^3.24.0"
   },

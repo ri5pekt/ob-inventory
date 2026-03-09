@@ -3,50 +3,52 @@
     v-model:visible="visible"
     modal
     header="New Sale"
-    :style="{ width: '820px', maxWidth: '95vw' }"
+    :style="{ width: '820px', maxWidth: '96vw', maxHeight: '92vh' }"
+    :breakpoints="{ '768px': 'calc(100vw - 24px)', '480px': 'calc(100vw - 16px)' }"
+    content-style="overflow-y: auto;"
     @hide="resetForm"
   >
     <div class="create-sale-form">
 
-      <!-- Type + Warehouse row -->
-      <div class="form-row">
-        <div class="field">
-          <label>Sale Type</label>
-          <div class="type-toggle">
-            <Button
-              v-for="opt in typeOptions"
-              :key="opt.value"
-              :label="opt.label"
-              :icon="opt.icon"
-              :severity="form.saleType === opt.value ? undefined : 'secondary'"
-              :outlined="form.saleType !== opt.value"
-              size="small"
-              @click="onTypeChange(opt.value as 'direct' | 'partner')"
-            />
-          </div>
-        </div>
-
-        <div class="field">
-          <label>
-            {{ form.saleType === 'partner' ? 'Partner Warehouse' : 'Warehouse' }}
-            <span v-if="form.saleType === 'partner'" class="required">*</span>
-          </label>
-          <Select
-            v-model="form.warehouseId"
-            :options="warehouseOptions"
-            option-label="name"
-            option-value="id"
-            :placeholder="form.saleType === 'partner' ? 'Select partner warehouse…' : 'Select warehouse…'"
-            :loading="loadingWarehouses"
-            show-clear
-            fluid
-            @change="clearItems"
+      <!-- Sale Type -->
+      <div class="field">
+        <label>Sale Type</label>
+        <div class="type-toggle">
+          <Button
+            v-for="opt in typeOptions"
+            :key="opt.value"
+            :label="opt.label"
+            :icon="opt.icon"
+            :severity="form.saleType === opt.value ? undefined : 'secondary'"
+            :outlined="form.saleType !== opt.value"
+            size="small"
+            @click="onTypeChange(opt.value as 'direct' | 'partner')"
           />
         </div>
       </div>
 
+      <!-- Warehouse -->
+      <div class="field">
+        <label>
+          {{ form.saleType === 'partner' ? 'Partner Warehouse' : 'Warehouse' }}
+          <span v-if="form.saleType === 'partner'" class="required">*</span>
+        </label>
+        <Select
+          v-model="form.warehouseId"
+          :options="warehouseOptions"
+          option-label="name"
+          option-value="id"
+          :placeholder="form.saleType === 'partner' ? 'Select partner warehouse…' : 'Select warehouse…'"
+          :loading="loadingWarehouses"
+          show-clear
+          fluid
+          append-to="body"
+          @change="clearItems"
+        />
+      </div>
+
       <!-- Customer row -->
-      <div class="form-row">
+      <div class="form-row form-row-customer">
         <div class="field">
           <label>Customer Name</label>
           <InputText v-model="form.customerName" placeholder="Optional" fluid />
@@ -63,12 +65,10 @@
           <label>Currency</label>
           <InputText v-model="form.currency" placeholder="ILS" fluid />
         </div>
-      </div>
-
-      <!-- Customer address -->
-      <div class="field">
-        <label>Customer Address</label>
-        <InputText v-model="form.customerAddress" placeholder="Optional — street, city, zip…" fluid />
+        <div class="field field-full">
+          <label>Customer Address</label>
+          <InputText v-model="form.customerAddress" placeholder="Optional — street, city, zip…" fluid />
+        </div>
       </div>
 
       <!-- Product search -->
@@ -192,7 +192,7 @@
       </template>
     </div>
 
-      <template #footer>
+    <template #footer>
       <div class="footer-row">
         <span v-if="form.items.length > 0" class="footer-summary">
           {{ form.items.length }} product{{ form.items.length !== 1 ? 's' : '' }} ·
@@ -217,6 +217,7 @@
     modal
     header="Confirm Sale"
     :style="{ width: '420px' }"
+    :breakpoints="{ '768px': 'calc(100vw - 24px)', '480px': 'calc(100vw - 16px)' }"
     :closable="!submitting"
   >
     <div class="confirm-body">
@@ -251,13 +252,15 @@
     </div>
 
     <template #footer>
-      <Button label="Cancel" severity="secondary" outlined :disabled="submitting" @click="showConfirm = false" />
-      <Button
-        label="Confirm & Create"
-        icon="pi pi-check"
-        :loading="submitting"
-        @click="submit"
-      />
+      <div class="confirm-footer-row">
+        <Button label="Cancel" severity="secondary" outlined :disabled="submitting" @click="showConfirm = false" />
+        <Button
+          label="Confirm & Create"
+          icon="pi pi-check"
+          :loading="submitting"
+          @click="submit"
+        />
+      </div>
     </template>
   </Dialog>
 </template>
@@ -378,7 +381,7 @@ function clearItems() {
 
 function addItem(result: ProductSearchResult) {
   if (addedProductIds.value.includes(result.productId)) return
-  form.value.items.push({ ...result, quantity: 1, unitPrice: null })
+  form.value.items.unshift({ ...result, quantity: 1, unitPrice: null })
 }
 
 function removeItem(idx: number) {
@@ -457,13 +460,19 @@ async function submit() {
 .create-sale-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
+  padding-bottom: 8px;
 }
 
 .form-row {
   display: flex;
   gap: 16px;
   align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.form-row-customer {
+  align-items: stretch;
 }
 
 .field {
@@ -471,9 +480,11 @@ async function submit() {
   flex-direction: column;
   gap: 6px;
   flex: 1;
+  min-width: 0;
 }
 
 .field-sm { flex: 0 0 100px; }
+.field-full { flex: 1 1 100%; min-width: 100%; }
 
 label {
   font-size: 12px;
@@ -686,6 +697,7 @@ label {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  padding-top: 12px;
 }
 
 .footer-summary {
@@ -757,5 +769,85 @@ label {
   font-size: 14px;
   color: var(--p-text-color);
   margin: 0;
+}
+
+.confirm-footer-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+}
+
+/* ═══════════════════════════════════════════════
+   MOBILE  ≤ 768px
+════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .create-sale-form { gap: 12px; padding-bottom: 4px; }
+
+  .form-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .field-sm { flex: 1 1 auto; }
+  .field-full { min-width: 0; }
+
+  .type-toggle { flex-wrap: wrap; }
+
+  .items-header { padding: 8px 12px; }
+  .items-list-head { display: none; }
+
+  .item-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    align-items: stretch;
+  }
+
+  .item-row .col-product { order: 1; }
+  .item-row .col-qty-wrap { order: 2; display: flex; align-items: center; gap: 8px; }
+  .item-row .col-price { order: 3; }
+  .item-row .col-total { order: 4; text-align: left; }
+  .item-row .col-remove { order: 5; justify-self: start; }
+
+  .item-name { white-space: normal; word-break: break-word; }
+  .item-sku { font-size: 11px; }
+  .item-name { font-size: 12px; }
+
+  .qty-stepper { height: 28px; }
+  .qty-btn { width: 24px; }
+  .qty-input { width: 34px; font-size: 12px; }
+
+  .grand-total-row { padding: 8px 12px; flex-wrap: wrap; }
+
+  .footer-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .footer-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .footer-actions .p-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .confirm-body { gap: 12px; padding: 8px 0; }
+  .confirm-stats { flex-wrap: wrap; padding: 8px 12px; }
+
+  .confirm-footer-row {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .confirm-footer-row .p-button {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>
