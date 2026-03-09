@@ -15,6 +15,7 @@ Use this checklist before deploying to production. Version: **1.1.0**
   ```bash
   pnpm build
   ```
+- [ ] **No uncommitted secrets** — `.env`, passwords, API keys not in repo
 - [ ] **Docker images build** (API, Web, Worker)
   ```bash
   docker compose build
