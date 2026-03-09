@@ -14,10 +14,11 @@
 - **Stop immediately** on migration failure — do not proceed
 - **Do not overwrite** `.env` — preserve existing values
 - **Verify** worker logs and health after deploy
-- **Print** current commit SHA after `git pull` using `git rev-parse HEAD`
+- **Print** deployed commit SHA using `git rev-parse HEAD` after pull/reset
 - **Treat** failed `curl -fSs https://activebrands.cloud/api/health` as deploy failure
 - **Do not** perform rollback automatically unless explicitly instructed
 - **If** any checkpoint output is unclear or non-numeric where numeric is expected, stop and report instead of guessing
+- **Never** remove Docker volumes or database data (e.g. `docker compose down -v`, `docker volume rm`, dropping the DB) unless explicitly instructed for rollback/restore
 
 ---
 
@@ -103,14 +104,15 @@ ssh root@187.124.160.50 "cd /opt/ob-inventory && docker compose exec -T postgres
 ssh root@187.124.160.50
 ```
 
-### 3.2 Pull latest code
+### 3.2 Pull latest code (deterministic for deploy-only servers)
 ```bash
 cd /opt/ob-inventory
 git fetch origin
-git status                    # See current branch
-git pull origin main
+git checkout main
+git reset --hard origin/main
 git rev-parse HEAD            # Print deployed commit SHA (record this)
 ```
+**Why reset --hard:** Avoids local drift and detached HEAD; server should match `origin/main` exactly.
 
 ### 3.3 Stop app services only (keep Postgres and Redis running)
 ```bash
@@ -141,10 +143,16 @@ docker compose run --rm api node apps/api/dist/migrate.js
 **If migration command exits non-zero:** Stop immediately. Do not run `docker compose up -d`. Report failure. Only restore DB if migration partially modified the schema/data and the app cannot be recovered safely without restore.
 
 ### 3.6b Verify migration status (optional sanity check)
+**Stop only if you are sure this table should exist.** Some setups use a different schema/table.
+
 ```bash
+# Inspect drizzle schema tables first (optional)
+docker compose exec -T postgres psql -U ob_user -d ob_inventory -c "\dt drizzle.*"
+
+# If drizzle.__drizzle_migrations exists, query it (OB Inventory uses this)
 docker compose exec -T postgres psql -U ob_user -d ob_inventory -c "SELECT id, hash, created_at FROM drizzle.__drizzle_migrations ORDER BY created_at DESC LIMIT 10;"
 ```
-Confirms the DB registered the migrations. Should show 9 rows (0000–0008) after a fresh deploy.
+Should show 9 rows (0000–0008) after a fresh deploy. **Do not panic** if the table name differs — it may be a different migration setup.
 
 ### 3.7 Start all services
 ```bash
@@ -219,7 +227,7 @@ docker compose up -d
 | 1 | Push to git | ✅ |
 | 2 | Backup DB: pg_dump to /tmp, copy to `/root/backups/ob-inventory/` | ✅ **MANDATORY** |
 | 3 | Check products.box_number — **STOP if count > 0** | ⚠️ **RED-ALERT** |
-| 4 | `git pull origin main` + `git rev-parse HEAD` | ✅ |
+| 4 | `git fetch` + `checkout main` + `reset --hard origin/main` + `git rev-parse HEAD` | ✅ |
 | 5 | `docker compose stop web api worker caddy` | ✅ (keeps Postgres/Redis) |
 | 6 | `docker compose build` | ✅ |
 | 7 | `docker compose run --rm api node apps/api/dist/migrate.js` | ✅ |
@@ -234,12 +242,15 @@ docker compose up -d
 
 ```bash
 cd /opt/ob-inventory
-git pull origin main
+git fetch origin
+git checkout main
+git reset --hard origin/main
 git rev-parse HEAD
 docker compose stop web api worker caddy
 docker compose build
 docker compose run --rm api node apps/api/dist/migrate.js
-docker compose exec -T postgres psql -U ob_user -d ob_inventory -c "SELECT id, hash, created_at FROM drizzle.__drizzle_migrations ORDER BY created_at DESC LIMIT 10;"
+# Optional: docker compose exec -T postgres psql -U ob_user -d ob_inventory -c "\dt drizzle.*"
+# Optional: docker compose exec -T postgres psql -U ob_user -d ob_inventory -c "SELECT id, hash, created_at FROM drizzle.__drizzle_migrations ORDER BY created_at DESC LIMIT 10;"
 docker compose up -d
 docker compose ps
 docker compose logs api --tail 50
