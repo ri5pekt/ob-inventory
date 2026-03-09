@@ -60,7 +60,8 @@ cd /opt/ob-inventory
 docker compose exec -T postgres pg_dump -U ob_user -d ob_inventory -F c -f /tmp/ob_inventory_backup.dump
 # Copy to host (host path may not be writable from inside container)
 docker compose cp postgres:/tmp/ob_inventory_backup.dump /root/backups/ob-inventory/ob_inventory_$(date +%Y%m%d_%H%M%S).dump
-# Housekeeping: remove temp dump from container
+# Verify temp file existed, then remove (housekeeping)
+docker compose exec -T postgres test -f /tmp/ob_inventory_backup.dump && echo "Backup created in container"
 docker compose exec -T postgres rm -f /tmp/ob_inventory_backup.dump
 ```
 **Fallback** if `docker compose cp` is unavailable: `docker cp $(docker compose ps -q postgres):/tmp/ob_inventory_backup.dump /root/backups/ob-inventory/ob_inventory_$(date +%Y%m%d_%H%M%S).dump`
@@ -230,7 +231,7 @@ docker compose up -d
 | 1 | Push to git | ✅ |
 | 2 | Backup DB: pg_dump to /tmp, copy to `/root/backups/ob-inventory/` | ✅ **MANDATORY** |
 | 3 | Check products.box_number — **STOP if count > 0** | ⚠️ **RED-ALERT** |
-| 4 | `git fetch` + `checkout main` + `reset --hard origin/main` + `git rev-parse HEAD` | ✅ |
+| 4 | `git fetch` + `checkout -B main origin/main` + `reset --hard origin/main` + `git rev-parse HEAD` | ✅ |
 | 5 | `docker compose stop web api worker caddy` | ✅ (keeps Postgres/Redis) |
 | 6 | `docker compose build` | ✅ |
 | 7 | `docker compose run --rm api node apps/api/dist/migrate.js` | ✅ |
