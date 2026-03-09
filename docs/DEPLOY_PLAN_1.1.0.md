@@ -60,8 +60,6 @@ cd /opt/ob-inventory
 docker compose exec -T postgres pg_dump -U ob_user -d ob_inventory -F c -f /tmp/ob_inventory_backup.dump
 # Copy to host (host path may not be writable from inside container)
 docker compose cp postgres:/tmp/ob_inventory_backup.dump /root/backups/ob-inventory/ob_inventory_$(date +%Y%m%d_%H%M%S).dump
-# Verify temp file existed, then remove (housekeeping)
-docker compose exec -T postgres test -f /tmp/ob_inventory_backup.dump && echo "Backup created in container"
 docker compose exec -T postgres rm -f /tmp/ob_inventory_backup.dump
 ```
 **Fallback** if `docker compose cp` is unavailable: `docker cp $(docker compose ps -q postgres):/tmp/ob_inventory_backup.dump /root/backups/ob-inventory/ob_inventory_$(date +%Y%m%d_%H%M%S).dump`
