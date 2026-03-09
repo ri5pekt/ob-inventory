@@ -48,3 +48,6 @@ apps/api/uploads/
 
 # Server / deployment secrets
 VPS/
+
+# DB schema dumps (regenerate with scripts/compare-production-db.py dump)
+scripts/production-schema.sql

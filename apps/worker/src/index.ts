@@ -180,3 +180,20 @@ setTimeout(async () => {
     console.warn('[worker] Could not check stores:', (err as Error).message)
   }
 }, 2000)
+
+// Graceful shutdown (Docker/K8s send SIGTERM)
+async function shutdown(signal: string) {
+  console.log(`[worker] ${signal} received, shutting down gracefully...`)
+  try {
+    await worker.close()
+    await connection.quit()
+    console.log('[worker] Shutdown complete.')
+    process.exit(0)
+  } catch (err) {
+    console.error('[worker] Shutdown error:', err)
+    process.exit(1)
+  }
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'))
+process.on('SIGINT', () => shutdown('SIGINT'))

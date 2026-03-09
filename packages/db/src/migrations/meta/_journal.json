@@ -57,6 +57,13 @@
       "when": 1741564800000,
       "tag": "0007_schema_sync",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1741651200000,
+      "tag": "0008_drop_products_box_number",
+      "breakpoints": true
     }
   ]
 }

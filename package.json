@@ -10,7 +10,7 @@
     "dev:api": "pnpm --filter @ob-inventory/api dev",
     "dev:worker": "pnpm --filter @ob-inventory/worker dev",
     "dev:web": "pnpm --filter @ob-inventory/web dev",
-    "build": "pnpm --filter @ob-inventory/types build && pnpm --filter @ob-inventory/db build && pnpm --filter './apps/*' build",
+    "build": "pnpm --filter @ob-inventory/types build && pnpm --filter @ob-inventory/db build && pnpm --filter @ob-inventory/api build && pnpm --filter @ob-inventory/web build && pnpm --filter @ob-inventory/worker build",
     "lint": "eslint .",
     "format": "prettier --write .",
     "db:generate": "pnpm --filter @ob-inventory/db generate",
@@ -19,7 +19,8 @@
     "import:csv": "tsx scripts/import-csv.ts",
     "db:seed": "tsx --env-file=.env scripts/seed.ts",
     "db:seed-data": "tsx --env-file=.env scripts/seed-data.ts",
-    "woo-sync:diagnose": "tsx --env-file=.env scripts/woo-sync-diagnose.ts"
+    "woo-sync:diagnose": "tsx --env-file=.env scripts/woo-sync-diagnose.ts",
+    "db:compare-production": "python scripts/compare-production-db.py"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

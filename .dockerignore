@@ -1,0 +1,45 @@
+# Dependencies (reinstalled in container)
+node_modules
+**/node_modules
+.pnpm-store
+
+# Build outputs
+dist
+**/dist
+build
+.output
+.vite
+
+# Git and IDE
+.git
+.gitignore
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.DS_Store
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+
+# Test and dev
+test-screenshots
+*.log
+coverage
+.nyc_output
+
+# Docs (not needed for build)
+docs
+*.md
+!README.md
+
+# Misc
+drizzle
+apps/api/uploads
+caddy_data
+caddy_config
+VPS
+scripts/production-schema.sql
