@@ -14,6 +14,9 @@
 - **Stop immediately** on migration failure — do not proceed
 - **Do not overwrite** `.env` — preserve existing values
 - **Verify** worker logs and health after deploy
+- **Print** current commit SHA after `git pull` using `git rev-parse HEAD`
+- **Treat** failed `curl -fSs https://activebrands.cloud/api/health` as deploy failure
+- **Do not** perform rollback automatically unless explicitly instructed
 
 ---
 
@@ -43,16 +46,20 @@ All packages must build successfully.
 ssh root@187.124.160.50
 ```
 
-### 1.2 Create backup directory
+### 1.2 Create backup directory on host
 ```bash
 mkdir -p /root/backups/ob-inventory
 ```
 
-### 1.3 Create database backup
+### 1.3 Create database backup (container-safe path first)
 ```bash
 cd /opt/ob-inventory
-docker compose exec -T postgres pg_dump -U ob_user -d ob_inventory -F c > /root/backups/ob-inventory/ob_inventory_$(date +%Y%m%d_%H%M%S).dump
+# pg_dump writes to a path inside the postgres container; /tmp is safe
+docker compose exec -T postgres pg_dump -U ob_user -d ob_inventory -F c -f /tmp/ob_inventory_backup.dump
+# Copy to host (host path may not be writable from inside container)
+docker compose cp postgres:/tmp/ob_inventory_backup.dump /root/backups/ob-inventory/ob_inventory_$(date +%Y%m%d_%H%M%S).dump
 ```
+**Fallback** if `docker compose cp` is unavailable: `docker cp $(docker compose ps -q postgres):/tmp/ob_inventory_backup.dump /root/backups/ob-inventory/ob_inventory_$(date +%Y%m%d_%H%M%S).dump`
 
 ### 1.4 Verify backup
 ```bash
@@ -100,6 +107,7 @@ cd /opt/ob-inventory
 git fetch origin
 git status                    # See current branch
 git pull origin main
+git rev-parse HEAD            # Print deployed commit SHA (record this)
 ```
 
 ### 3.3 Stop app services only (keep Postgres and Redis running)
@@ -128,7 +136,7 @@ cd /opt/ob-inventory
 docker compose run --rm api node apps/api/dist/migrate.js
 ```
 **Expected output:** `Running migrations from ...` then `Migrations complete.`  
-**If it fails:** Do NOT start services. Restore from backup if needed.
+**If migration command exits non-zero:** Stop immediately. Do not run `docker compose up -d`. Report failure. Only restore DB if migration partially modified the schema/data and the app cannot be recovered safely without restore.
 
 ### 3.7 Start all services
 ```bash
@@ -144,18 +152,22 @@ All services should be `Up` or `running`.
 
 ---
 
-## Phase 4: Post-deploy verification
+## Phase 4: Post-deploy verification (hard checks)
 
-### 4.1 API health (fail loudly)
-```bash
-curl -fSs https://activebrands.cloud/api/health
-```
+**Treat failed health check as deploy failure.**
 
-### 4.2 Check worker logs
+### 4.1 Check API and worker logs
 ```bash
+docker compose logs api --tail 50
 docker compose logs worker --tail 50
 ```
-**Expected:** `[worker] Redis connected` then `[worker] Ready. N WooCommerce store(s) configured for sync.`
+**Expected (worker):** `[worker] Redis connected` then `[worker] Ready. N WooCommerce store(s) configured for sync.`
+
+### 4.2 API health (fail loudly)
+```bash
+curl -fSs https://activebrands.cloud/api/health && echo "API healthy"
+```
+**If this fails:** Treat as deploy failure. Do not consider deploy complete.
 
 ### 4.3 Web app
 - Open https://activebrands.cloud
@@ -171,6 +183,8 @@ docker compose logs worker --tail 50
 ## Rollback (the real parachute)
 
 **Once destructive migrations are applied, code rollback alone is fake comfort.**
+
+**Do not perform rollback automatically unless explicitly instructed.**
 
 ### Actual rollback
 1. **Restore DB** from backup
@@ -194,15 +208,15 @@ docker compose up -d
 | Step | Action | Safe? |
 |------|--------|-------|
 | 1 | Push to git | ✅ |
-| 2 | Backup DB to `/root/backups/ob-inventory/` | ✅ **MANDATORY** |
+| 2 | Backup DB: pg_dump to /tmp, copy to `/root/backups/ob-inventory/` | ✅ **MANDATORY** |
 | 3 | Check products.box_number — **STOP if count > 0** | ⚠️ **RED-ALERT** |
-| 4 | `git pull origin main` | ✅ |
+| 4 | `git pull origin main` + `git rev-parse HEAD` | ✅ |
 | 5 | `docker compose stop web api worker caddy` | ✅ (keeps Postgres/Redis) |
 | 6 | `docker compose build` | ✅ |
 | 7 | `docker compose run --rm api node apps/api/dist/migrate.js` | ✅ |
 | 8 | `docker compose up -d` | ✅ |
-| 9 | `curl -fSs https://activebrands.cloud/api/health` | ✅ |
-| 10 | `docker compose logs worker --tail 50` | ✅ |
+| 9 | `docker compose logs api --tail 50` + `worker --tail 50` | ✅ |
+| 10 | `curl -fSs https://activebrands.cloud/api/health` (failure = deploy failure) | ✅ |
 | 11 | Verify version, inventory data | ✅ |
 
 ---
@@ -212,13 +226,15 @@ docker compose up -d
 ```bash
 cd /opt/ob-inventory
 git pull origin main
+git rev-parse HEAD
 docker compose stop web api worker caddy
 docker compose build
 docker compose run --rm api node apps/api/dist/migrate.js
 docker compose up -d
 docker compose ps
-curl -fSs https://activebrands.cloud/api/health
+docker compose logs api --tail 50
 docker compose logs worker --tail 50
+curl -fSs https://activebrands.cloud/api/health && echo "API healthy"
 ```
 
 ---
