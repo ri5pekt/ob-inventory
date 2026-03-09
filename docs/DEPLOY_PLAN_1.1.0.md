@@ -6,6 +6,17 @@
 
 ---
 
+## Agent rules (do not deploy without these)
+
+- **Never** run destructive migration 0008 without checking data first
+- **Never** use `docker compose down` — it stops Postgres and Redis; use `stop` instead
+- **Always** build before running migrations (migrations must use the new image)
+- **Stop immediately** on migration failure — do not proceed
+- **Do not overwrite** `.env` — preserve existing values
+- **Verify** worker logs and health after deploy
+
+---
+
 ## Phase 0: Pre-deploy (local)
 
 ### 0.1 Commit & push
@@ -32,66 +43,58 @@ All packages must build successfully.
 ssh root@187.124.160.50
 ```
 
-### 1.2 Create database backup
+### 1.2 Create backup directory
 ```bash
-cd /opt/ob-inventory
-docker compose exec -T postgres pg_dump -U ob_user -d ob_inventory -F c -f /tmp/ob_inventory_backup_$(date +%Y%m%d_%H%M%S).dump
+mkdir -p /root/backups/ob-inventory
 ```
 
-### 1.3 Copy backup to safe location (optional)
+### 1.3 Create database backup
 ```bash
-# List backups
-ls -la /tmp/ob_inventory_backup_*.dump
-
-# Or copy to host (from your local machine):
-# scp root@187.124.160.50:/tmp/ob_inventory_backup_*.dump ./backups/
+cd /opt/ob-inventory
+docker compose exec -T postgres pg_dump -U ob_user -d ob_inventory -F c > /root/backups/ob-inventory/ob_inventory_$(date +%Y%m%d_%H%M%S).dump
 ```
 
 ### 1.4 Verify backup
 ```bash
-# Quick check: backup file exists and has size
-ls -lh /tmp/ob_inventory_backup_*.dump
+ls -lh /root/backups/ob-inventory/ob_inventory_*.dump
+```
+
+### 1.5 (Recommended) Download backup locally
+```powershell
+# From your local machine:
+scp root@187.124.160.50:/root/backups/ob-inventory/ob_inventory_*.dump ./backups/
 ```
 
 ---
 
-## Phase 2: Check migration impact (data safety)
+## Phase 2: Migration 0008 — RED-ALERT CHECKPOINT
 
-### 2.1 Migrations that will run
-Production has **4 migrations** applied (0000–0003). These will run:
-- **0004** — `ADD COLUMN IF NOT EXISTS customer_address` (sales) — safe, idempotent
-- **0005** — `ADD COLUMN IF NOT EXISTS customer_phone` (sales) — safe, idempotent
-- **0006** — `ADD COLUMN IF NOT EXISTS secret_token` (stores) — safe, idempotent
-- **0007** — Adds columns to warehouses, inventory_stock, products, transfers, sales, sale_items — all use `IF NOT EXISTS`, safe
-- **0008** — `DROP COLUMN IF EXISTS box_number` (products) — **⚠️ READ BELOW**
+**⚠️ 0008 is destructive.** Do not proceed until this is verified.
 
-### 2.2 Migration 0008 — products.box_number
-- **What it does:** Drops `products.box_number` (moved to `inventory_stock.box_number` per warehouse)
-- **Data impact:** If production has values in `products.box_number`, they will be **lost**
-- **Check before deploy:**
-  ```bash
-  ssh root@187.124.160.50 "docker compose -f /opt/ob-inventory/docker-compose.yml exec -T postgres psql -U ob_user -d ob_inventory -t -c \"SELECT COUNT(*) FROM products WHERE box_number IS NOT NULL AND box_number != '';\""
-  ```
-- **If count > 0:** Decide whether to migrate that data to `inventory_stock` first, or accept the loss (app uses `inventory_stock.box_number` only)
-- **If count = 0:** Safe to run 0008
+### 2.1 Check products.box_number usage
+```bash
+ssh root@187.124.160.50 "cd /opt/ob-inventory && docker compose exec -T postgres psql -U ob_user -d ob_inventory -t -c \"SELECT COUNT(*) FROM products WHERE box_number IS NOT NULL AND box_number != '';\""
+```
+
+### 2.2 Decision
+- **If count > 0:** **STOP.** Do not deploy. Report back. Decide whether to migrate data to `inventory_stock` first, or accept the loss (app uses `inventory_stock.box_number` only).
+- **If count = 0:** Safe to proceed with deploy.
+
+### 2.3 Other migrations (safe)
+- **0004, 0005, 0006, 0007** — all use `IF NOT EXISTS`, idempotent, safe
 
 ---
 
 ## Phase 3: Deploy steps (on production server)
+
+**Correct order:** pull → stop app only → build → migrate → start
 
 ### 3.1 SSH to production
 ```powershell
 ssh root@187.124.160.50
 ```
 
-### 3.2 Stop services (graceful)
-```bash
-cd /opt/ob-inventory
-docker compose down
-```
-**Note:** This stops API, Worker, Web, Caddy. Postgres and Redis keep running (data preserved).
-
-### 3.3 Pull latest code
+### 3.2 Pull latest code
 ```bash
 cd /opt/ob-inventory
 git fetch origin
@@ -99,26 +102,33 @@ git status                    # See current branch
 git pull origin main
 ```
 
+### 3.3 Stop app services only (keep Postgres and Redis running)
+```bash
+cd /opt/ob-inventory
+docker compose stop web api worker caddy
+```
+**Do NOT use `docker compose down`** — that stops Postgres and Redis; migrations need Postgres.
+
 ### 3.4 Verify .env exists
 ```bash
 test -f /opt/ob-inventory/.env && echo "OK" || echo "MISSING - create from .env.example"
 ```
 If missing, copy from `.env.example` and fill values. **Do not overwrite** existing `.env` with defaults.
 
-### 3.5 Run migrations (BEFORE starting API)
+### 3.5 Build fresh images
+```bash
+cd /opt/ob-inventory
+docker compose build
+```
+Use `--no-cache` only if you suspect stale layers.
+
+### 3.6 Run migrations (using the newly built image)
 ```bash
 cd /opt/ob-inventory
 docker compose run --rm api node apps/api/dist/migrate.js
 ```
 **Expected output:** `Running migrations from ...` then `Migrations complete.`  
 **If it fails:** Do NOT start services. Restore from backup if needed.
-
-### 3.6 Build Docker images
-```bash
-cd /opt/ob-inventory
-docker compose build --no-cache
-```
-Builds: api, web, worker. Uses `.dockerignore` (no node_modules in context).
 
 ### 3.7 Start all services
 ```bash
@@ -134,11 +144,12 @@ All services should be `Up` or `running`.
 
 ---
 
-## Phase 4: Worker setup verification
+## Phase 4: Post-deploy verification
 
-### 4.1 Worker requirements
-- **DATABASE_URL** — for reading stores, products, inventory
-- **REDIS_URL** — for BullMQ queue (`sync-woo-stock`)
+### 4.1 API health (fail loudly)
+```bash
+curl -fSs https://activebrands.cloud/api/health
+```
 
 ### 4.2 Check worker logs
 ```bash
@@ -146,55 +157,35 @@ docker compose logs worker --tail 50
 ```
 **Expected:** `[worker] Redis connected` then `[worker] Ready. N WooCommerce store(s) configured for sync.`
 
-### 4.3 Worker processes jobs from API
-- API enqueues jobs when stock changes (warehouse products, transfers, etc.)
-- Worker consumes `sync-woo-stock` queue and pushes stock to WooCommerce stores
-- No extra config needed if stores are set in Settings → WooCommerce
-
----
-
-## Phase 5: Post-deploy verification
-
-### 5.1 API health
-```bash
-curl -s https://activebrands.cloud/api/health | head -5
-```
-
-### 5.2 Web app
+### 4.3 Web app
 - Open https://activebrands.cloud
 - Login with admin credentials
 - **Check version:** Sidebar should show **v1.1.0**
 
-### 5.3 Inventory data
+### 4.4 Inventory data
 - Open a warehouse, verify products and stock quantities are correct
 - Check a few sales/transfers — data should be intact
 
-### 5.4 Worker
-```bash
-docker compose logs worker --tail 20
-```
-Should show "Ready" and no errors.
-
 ---
 
-## Rollback (if something goes wrong)
+## Rollback (the real parachute)
 
-### If migrations fail
+**Once destructive migrations are applied, code rollback alone is fake comfort.**
+
+### Actual rollback
+1. **Restore DB** from backup
+2. **Redeploy old code**
+
 ```bash
 cd /opt/ob-inventory
 # Restore from backup (replace TIMESTAMP with your backup file)
-docker compose exec -T postgres pg_restore -U ob_user -d ob_inventory -c /tmp/ob_inventory_backup_TIMESTAMP.dump
-# Or: drop and recreate DB, then restore
-```
+docker compose exec -T postgres pg_restore -U ob_user -d ob_inventory -c /root/backups/ob-inventory/ob_inventory_TIMESTAMP.dump
 
-### If app fails after deploy
-```bash
-cd /opt/ob-inventory
+# Redeploy previous version
 git checkout 5c08d54          # Previous known-good commit
 docker compose build
 docker compose up -d
 ```
-**Note:** Migrations already applied cannot be "un-applied". Rollback only reverts code.
 
 ---
 
@@ -203,14 +194,32 @@ docker compose up -d
 | Step | Action | Safe? |
 |------|--------|-------|
 | 1 | Push to git | ✅ |
-| 2 | Backup DB | ✅ **MANDATORY** |
-| 3 | Check products.box_number usage | ⚠️ Verify |
-| 4 | `docker compose down` | ✅ |
-| 5 | `git pull origin main` | ✅ |
-| 6 | `docker compose run --rm api node apps/api/dist/migrate.js` | ✅ (after backup) |
-| 7 | `docker compose build --no-cache` | ✅ |
+| 2 | Backup DB to `/root/backups/ob-inventory/` | ✅ **MANDATORY** |
+| 3 | Check products.box_number — **STOP if count > 0** | ⚠️ **RED-ALERT** |
+| 4 | `git pull origin main` | ✅ |
+| 5 | `docker compose stop web api worker caddy` | ✅ (keeps Postgres/Redis) |
+| 6 | `docker compose build` | ✅ |
+| 7 | `docker compose run --rm api node apps/api/dist/migrate.js` | ✅ |
 | 8 | `docker compose up -d` | ✅ |
-| 9 | Verify health, version, data | ✅ |
+| 9 | `curl -fSs https://activebrands.cloud/api/health` | ✅ |
+| 10 | `docker compose logs worker --tail 50` | ✅ |
+| 11 | Verify version, inventory data | ✅ |
+
+---
+
+## Short corrected order (trusted)
+
+```bash
+cd /opt/ob-inventory
+git pull origin main
+docker compose stop web api worker caddy
+docker compose build
+docker compose run --rm api node apps/api/dist/migrate.js
+docker compose up -d
+docker compose ps
+curl -fSs https://activebrands.cloud/api/health
+docker compose logs worker --tail 50
+```
 
 ---
 
