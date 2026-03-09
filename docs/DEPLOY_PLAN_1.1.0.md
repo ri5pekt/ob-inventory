@@ -17,6 +17,7 @@
 - **Print** current commit SHA after `git pull` using `git rev-parse HEAD`
 - **Treat** failed `curl -fSs https://activebrands.cloud/api/health` as deploy failure
 - **Do not** perform rollback automatically unless explicitly instructed
+- **If** any checkpoint output is unclear or non-numeric where numeric is expected, stop and report instead of guessing
 
 ---
 
@@ -84,8 +85,9 @@ ssh root@187.124.160.50 "cd /opt/ob-inventory && docker compose exec -T postgres
 ```
 
 ### 2.2 Decision
+- **If the query result is not a clean numeric value** (e.g. weird whitespace, error, empty): **STOP** and report failure.
 - **If count > 0:** **STOP.** Do not deploy. Report back. Decide whether to migrate data to `inventory_stock` first, or accept the loss (app uses `inventory_stock.box_number` only).
-- **If count = 0:** Safe to proceed with deploy.
+- **Only continue if count = 0.**
 
 ### 2.3 Other migrations (safe)
 - **0004, 0005, 0006, 0007** — all use `IF NOT EXISTS`, idempotent, safe
@@ -137,6 +139,12 @@ docker compose run --rm api node apps/api/dist/migrate.js
 ```
 **Expected output:** `Running migrations from ...` then `Migrations complete.`  
 **If migration command exits non-zero:** Stop immediately. Do not run `docker compose up -d`. Report failure. Only restore DB if migration partially modified the schema/data and the app cannot be recovered safely without restore.
+
+### 3.6b Verify migration status (optional sanity check)
+```bash
+docker compose exec -T postgres psql -U ob_user -d ob_inventory -c "SELECT id, hash, created_at FROM drizzle.__drizzle_migrations ORDER BY created_at DESC LIMIT 10;"
+```
+Confirms the DB registered the migrations. Should show 9 rows (0000–0008) after a fresh deploy.
 
 ### 3.7 Start all services
 ```bash
@@ -192,8 +200,9 @@ curl -fSs https://activebrands.cloud/api/health && echo "API healthy"
 
 ```bash
 cd /opt/ob-inventory
-# Restore from backup (replace TIMESTAMP with your backup file)
-docker compose exec -T postgres pg_restore -U ob_user -d ob_inventory -c /root/backups/ob-inventory/ob_inventory_TIMESTAMP.dump
+# Backup is on host; copy into container first (replace TIMESTAMP with your backup file)
+docker compose cp /root/backups/ob-inventory/ob_inventory_TIMESTAMP.dump postgres:/tmp/restore.dump
+docker compose exec -T postgres pg_restore -U ob_user -d ob_inventory -c /tmp/restore.dump
 
 # Redeploy previous version
 git checkout 5c08d54          # Previous known-good commit
@@ -230,6 +239,7 @@ git rev-parse HEAD
 docker compose stop web api worker caddy
 docker compose build
 docker compose run --rm api node apps/api/dist/migrate.js
+docker compose exec -T postgres psql -U ob_user -d ob_inventory -c "SELECT id, hash, created_at FROM drizzle.__drizzle_migrations ORDER BY created_at DESC LIMIT 10;"
 docker compose up -d
 docker compose ps
 docker compose logs api --tail 50
