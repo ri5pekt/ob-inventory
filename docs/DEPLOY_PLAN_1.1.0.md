@@ -62,7 +62,11 @@ docker compose exec -T postgres pg_dump -U ob_user -d ob_inventory -F c -f /tmp/
 docker compose cp postgres:/tmp/ob_inventory_backup.dump /root/backups/ob-inventory/ob_inventory_$(date +%Y%m%d_%H%M%S).dump
 docker compose exec -T postgres rm -f /tmp/ob_inventory_backup.dump
 ```
-**Fallback** if `docker compose cp` is unavailable: `docker cp $(docker compose ps -q postgres):/tmp/ob_inventory_backup.dump /root/backups/ob-inventory/ob_inventory_$(date +%Y%m%d_%H%M%S).dump`
+**Fallback** if `docker compose cp` is unavailable:
+```bash
+docker cp $(docker compose ps -q postgres):/tmp/ob_inventory_backup.dump /root/backups/ob-inventory/ob_inventory_$(date +%Y%m%d_%H%M%S).dump
+docker compose exec -T postgres rm -f /tmp/ob_inventory_backup.dump
+```
 
 ### 1.4 Verify backup
 ```bash
