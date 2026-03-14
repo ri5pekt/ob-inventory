@@ -47,6 +47,7 @@ export const productSearchRoutes: FastifyPluginAsync = async (fastify) => {
         brandName:    brands.name,
         categoryName: categories.name,
         availableQty: inventoryStock.quantity,
+        retailPrice:  products.retailPrice,
       })
       .from(inventoryStock)
       .innerJoin(products,    eq(inventoryStock.productId,   products.id))

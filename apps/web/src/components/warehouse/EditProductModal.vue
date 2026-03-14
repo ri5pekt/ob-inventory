@@ -158,6 +158,36 @@
         />
       </div>
 
+      <!-- ── Pricing ── -->
+      <SectionLabel>Pricing</SectionLabel>
+      <div class="form-grid">
+        <div class="field">
+          <label class="field-label">Cost Price</label>
+          <InputNumber
+            v-model="form.costPrice"
+            :min="0"
+            :max="999999"
+            :min-fraction-digits="2"
+            :max-fraction-digits="2"
+            placeholder="0.00"
+            class="w-full"
+          />
+        </div>
+
+        <div class="field">
+          <label class="field-label">Retail Price</label>
+          <InputNumber
+            v-model="form.retailPrice"
+            :min="0"
+            :max="999999"
+            :min-fraction-digits="2"
+            :max-fraction-digits="2"
+            placeholder="0.00"
+            class="w-full"
+          />
+        </div>
+      </div>
+
       <!-- ── Stock ── -->
       <SectionLabel>Stock</SectionLabel>
       <div class="form-grid">
@@ -289,6 +319,8 @@ const buildForm = (item: StockItemDTO | null) => ({
   colorOptionId: item?.colorOptionId ?? null as string | null,
   unitOptionId:  item?.unitOptionId  ?? null as string | null,
   image:         item?.image         ?? null as string | null,
+  costPrice:     item?.costPrice   != null ? parseFloat(item.costPrice)   : null as number | null,
+  retailPrice:   item?.retailPrice != null ? parseFloat(item.retailPrice) : null as number | null,
 })
 
 // ── Image upload + resize ────────────────────────────────────────────────────
@@ -384,6 +416,8 @@ async function submit() {
       colorOptionId: form.value.colorOptionId || null,
       unitOptionId:  form.value.unitOptionId  || null,
       image:         form.value.image         ?? null,
+      costPrice:     form.value.costPrice     ?? null,
+      retailPrice:   form.value.retailPrice   ?? null,
     })
 
     await queryClient.invalidateQueries({ queryKey: ['warehouse-stock', props.warehouseId] })

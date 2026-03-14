@@ -68,6 +68,9 @@ export interface StockItemDTO {
   wooTitle:      string | null
   // product image stored as a resized base64 data URL
   image:         string | null
+  // pricing
+  costPrice:     string | null
+  retailPrice:   string | null
 }
 
 export interface ApiError {

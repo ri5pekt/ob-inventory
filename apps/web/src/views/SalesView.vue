@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <SalePeriodStats :sales="sales" @date-range-change="onDateRangeChange" />
+    <SalePeriodStats @date-range-change="onDateRangeChange" />
 
     <!-- Filter chips + search -->
     <div class="filter-bar">
@@ -26,9 +26,34 @@
           :class="{ active: activeFilter === f.value }"
           @click="activeFilter = f.value"
         >
-          <i :class="f.icon" />
+          <i :class="f.icon" class="chip-icon" />
           {{ f.label }}
+          <span class="chip-count">{{ f.count }}</span>
         </button>
+      </div>
+      <div class="filter-selects-row">
+        <Select
+          v-model="filterTarget"
+          :options="filterTargetOptions"
+          option-label="name"
+          option-value="id"
+          placeholder="All Targets"
+          show-clear
+          size="small"
+          class="filter-select"
+          append-to="body"
+        />
+        <Select
+          v-model="filterInvoiceStatus"
+          :options="filterInvoiceOptions"
+          option-label="name"
+          option-value="id"
+          placeholder="All Invoice Statuses"
+          show-clear
+          size="small"
+          class="filter-select"
+          append-to="body"
+        />
       </div>
       <InputText
         v-model="search"
@@ -55,13 +80,9 @@
         row-hover
         @row-click="openDetail($event.data)"
       >
-        <Column field="createdAt" header="Date" style="width:160px" sortable>
-          <template #body="{ data }">{{ formatDate(data.createdAt) }}</template>
-        </Column>
-
-        <Column field="saleType" header="Type" style="width:130px" sortable>
+        <Column field="createdAt" header="Date" style="width:160px; white-space:nowrap" sortable>
           <template #body="{ data }">
-            <Tag :value="typeLabel(data.saleType)" :severity="typeSeverity(data.saleType)" />
+            <span style="white-space:nowrap">{{ formatDate(data.createdAt) }}</span>
           </template>
         </Column>
 
@@ -75,9 +96,29 @@
           </template>
         </Column>
 
-        <Column field="warehouseName" header="Warehouse" style="width:150px" sortable>
+        <Column field="warehouseName" header="Warehouse" style="width:180px; white-space:nowrap" sortable>
           <template #body="{ data }">
-            <span>{{ data.warehouseName ?? '—' }}</span>
+            <span style="white-space:nowrap">{{ data.warehouseName ?? '—' }}</span>
+          </template>
+        </Column>
+
+        <Column field="saleType" header="Type" style="width:130px" sortable>
+          <template #body="{ data }">
+            <Tag :value="typeLabel(data.saleType)" :severity="typeSeverity(data.saleType)" />
+          </template>
+        </Column>
+
+        <Column field="targetName" header="Target" style="width:130px; white-space:nowrap" sortable>
+          <template #body="{ data }">
+            <Tag v-if="data.targetName" :value="data.targetName" severity="secondary" style="white-space:nowrap" />
+            <span v-else class="no-value">—</span>
+          </template>
+        </Column>
+
+        <Column field="invoiceStatusName" header="Invoice" style="width:130px; white-space:nowrap" sortable>
+          <template #body="{ data }">
+            <Tag v-if="data.invoiceStatusName" :value="data.invoiceStatusName" severity="info" style="white-space:nowrap" />
+            <span v-else class="no-value">—</span>
           </template>
         </Column>
 
@@ -94,9 +135,9 @@
           </template>
         </Column>
 
-        <Column field="totalPrice" header="Total" style="width:110px; text-align:right" sortable>
+        <Column field="totalPrice" header="Total" style="width:110px; text-align:right; white-space:nowrap" sortable>
           <template #body="{ data }">
-            <span v-if="data.totalPrice" class="total-price">
+            <span v-if="data.totalPrice" class="total-price" style="white-space:nowrap">
               {{ parseFloat(data.totalPrice).toFixed(2) }} {{ data.currency }}
             </span>
             <span v-else class="no-value">—</span>
@@ -119,19 +160,27 @@
       </DataTable>
     </div>
 
-    <SaleDetailDialog v-model:visible="showDetail" :sale="selectedSale" @deleted="onSaleDeleted" />
+    <SaleDetailDialog
+      v-model:visible="showDetail"
+      :sale="selectedSale"
+      @deleted="onSaleDeleted"
+      @edit="onEditSale"
+    />
     <CreateSaleModal v-model="showCreate" @created="onSaleCreated" />
+    <EditSaleModal v-model="showEdit" :sale="editingSale" @updated="onSaleUpdated" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import { getSales, getSale, type Sale, type SaleDetail, type SaleType } from '@/api/sales'
+import { getSaleTargets, getSaleInvoiceStatuses, type SaleMetaItem } from '@/api/saleMeta'
 import SalePeriodStats from '@/components/sales/SalePeriodStats.vue'
 import SaleDetailDialog from '@/components/sales/SaleDetailDialog.vue'
 import CreateSaleModal from '@/components/sales/CreateSaleModal.vue'
+import EditSaleModal from '@/components/sales/EditSaleModal.vue'
 
 // ── Date range (driven by SalePeriodStats) ────────────────────────────────────
 const dateRange = ref<{ from: string; to: string } | null>(null)
@@ -141,11 +190,26 @@ function onDateRangeChange(range: { from: string; to: string } | null) {
 }
 
 // ── Data ──────────────────────────────────────────────────────────────────────
-const activeFilter = ref<SaleType | undefined>(undefined)
+const activeFilter      = ref<SaleType | undefined>(undefined)
+const filterTarget      = ref<string | null>(null)
+const filterInvoiceStatus = ref<string | null>(null)
+const filterTargetOptions   = ref<SaleMetaItem[]>([])
+const filterInvoiceOptions  = ref<SaleMetaItem[]>([])
 const search       = ref('')
+
+onMounted(async () => {
+  try {
+    [filterTargetOptions.value, filterInvoiceOptions.value] = await Promise.all([
+      getSaleTargets(),
+      getSaleInvoiceStatuses(),
+    ])
+  } catch { /* non-critical */ }
+})
 const showCreate   = ref(false)
 const showDetail   = ref(false)
+const showEdit     = ref(false)
 const selectedSale = ref<SaleDetail | null>(null)
+const editingSale  = ref<SaleDetail | null>(null)
 const refreshKey   = ref(0)
 
 const { data: salesData, isLoading } = useQuery({
@@ -166,19 +230,33 @@ function onSaleDeleted() {
   refreshKey.value++
 }
 
+function onEditSale(sale: SaleDetail) {
+  editingSale.value = sale
+  showEdit.value    = true
+}
+
+async function onSaleUpdated() {
+  showEdit.value    = false
+  showDetail.value  = false
+  selectedSale.value = null
+  refreshKey.value++
+}
+
 const sales = computed(() => salesData.value ?? [])
 
 const router = useRouter()
-const typeFilters = [
-  { value: undefined,                  label: 'All',         icon: 'pi pi-list' },
-  { value: 'woocommerce' as SaleType,  label: 'WooCommerce', icon: 'pi pi-globe' },
-  { value: 'direct' as SaleType,       label: 'Direct',      icon: 'pi pi-user' },
-  { value: 'partner' as SaleType,      label: 'Partner',     icon: 'pi pi-building' },
-]
+const typeFilters = computed(() => [
+  { value: undefined,                  label: 'All',         icon: 'pi pi-list',      count: sales.value.length },
+  { value: 'woocommerce' as SaleType,  label: 'WooCommerce', icon: 'pi pi-globe',     count: sales.value.filter(s => s.saleType === 'woocommerce').length },
+  { value: 'direct' as SaleType,       label: 'Direct',      icon: 'pi pi-user',      count: sales.value.filter(s => s.saleType === 'direct').length },
+  { value: 'partner' as SaleType,      label: 'Partner',     icon: 'pi pi-building',  count: sales.value.filter(s => s.saleType === 'partner').length },
+])
 
 const filteredSales = computed(() => {
   let list = sales.value
-  if (activeFilter.value) list = list.filter(s => s.saleType === activeFilter.value)
+  if (activeFilter.value)       list = list.filter(s => s.saleType === activeFilter.value)
+  if (filterTarget.value)       list = list.filter(s => s.targetId === filterTarget.value)
+  if (filterInvoiceStatus.value) list = list.filter(s => s.invoiceStatusId === filterInvoiceStatus.value)
   const q = search.value.trim().toLowerCase()
   if (q) {
     list = list.filter(s =>
@@ -247,6 +325,8 @@ function statusSeverity(status: string) {
 .filter-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .filter-search { flex: 1; min-width: 180px; }
+.filter-select { width: 160px; flex-shrink: 0; }
+.filter-selects-row { display: contents; }
 
 .chip {
   display: inline-flex;
@@ -265,6 +345,24 @@ function statusSeverity(status: string) {
 
 .chip:hover { border-color: var(--p-primary-color); color: var(--p-primary-color); }
 .chip.active { background: var(--p-primary-color); border-color: var(--p-primary-color); color: #fff; }
+
+.chip-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.chip.active .chip-count {
+  background: rgba(255, 255, 255, 0.25);
+}
 
 .table-card {
   flex: 1;
@@ -297,6 +395,7 @@ function statusSeverity(status: string) {
 :deep(.sales-datatable .p-datatable-tbody td),
 :deep(.sales-datatable .p-datatable-thead th) { padding: 6px 8px; }
 :deep(.sales-datatable .p-paginator) { padding: 6px 8px; }
+:deep(.sales-datatable .p-tag) { white-space: nowrap; }
 
 /* ═══════════════════════════════════════════════
    MOBILE  ≤ 768px
@@ -316,6 +415,10 @@ function statusSeverity(status: string) {
   .filter-search { min-width: 0; width: 100%; }
 
   .chip { padding: 4px 10px; font-size: 12px; }
+  .chip-icon { display: none; }
+
+  .filter-selects-row { display: flex; gap: 6px; width: 100%; }
+  .filter-selects-row .filter-select { width: 0; flex: 1; }
 
   .empty-state { padding: 40px 16px; }
   .empty-icon { font-size: 32px; }

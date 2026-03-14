@@ -112,6 +112,36 @@
         </div>
       </div>
 
+      <!-- ── Pricing ──────────────────────────────────────────────── -->
+      <section-label>Pricing</section-label>
+      <div class="form-grid">
+        <div class="field">
+          <label class="field-label">Cost Price</label>
+          <InputNumber
+            v-model="form.costPrice"
+            :min="0"
+            :max="999999"
+            :min-fraction-digits="2"
+            :max-fraction-digits="2"
+            placeholder="0.00"
+            class="w-full"
+          />
+        </div>
+
+        <div class="field">
+          <label class="field-label">Retail Price</label>
+          <InputNumber
+            v-model="form.retailPrice"
+            :min="0"
+            :max="999999"
+            :min-fraction-digits="2"
+            :max-fraction-digits="2"
+            placeholder="0.00"
+            class="w-full"
+          />
+        </div>
+      </div>
+
       <!-- ── Warehouse / Stock ─────────────────────────────────────── -->
       <section-label>Stock</section-label>
       <div class="form-grid">
@@ -230,6 +260,8 @@ const emptyForm = () => ({
   sizeOptionId:  null as string | null,
   colorOptionId: null as string | null,
   unitOptionId:  null as string | null,
+  costPrice:     null as number | null,
+  retailPrice:   null as number | null,
 })
 
 const form     = ref(emptyForm())
@@ -279,6 +311,8 @@ async function submit() {
       sizeOptionId: form.value.sizeOptionId  || null,
       colorOptionId:form.value.colorOptionId || null,
       unitOptionId: form.value.unitOptionId  || null,
+      costPrice:    form.value.costPrice    ?? null,
+      retailPrice:  form.value.retailPrice  ?? null,
     })
 
     await queryClient.invalidateQueries({ queryKey: ['warehouse-stock', props.warehouseId] })

@@ -45,6 +45,8 @@ export const products = pgTable('products', {
   dateAdded: date('date_added', { mode: 'string' }),
   picture: text('picture'),
   basePrice: numeric('base_price', { precision: 10, scale: 2 }),
+  costPrice: numeric('cost_price', { precision: 10, scale: 2 }),
+  retailPrice: numeric('retail_price', { precision: 10, scale: 2 }),
   wooProductId: integer('woo_product_id'),
   wooTitle: text('woo_title'),
   notes: text('notes'),

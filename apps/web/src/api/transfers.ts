@@ -12,6 +12,7 @@ export interface ProductSearchResult {
   model:        string | null
   size:         string | null
   color:        string | null
+  retailPrice:  string | null
 }
 
 export async function searchProducts(
@@ -49,6 +50,7 @@ export interface TransferItem {
   sku:        string
   name:       string
   quantity:   number
+  boxNumber:  string | null
 }
 
 export interface TransferDetail extends TransferSummary {
@@ -85,4 +87,14 @@ export async function deleteTransfer(id: string, reason?: string): Promise<void>
 export async function createTransfer(payload: CreateTransferRequest): Promise<{ id: string }> {
   const { data } = await apiClient.post<{ id: string }>('/transfers', payload)
   return data
+}
+
+export interface UpdateTransferRequest {
+  reference?: string
+  notes?:     string
+  items:      { productId: string; quantity: number }[]
+}
+
+export async function updateTransfer(id: string, payload: UpdateTransferRequest): Promise<void> {
+  await apiClient.put(`/transfers/${id}`, payload)
 }

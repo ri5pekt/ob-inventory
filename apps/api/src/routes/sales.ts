@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify'
-import { eq, desc, count, and, sql, inArray, gte, lte, isNotNull } from 'drizzle-orm'
+import { eq, desc, and, sql, inArray, gte, lte, isNotNull } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../db.js'
 import { enqueueSyncWooStock } from '../queue.js'
@@ -11,6 +11,8 @@ import {
   products,
   inventoryStock,
   inventoryLedger,
+  saleTargets,
+  saleInvoiceStatuses,
 } from '@ob-inventory/db'
 
 export const salesRoutes: FastifyPluginAsync = async (fastify) => {
@@ -50,14 +52,20 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         currency:        sales.currency,
         notes:           sales.notes,
         createdAt:       sales.createdAt,
-        itemCount:       count(saleItems.id),
+        targetId:        sales.targetId,
+        targetName:      saleTargets.name,
+        invoiceStatusId: sales.invoiceStatusId,
+        invoiceStatusName: saleInvoiceStatuses.name,
+        itemCount:       sql<number>`coalesce(sum(${saleItems.quantity}), 0)`,
       })
       .from(sales)
       .leftJoin(warehouses, eq(sales.warehouseId, warehouses.id))
       .leftJoin(stores, eq(sales.storeId, stores.id))
       .leftJoin(saleItems, eq(sales.id, saleItems.saleId))
+      .leftJoin(saleTargets, eq(sales.targetId, saleTargets.id))
+      .leftJoin(saleInvoiceStatuses, eq(sales.invoiceStatusId, saleInvoiceStatuses.id))
       .where(filters.length > 0 ? and(...filters) : undefined)
-      .groupBy(sales.id, warehouses.name, stores.name)
+      .groupBy(sales.id, warehouses.name, stores.name, saleTargets.name, saleInvoiceStatuses.name)
       .orderBy(desc(sales.createdAt))
       .limit(q.limit)
       .offset(q.offset)
@@ -86,17 +94,40 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         notes:           sales.notes,
         createdAt:       sales.createdAt,
         updatedAt:       sales.updatedAt,
+        targetId:        sales.targetId,
+        targetName:      saleTargets.name,
+        invoiceStatusId: sales.invoiceStatusId,
+        invoiceStatusName: saleInvoiceStatuses.name,
       })
       .from(sales)
       .leftJoin(warehouses, eq(sales.warehouseId, warehouses.id))
       .leftJoin(stores, eq(sales.storeId, stores.id))
+      .leftJoin(saleTargets, eq(sales.targetId, saleTargets.id))
+      .leftJoin(saleInvoiceStatuses, eq(sales.invoiceStatusId, saleInvoiceStatuses.id))
       .where(eq(sales.id, request.params.id))
 
     if (!sale) return reply.status(404).send({ error: 'Sale not found' })
 
     const items = await db
-      .select()
+      .select({
+        id:        saleItems.id,
+        saleId:    saleItems.saleId,
+        productId: saleItems.productId,
+        sku:       saleItems.sku,
+        name:      saleItems.name,
+        quantity:  saleItems.quantity,
+        unitPrice: saleItems.unitPrice,
+        lineTotal: saleItems.lineTotal,
+        boxNumber: inventoryStock.boxNumber,
+      })
       .from(saleItems)
+      .leftJoin(
+        inventoryStock,
+        and(
+          eq(saleItems.productId, inventoryStock.productId),
+          eq(inventoryStock.warehouseId, sale.warehouseId),
+        ),
+      )
       .where(eq(saleItems.saleId, request.params.id))
       .orderBy(saleItems.sku)
 
@@ -114,6 +145,8 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       customerAddress: z.string().optional(),
       currency:        z.string().default('ILS'),
       notes:           z.string().optional(),
+      targetId:        z.string().uuid().optional(),
+      invoiceStatusId: z.string().uuid().optional(),
       items: z.array(z.object({
         sku:       z.string().min(1),
         name:      z.string().min(1),
@@ -204,6 +237,8 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         totalPrice:    totalPrice > 0 ? String(totalPrice) : null,
         currency:      d.currency,
         notes:         d.notes ?? null,
+        targetId:        d.targetId        ?? null,
+        invoiceStatusId: d.invoiceStatusId ?? null,
         createdBy:     userId,
       }).returning()
 
@@ -267,6 +302,170 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     return reply.status(201).send(result)
+  })
+
+  // ── Edit sale ──────────────────────────────────────────────────────────────
+  fastify.put<{ Params: { id: string } }>('/api/sales/:id', auth, async (request, reply) => {
+    const bodySchema = z.object({
+      customerName:    z.string().optional(),
+      customerEmail:   z.string().optional(),
+      customerPhone:   z.string().optional(),
+      customerAddress: z.string().optional(),
+      currency:        z.string().optional(),
+      notes:           z.string().optional(),
+      targetId:        z.string().uuid().nullable().optional(),
+      invoiceStatusId: z.string().uuid().nullable().optional(),
+      items: z.array(z.object({
+        productId: z.string().uuid().optional(),
+        sku:       z.string().min(1),
+        name:      z.string().min(1),
+        quantity:  z.number().int().positive(),
+        unitPrice: z.number().nonnegative().optional(),
+        lineTotal: z.number().nonnegative().optional(),
+      })).min(1),
+    })
+
+    const parsed = bodySchema.safeParse(request.body)
+    if (!parsed.success) {
+      return reply.status(400).send({ error: 'Invalid input', code: 'VALIDATION_ERROR', details: parsed.error.flatten() })
+    }
+    const d = parsed.data
+
+    const [sale] = await db.select().from(sales).where(eq(sales.id, request.params.id))
+    if (!sale) return reply.status(404).send({ error: 'Sale not found' })
+
+    const jwtPayload = (request as { user?: { sub?: string } }).user
+    const userId = jwtPayload?.sub ?? null
+
+    // Load current items
+    const oldItems = await db.select().from(saleItems).where(eq(saleItems.saleId, sale.id))
+
+    // Resolve product IDs for new items by SKU
+    const newSkus = [...new Set(d.items.map(i => i.sku))]
+    const foundProducts = await db
+      .select({ id: products.id, sku: products.sku })
+      .from(products)
+      .where(inArray(products.sku, newSkus))
+    const productBySku = new Map(foundProducts.map(p => [p.sku, p]))
+
+    // Build stock delta map: productId -> net change (positive = restore, negative = deduct)
+    const stockDeltas = new Map<string, number>()
+    for (const old of oldItems) {
+      if (old.productId) stockDeltas.set(old.productId, (stockDeltas.get(old.productId) ?? 0) + old.quantity)
+    }
+    for (const item of d.items) {
+      const product = productBySku.get(item.sku)
+      if (product) stockDeltas.set(product.id, (stockDeltas.get(product.id) ?? 0) - item.quantity)
+    }
+
+    // Validate stock for items that need more than what's available
+    const productIds = [...stockDeltas.keys()]
+    const stockRows = productIds.length > 0
+      ? await db
+          .select({ productId: inventoryStock.productId, quantity: inventoryStock.quantity })
+          .from(inventoryStock)
+          .where(and(inArray(inventoryStock.productId, productIds), eq(inventoryStock.warehouseId, sale.warehouseId)))
+      : []
+    const stockByProductId = new Map(stockRows.map(s => [s.productId, s.quantity]))
+
+    const insufficientItems: { sku: string; requested: number; available: number }[] = []
+    for (const item of d.items) {
+      const product = productBySku.get(item.sku)
+      if (product) {
+        const currentStock = stockByProductId.get(product.id) ?? 0
+        const oldQty       = oldItems.find(o => o.productId === product.id)?.quantity ?? 0
+        const effectiveAvailable = currentStock + oldQty
+        if (item.quantity > effectiveAvailable) {
+          insufficientItems.push({ sku: item.sku, requested: item.quantity, available: effectiveAvailable })
+        }
+      }
+    }
+    if (insufficientItems.length > 0) {
+      return reply.status(422).send({ error: 'Insufficient stock', code: 'INSUFFICIENT_STOCK', items: insufficientItems })
+    }
+
+    const totalPrice = d.items.reduce((sum, item) => {
+      const lt = item.lineTotal ?? (item.unitPrice != null ? item.unitPrice * item.quantity : null)
+      return lt != null ? sum + lt : sum
+    }, 0)
+
+    await db.transaction(async (tx) => {
+      // Apply stock deltas + ledger entries
+      for (const [productId, delta] of stockDeltas.entries()) {
+        if (delta === 0) continue
+        await tx
+          .update(inventoryStock)
+          .set({ quantity: sql`${inventoryStock.quantity} + ${delta}`, updatedAt: sql`now()` })
+          .where(and(eq(inventoryStock.productId, productId), eq(inventoryStock.warehouseId, sale.warehouseId)))
+
+        await tx.insert(inventoryLedger).values({
+          productId,
+          warehouseId:   sale.warehouseId,
+          actionType:    delta > 0 ? 'return' : 'sale',
+          quantityDelta: delta,
+          referenceId:   sale.id,
+          referenceType: 'sale',
+          notes:         `Sale edited — stock ${delta > 0 ? 'restored' : 'adjusted'} (${sale.saleType})`,
+          createdBy:     userId,
+        })
+      }
+
+      // Replace sale items
+      await tx.delete(saleItems).where(eq(saleItems.saleId, sale.id))
+      await tx.insert(saleItems).values(
+        d.items.map(item => {
+          const product = productBySku.get(item.sku)
+          const lt: string | null = item.lineTotal != null
+            ? String(item.lineTotal)
+            : item.unitPrice != null ? String(item.unitPrice * item.quantity) : null
+          return {
+            saleId:    sale.id,
+            productId: product?.id ?? null,
+            sku:       item.sku,
+            name:      item.name,
+            quantity:  item.quantity,
+            unitPrice: item.unitPrice != null ? String(item.unitPrice) : null,
+            lineTotal: lt,
+          }
+        }),
+      )
+
+      // Update sale metadata
+      await tx
+        .update(sales)
+        .set({
+          customerName:    d.customerName    ?? null,
+          customerEmail:   d.customerEmail   ?? null,
+          customerPhone:   d.customerPhone   ?? null,
+          customerAddress: d.customerAddress ?? null,
+          currency:        d.currency        ?? sale.currency,
+          notes:           d.notes           ?? null,
+          totalPrice:      totalPrice > 0 ? String(totalPrice) : null,
+          targetId:        d.targetId        !== undefined ? d.targetId        : sale.targetId,
+          invoiceStatusId: d.invoiceStatusId !== undefined ? d.invoiceStatusId : sale.invoiceStatusId,
+        })
+        .where(eq(sales.id, sale.id))
+    })
+
+    // Trigger Woo sync for all affected products
+    const [wh] = await db.select({ type: warehouses.type }).from(warehouses).where(eq(warehouses.id, sale.warehouseId))
+    if (wh?.type === 'main') {
+      const affectedIds = [
+        ...new Set([
+          ...oldItems.map(i => i.productId).filter(Boolean) as string[],
+          ...d.items.map(i => productBySku.get(i.sku)?.id).filter((id): id is string => !!id),
+        ]),
+      ]
+      for (const productId of affectedIds) {
+        try {
+          await enqueueSyncWooStock(productId)
+        } catch (err) {
+          (request as { log?: { warn: (o: object, msg: string) => void } }).log?.warn?.({ err, productId }, 'Failed to enqueue sync-woo-stock after sale edit')
+        }
+      }
+    }
+
+    return reply.status(200).send({ ok: true })
   })
 
   // ── Delete sale (restore stock + ledger) ───────────────────────────────────

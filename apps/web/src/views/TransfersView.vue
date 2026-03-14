@@ -88,8 +88,14 @@
       </DataTable>
     </div>
 
-    <TransferDetailDialog v-model:visible="showDetail" :transfer="selectedTransfer" @deleted="onTransferDeleted" />
+    <TransferDetailDialog
+      v-model:visible="showDetail"
+      :transfer="selectedTransfer"
+      @deleted="onTransferDeleted"
+      @edit="onEditTransfer"
+    />
     <CreateTransferModal v-model="showCreate" @created="onTransferCreated" />
+    <EditTransferModal v-model="showEdit" :transfer="editingTransfer" @updated="onTransferUpdated" />
   </div>
 </template>
 
@@ -101,10 +107,13 @@ import { getTransfers, getTransfer, type TransferSummary, type TransferDetail } 
 import TransferStatsSection  from '@/components/transfers/TransferStatsSection.vue'
 import TransferDetailDialog  from '@/components/transfers/TransferDetailDialog.vue'
 import CreateTransferModal   from '@/components/transfers/CreateTransferModal.vue'
+import EditTransferModal     from '@/components/transfers/EditTransferModal.vue'
 
 const router = useRouter()
-const showCreate       = ref(false)
-const isMobile         = ref(false)
+const showCreate        = ref(false)
+const showEdit          = ref(false)
+const editingTransfer   = ref<TransferDetail | null>(null)
+const isMobile          = ref(false)
 const mobileQuery      = window.matchMedia('(max-width: 768px)')
 function setMobile() { isMobile.value = mobileQuery.matches }
 onMounted(() => { setMobile(); mobileQuery.addEventListener('change', setMobile) })
@@ -126,6 +135,18 @@ const { data: transfersData, isLoading } = useQuery({
 
 function onTransferDeleted() {
   selectedTransfer.value = null
+  refreshKey.value++
+}
+
+function onEditTransfer(transfer: TransferDetail) {
+  editingTransfer.value = transfer
+  showEdit.value        = true
+}
+
+function onTransferUpdated() {
+  showEdit.value          = false
+  showDetail.value        = false
+  selectedTransfer.value  = null
   refreshKey.value++
 }
 
@@ -199,7 +220,7 @@ function formatDate(iso: string) {
 
 /* Table min-width for horizontal scroll */
 :deep(.transfers-datatable .p-datatable-table) {
-  min-width: 920px;
+  min-width: 700px;
 }
 
 /* Frozen columns opaque background */
@@ -208,36 +229,28 @@ function formatDate(iso: string) {
 :deep(.transfers-datatable tr.p-row-odd .p-frozen-column) { background: var(--p-datatable-row-striped-background, #fafafa); }
 :deep(.transfers-datatable tr:hover .p-frozen-column) { background: var(--p-datatable-row-hover-background, #f1f5f9); }
 
-/* Date column: fixed width, wrap */
-:deep(.col-date) { width: 100px; max-width: 100px; }
+/* Date column */
+:deep(.col-date) { width: 150px; min-width: 150px; }
 .date-text {
   font-size: 12px;
   color: var(--p-text-color);
-  display: block;
-  max-width: 100%;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-  line-height: 1.3;
+  white-space: nowrap;
 }
 
-/* Route column: fixed width, wrap */
-:deep(.col-route) { width: 140px; max-width: 140px; }
+/* Route column */
+:deep(.col-route) { min-width: 220px; }
 .route-cell {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 .wh-badge {
   font-size: 11px;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 6px;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-  line-height: 1.3;
+  white-space: nowrap;
 }
 .wh-from { background: var(--p-orange-50, #fff7ed); color: var(--p-orange-700, #c2410c); }
 .wh-to   { background: var(--p-green-50, #f0fdf4);  color: var(--p-green-700, #15803d); }
@@ -247,12 +260,6 @@ function formatDate(iso: string) {
 .notes-text  {
   font-size: 12px;
   color: var(--p-text-muted-color);
-  display: block;
-  max-width: 200px;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-  line-height: 1.3;
 }
 .no-value    { color: var(--p-text-muted-color); }
 
@@ -274,8 +281,8 @@ function formatDate(iso: string) {
 
   :deep(.transfers-datatable .p-datatable-tbody td),
   :deep(.transfers-datatable .p-datatable-thead th) { padding: 6px 8px; font-size: 12px; }
-  :deep(.col-date) { width: 80px; max-width: 80px; }
-  :deep(.col-route) { width: 110px; max-width: 110px; }
+  :deep(.col-date) { width: 130px; min-width: 130px; }
+  :deep(.col-route) { min-width: 180px; }
   .date-text { font-size: 11px; }
   .wh-badge { font-size: 10px; padding: 2px 6px; }
 }

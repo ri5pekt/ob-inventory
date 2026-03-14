@@ -46,6 +46,14 @@
           <span class="meta-label">Date</span>
           <span>{{ formatDate(sale.createdAt) }}</span>
         </div>
+        <div v-if="sale.targetName" class="meta-row">
+          <span class="meta-label">Target</span>
+          <span class="meta-tag meta-tag-target">{{ sale.targetName }}</span>
+        </div>
+        <div v-if="sale.invoiceStatusName" class="meta-row">
+          <span class="meta-label">Invoice</span>
+          <span class="meta-tag meta-tag-invoice">{{ sale.invoiceStatusName }}</span>
+        </div>
         <div v-if="sale.notes" class="meta-row">
           <span class="meta-label">Notes</span>
           <span>{{ sale.notes }}</span>
@@ -55,8 +63,22 @@
       <div class="detail-items">
         <h4>Items</h4>
         <DataTable :value="sale.items ?? []" size="small" striped-rows>
-          <Column field="sku"       header="SKU"        style="width:110px" />
-          <Column field="name"      header="Product" />
+          <Column field="sku"       header="SKU"        style="width:90px">
+            <template #body="{ data }">
+              <span class="cell-sku">{{ data.sku }}</span>
+            </template>
+          </Column>
+          <Column field="name"      header="Product">
+            <template #body="{ data }">
+              <span class="cell-name">{{ data.name }}</span>
+            </template>
+          </Column>
+          <Column field="boxNumber" header="Box"        style="width:70px">
+            <template #body="{ data }">
+              <span v-if="data.boxNumber" class="box-badge">{{ data.boxNumber }}</span>
+              <span v-else class="box-empty">—</span>
+            </template>
+          </Column>
           <Column field="quantity"  header="Qty"        style="width:60px; text-align:right" />
           <Column field="unitPrice" header="Unit Price" style="width:100px; text-align:right">
             <template #body="{ data }">
@@ -87,7 +109,16 @@
           :disabled="!sale"
           @click="showConfirm = true"
         />
-        <Button label="Close" severity="secondary" outlined size="small" @click="$emit('update:visible', false)" />
+        <div class="footer-right">
+          <Button label="Close" severity="secondary" outlined size="small" @click="$emit('update:visible', false)" />
+          <Button
+            label="Edit"
+            icon="pi pi-pencil"
+            size="small"
+            :disabled="!sale"
+            @click="$emit('edit', sale!)"
+          />
+        </div>
       </div>
     </template>
   </Dialog>
@@ -139,6 +170,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:visible', v: boolean): void
   (e: 'deleted'): void
+  (e: 'edit', sale: SaleDetail): void
 }>()
 
 const showConfirm = ref(false)
@@ -230,6 +262,43 @@ function formatDate(iso: string) {
   color: var(--p-primary-color);
 }
 
+.cell-sku {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--p-text-muted-color);
+  letter-spacing: 0.2px;
+}
+
+.cell-name {
+  font-size: 12px;
+}
+
+.meta-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.meta-tag-target  { background: var(--p-violet-50, #f5f3ff); color: var(--p-violet-700, #6d28d9); }
+.meta-tag-invoice { background: var(--p-amber-50, #fffbeb);  color: var(--p-amber-700,  #b45309); }
+
+.box-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--p-primary-50, #eff6ff);
+  color: var(--p-primary-700, #1d4ed8);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.box-empty {
+  color: var(--p-text-muted-color);
+}
+
 .detail-items h4 {
   margin: 0 0 8px;
   font-size: 13px;
@@ -256,16 +325,22 @@ function formatDate(iso: string) {
   gap: 8px;
 }
 
+.footer-right { display: flex; gap: 8px; align-items: center; }
+
 @media (max-width: 768px) {
   .detail-footer {
     flex-direction: column-reverse;
     align-items: stretch;
   }
 
+  .footer-right { flex-direction: row-reverse; }
+
   .detail-footer .p-button {
     width: 100%;
     justify-content: center;
   }
+
+  .footer-right .p-button { width: auto; flex: 1; }
 
   .detail-meta { padding: 12px; }
   .meta-row { font-size: 13px; }

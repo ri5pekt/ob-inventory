@@ -82,6 +82,20 @@
       <template #body="{ data }"><span class="muted-sm">{{ formatDate(data.dateAdded) }}</span></template>
     </Column>
 
+    <Column field="costPrice" header="Cost" sortable style="width: 82px; text-align: right">
+      <template #body="{ data }">
+        <span v-if="data.costPrice != null" class="price-value">{{ parseFloat(data.costPrice).toFixed(2) }}</span>
+        <span v-else class="muted">—</span>
+      </template>
+    </Column>
+
+    <Column field="retailPrice" header="Retail" sortable style="width: 82px; text-align: right">
+      <template #body="{ data }">
+        <span v-if="data.retailPrice != null" class="price-value price-retail">{{ parseFloat(data.retailPrice).toFixed(2) }}</span>
+        <span v-else class="muted">—</span>
+      </template>
+    </Column>
+
     <Column field="boxNumber" header="Box" sortable style="width: 72px">
       <template #body="{ data }">
         <span v-if="data.boxNumber" class="box-badge">{{ data.boxNumber }}</span>
@@ -116,7 +130,7 @@ function formatDate(iso: string | null | undefined): string {
 <style scoped>
 /* Force the inner table to be wide enough to trigger horizontal scroll */
 :deep(.p-datatable-table) {
-  min-width: 1106px; /* 40(edit)+44(img)+120(sku)+160+90+110+120+70+90+70+110+72+60 */
+  min-width: 1270px; /* 40(edit)+44(img)+120(sku)+160+90+110+120+70+90+70+110+82+82+72+60 */
 }
 
 /* Frozen columns must have an opaque background */
@@ -156,6 +170,15 @@ function formatDate(iso: string | null | undefined): string {
 
 .muted    { color: #94a3b8; font-size: 13px; }
 .muted-sm { color: #64748b; font-size: 13px; }
+
+.price-value {
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+.price-retail { color: #0369a1; }
+
 .qty      { font-weight: 700; font-size: 14px; color: #0f172a; }
 .qty-low  { color: #d97706; }
 .qty-zero { color: #dc2626; }

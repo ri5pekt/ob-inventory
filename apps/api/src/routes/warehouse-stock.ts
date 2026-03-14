@@ -35,6 +35,8 @@ export const warehouseStockRoutes: FastifyPluginAsync = async (fastify) => {
           brandId:      products.brandId,
           categoryId:   products.categoryId,
           image:        products.picture,
+          costPrice:    products.costPrice,
+          retailPrice:  products.retailPrice,
           brandName:    brands.name,
           categoryName: categories.name,
         })
@@ -94,6 +96,8 @@ export const warehouseStockRoutes: FastifyPluginAsync = async (fastify) => {
           unitOptionId:  a['unit']?.optionId  ?? null,
           quantity:      s.quantity,
           updatedAt:     s.updatedAt,
+          costPrice:     s.costPrice    ?? null,
+          retailPrice:   s.retailPrice  ?? null,
         }
       })
     },

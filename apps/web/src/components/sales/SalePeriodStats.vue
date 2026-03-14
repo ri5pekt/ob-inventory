@@ -43,49 +43,11 @@
       <span class="period-desc">{{ periodDescription }}</span>
     </div>
 
-    <!-- Stat cards -->
-    <div class="stats-cards">
-      <div class="stat-card stat-total">
-        <div class="stat-top">
-          <span class="stat-label">Total</span>
-          <i class="pi pi-chart-bar stat-icon" />
-        </div>
-        <span class="stat-count">{{ sales.length }}</span>
-        <span class="stat-revenue">{{ formatRevenue(totalRevenue(sales)) }}</span>
-      </div>
-      <div class="stat-card stat-woo">
-        <div class="stat-top">
-          <span class="stat-label">WooCommerce</span>
-          <i class="pi pi-globe stat-icon" />
-        </div>
-        <span class="stat-count">{{ byType('woocommerce').length }}</span>
-        <span class="stat-revenue">{{ formatRevenue(totalRevenue(byType('woocommerce'))) }}</span>
-      </div>
-      <div class="stat-card stat-direct">
-        <div class="stat-top">
-          <span class="stat-label">Direct</span>
-          <i class="pi pi-user stat-icon" />
-        </div>
-        <span class="stat-count">{{ byType('direct').length }}</span>
-        <span class="stat-revenue">{{ formatRevenue(totalRevenue(byType('direct'))) }}</span>
-      </div>
-      <div class="stat-card stat-partner">
-        <div class="stat-top">
-          <span class="stat-label">Partner</span>
-          <i class="pi pi-building stat-icon" />
-        </div>
-        <span class="stat-count">{{ byType('partner').length }}</span>
-        <span class="stat-revenue">{{ formatRevenue(totalRevenue(byType('partner'))) }}</span>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { Sale, SaleType } from '@/api/sales'
-
-const props = defineProps<{ sales: Sale[] }>()
 
 type PeriodPreset = 'today' | 'week' | 'month' | 'quarter' | 'year' | 'custom'
 
@@ -148,18 +110,6 @@ watch([activePeriod, customFrom, customTo], () => {
   emit('dateRangeChange', r ? { from: r.from.toISOString(), to: r.to.toISOString() } : null)
 })
 
-function byType(type: SaleType) {
-  return props.sales.filter(s => s.saleType === type)
-}
-
-function totalRevenue(list: Sale[]) {
-  return list.reduce((sum, s) => sum + (s.totalPrice ? parseFloat(s.totalPrice) : 0), 0)
-}
-
-function formatRevenue(amount: number) {
-  if (amount === 0) return '—'
-  return new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 }).format(amount)
-}
 </script>
 
 <style scoped>
@@ -225,84 +175,10 @@ function formatRevenue(amount: number) {
 .fade-enter-active, .fade-leave-active { transition: opacity 0.15s, transform 0.15s; }
 .fade-enter-from, .fade-leave-to       { opacity: 0; transform: translateX(-6px); }
 
-.stats-cards { display: flex; gap: 12px; }
-
-.stat-card {
-  flex: 1;
-  border-radius: 10px;
-  padding: 12px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  border: 1px solid transparent;
-}
-
-.stat-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.stat-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.stat-icon { font-size: 14px; opacity: 0.5; }
-
-.stat-count {
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.stat-revenue {
-  font-size: 13px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  opacity: 0.75;
-}
-
-.stat-total   { background: #f8fafc; border-color: #e2e8f0; color: #0f172a; }
-.stat-woo     { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
-.stat-direct  { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
-.stat-partner { background: #fff7ed; border-color: #fed7aa; color: #c2410c; }
-
 @media (max-width: 768px) {
-  .stats-section { padding: 8px 10px; gap: 8px; }
+  .stats-section { padding: 8px 10px; }
   .period-bar { gap: 6px; }
   .period-chip { padding: 2px 8px; font-size: 10px; }
   .period-desc { font-size: 10px; }
-
-  .stats-cards {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-  }
-
-  .stat-card {
-    flex: none;
-    min-width: 0;
-    padding: 6px 8px;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-  }
-
-  .stat-top {
-    margin-bottom: 0;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .stat-label { font-size: 9px; white-space: nowrap; }
-  .stat-icon { font-size: 12px; flex-shrink: 0; }
-  .stat-count { font-size: 16px; flex-shrink: 0; }
-  .stat-revenue { font-size: 10px; display: none; }
 }
 </style>

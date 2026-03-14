@@ -9,6 +9,7 @@
       <TabList>
         <Tab value="static"><i class="pi pi-list"></i> Static Parameters</Tab>
         <Tab value="attributes"><i class="pi pi-sliders-h"></i> Custom Attributes</Tab>
+        <Tab value="salemeta"><i class="pi pi-tag"></i> Sales Meta</Tab>
       </TabList>
 
       <TabPanels>
@@ -20,6 +21,11 @@
         <TabPanel value="attributes">
           <div class="tab-panel-pad">
             <CustomAttributesTab />
+          </div>
+        </TabPanel>
+        <TabPanel value="salemeta">
+          <div class="tab-panel-pad">
+            <SaleMetaTab />
           </div>
         </TabPanel>
       </TabPanels>
@@ -36,6 +42,7 @@ import TabPanel from 'primevue/tabpanel'
 import TabPanels from 'primevue/tabpanels'
 import StaticParamsTab from '@/components/settings/StaticParamsTab.vue'
 import CustomAttributesTab from '@/components/settings/CustomAttributesTab.vue'
+import SaleMetaTab from '@/components/settings/SaleMetaTab.vue'
 
 const activeTab = ref('static')
 </script>

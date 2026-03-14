@@ -163,13 +163,15 @@ async function runImport(job: ImportJob, csvBuffer: Buffer, warehouseId: string)
     model:     col(['model', 'type/ model', 'type/model']),
     size:      col(['size', 'size ']),
     color:     col(['color', 'colour']),
-    qty:       col(['qty', 'quantity', 'מלאי']),
-    price:     col(['price', 'מחיר רגיל', 'base price']),
-    image:     col(['image', 'images', 'picture']),
-    box:       col(['box#', 'box']),
-    dateAdded: col(['date added', 'date']),
-    unit:      col(['unit']),
-    rowType:   col(['סוג', 'type']),   // WooCommerce format only
+    qty:         col(['qty', 'quantity', 'מלאי']),
+    price:       col(['price', 'מחיר רגיל', 'base price']),
+    costPrice:   col(['cost price', 'cost_price', 'cost']),
+    retailPrice: col(['retail price', 'retail_price', 'retail', 'sale price']),
+    image:       col(['image', 'images', 'picture']),
+    box:         col(['box#', 'box']),
+    dateAdded:   col(['date added', 'date']),
+    unit:        col(['unit']),
+    rowType:     col(['סוג', 'type']),   // WooCommerce format only
   }
 
   if (C.sku === -1) {
@@ -301,9 +303,11 @@ async function runImport(job: ImportJob, csvBuffer: Buffer, warehouseId: string)
       const modelVal = cell(row, C.model)
       const sizeVal  = cell(row, C.size)
       const colorVal = cell(row, C.color)
-      const qty      = Math.max(0, parseInt(cell(row, C.qty) || '0', 10) || 0)
-      const price    = parseFloat(cell(row, C.price)) || null
-      const imageUrl = cell(row, C.image)
+      const qty         = Math.max(0, parseInt(cell(row, C.qty) || '0', 10) || 0)
+      const price       = parseFloat(cell(row, C.price))       || null
+      const costPrice   = parseFloat(cell(row, C.costPrice))   || null
+      const retailPrice = parseFloat(cell(row, C.retailPrice)) || null
+      const imageUrl    = cell(row, C.image)
       const boxNum   = cell(row, C.box) || null
       const dateAdded = parseDate(cell(row, C.dateAdded))
       const unitVal   = cell(row, C.unit)
@@ -321,16 +325,28 @@ async function runImport(job: ImportJob, csvBuffer: Buffer, warehouseId: string)
         if (!picturePath) result.imagesFailed++
       }
 
-      // Upsert product — only overwrite picture if a new image was successfully fetched
+      // Upsert product
+      // - picture only overwritten when a new image was successfully fetched
+      // - costPrice / retailPrice only overwritten when the CSV column has a value
+      //   (so a re-import without price columns won't wipe existing prices)
       const updateSet: Record<string, unknown> = {
         name, brandId, categoryId,
         basePrice: price != null ? String(price) : null,
         dateAdded,
       }
-      if (picturePath !== null) updateSet.picture = picturePath
+      if (picturePath   !== null) updateSet.picture     = picturePath
+      if (costPrice     !== null) updateSet.costPrice   = String(costPrice)
+      if (retailPrice   !== null) updateSet.retailPrice = String(retailPrice)
 
       const [product] = await db.insert(products)
-        .values({ sku, name, brandId, categoryId, basePrice: price != null ? String(price) : null, picture: picturePath, dateAdded })
+        .values({
+          sku, name, brandId, categoryId,
+          basePrice:   price       != null ? String(price)       : null,
+          costPrice:   costPrice   != null ? String(costPrice)   : null,
+          retailPrice: retailPrice != null ? String(retailPrice) : null,
+          picture: picturePath,
+          dateAdded,
+        })
         .onConflictDoUpdate({ target: products.sku, set: updateSet })
         .returning()
 

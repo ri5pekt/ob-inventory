@@ -36,9 +36,23 @@
       <div class="detail-items">
         <h4>Transferred Items</h4>
         <DataTable :value="transfer.items" size="small" striped-rows>
-          <Column field="sku"      header="SKU"     style="width: 120px" />
-          <Column field="name"     header="Product" />
-          <Column field="quantity" header="Qty"     style="width: 70px; text-align:right">
+          <Column field="sku"       header="SKU"     style="width: 100px">
+            <template #body="{ data }">
+              <span class="cell-sku">{{ data.sku }}</span>
+            </template>
+          </Column>
+          <Column field="name"      header="Product">
+            <template #body="{ data }">
+              <span class="cell-name">{{ data.name }}</span>
+            </template>
+          </Column>
+          <Column field="boxNumber" header="Box"     style="width: 70px">
+            <template #body="{ data }">
+              <span v-if="data.boxNumber" class="box-badge">{{ data.boxNumber }}</span>
+              <span v-else class="box-empty">—</span>
+            </template>
+          </Column>
+          <Column field="quantity"  header="Qty"     style="width: 60px; text-align:right">
             <template #body="{ data }">
               <span class="qty-badge">{{ data.quantity }}</span>
             </template>
@@ -61,7 +75,16 @@
           :disabled="!transfer"
           @click="showConfirm = true"
         />
-        <Button label="Close" severity="secondary" outlined size="small" @click="$emit('update:visible', false)" />
+        <div class="footer-right">
+          <Button label="Close" severity="secondary" outlined size="small" @click="$emit('update:visible', false)" />
+          <Button
+            label="Edit"
+            icon="pi pi-pencil"
+            size="small"
+            :disabled="!transfer"
+            @click="$emit('edit', transfer!)"
+          />
+        </div>
       </div>
     </template>
   </Dialog>
@@ -113,6 +136,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:visible': [val: boolean]
   'deleted': []
+  'edit': [transfer: TransferDetail]
 }>()
 
 const showConfirm  = ref(false)
@@ -179,6 +203,32 @@ function formatDate(iso: string) {
 
 .ref-text { font-family: monospace; font-size: 12px; color: var(--p-primary-color); }
 
+.cell-sku {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--p-text-muted-color);
+  letter-spacing: 0.2px;
+}
+
+.cell-name {
+  font-size: 12px;
+}
+
+.box-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--p-primary-50, #eff6ff);
+  color: var(--p-primary-700, #1d4ed8);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.box-empty {
+  color: var(--p-text-muted-color);
+}
+
 .detail-items h4 {
   margin: 0 0 10px; font-size: 12px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.4px; color: var(--p-text-muted-color);
@@ -193,6 +243,8 @@ function formatDate(iso: string) {
   align-items: center;
   width: 100%;
 }
+
+.footer-right { display: flex; gap: 8px; align-items: center; }
 
 .confirm-body {
   display: flex;

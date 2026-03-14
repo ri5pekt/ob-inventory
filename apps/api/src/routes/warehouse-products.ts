@@ -25,6 +25,8 @@ const addProductSchema = z.object({
   sizeOptionId:  z.string().uuid().nullable().optional(),
   colorOptionId: z.string().uuid().nullable().optional(),
   unitOptionId:  z.string().uuid().nullable().optional(),
+  costPrice:     z.number().nonnegative().nullable().optional(),
+  retailPrice:   z.number().nonnegative().nullable().optional(),
 })
 
 const updateProductSchema = z.object({
@@ -41,6 +43,8 @@ const updateProductSchema = z.object({
   colorOptionId: z.string().uuid().nullable().optional(),
   unitOptionId:  z.string().uuid().nullable().optional(),
   image:         z.string().nullable().optional(),
+  costPrice:     z.number().nonnegative().nullable().optional(),
+  retailPrice:   z.number().nonnegative().nullable().optional(),
 })
 
 async function upsertAttributes(
@@ -98,7 +102,12 @@ export const warehouseProductRoutes: FastifyPluginAsync = async (fastify) => {
     const [product] = existing
       ? [existing]
       : await db.insert(products)
-          .values({ sku: d.sku, name: d.name, wooTitle: d.wooTitle ?? null, brandId: d.brandId ?? null, categoryId: d.categoryId ?? null, dateAdded: d.dateAdded ?? null })
+          .values({
+            sku: d.sku, name: d.name, wooTitle: d.wooTitle ?? null,
+            brandId: d.brandId ?? null, categoryId: d.categoryId ?? null, dateAdded: d.dateAdded ?? null,
+            costPrice:   d.costPrice   != null ? String(d.costPrice)   : null,
+            retailPrice: d.retailPrice != null ? String(d.retailPrice) : null,
+          })
           .returning()
 
     await upsertAttributes(product.id, d)
@@ -153,7 +162,9 @@ export const warehouseProductRoutes: FastifyPluginAsync = async (fastify) => {
         brandId:    d.brandId    ?? null,
         categoryId: d.categoryId ?? null,
         dateAdded:  d.dateAdded  ?? null,
-        ...(d.image !== undefined ? { picture: d.image ?? null } : {}),
+        ...(d.image       !== undefined ? { picture:     d.image       ?? null } : {}),
+        ...(d.costPrice   !== undefined ? { costPrice:   d.costPrice   != null ? String(d.costPrice)   : null } : {}),
+        ...(d.retailPrice !== undefined ? { retailPrice: d.retailPrice != null ? String(d.retailPrice) : null } : {}),
       })
       .where(eq(products.id, productId))
 

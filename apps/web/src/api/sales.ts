@@ -21,6 +21,10 @@ export interface Sale {
   notes:         string | null
   createdAt:     string
   itemCount:     number
+  targetId:         string | null
+  targetName:       string | null
+  invoiceStatusId:  string | null
+  invoiceStatusName: string | null
 }
 
 export interface SaleItem {
@@ -32,6 +36,7 @@ export interface SaleItem {
   quantity:  number
   unitPrice: string | null
   lineTotal: string | null
+  boxNumber: string | null
 }
 
 export interface SaleDetail extends Sale {
@@ -55,6 +60,8 @@ export interface CreateSaleRequest {
   customerAddress?: string
   currency?:        string
   notes?:           string
+  targetId?:        string
+  invoiceStatusId?: string
   items:            CreateSaleItemInput[]
 }
 
@@ -77,6 +84,31 @@ export async function getSale(id: string): Promise<SaleDetail> {
 export async function createSale(payload: CreateSaleRequest): Promise<{ id: string }> {
   const { data } = await apiClient.post<{ id: string }>('/sales', payload)
   return data
+}
+
+export interface UpdateSaleItemInput {
+  productId?: string
+  sku:        string
+  name:       string
+  quantity:   number
+  unitPrice?: number
+  lineTotal?: number
+}
+
+export interface UpdateSaleRequest {
+  customerName?:    string
+  customerEmail?:   string
+  customerPhone?:   string
+  customerAddress?: string
+  currency?:        string
+  notes?:           string
+  targetId?:        string | null
+  invoiceStatusId?: string | null
+  items:            UpdateSaleItemInput[]
+}
+
+export async function updateSale(id: string, payload: UpdateSaleRequest): Promise<void> {
+  await apiClient.put(`/sales/${id}`, payload)
 }
 
 export async function deleteSale(id: string, reason?: string): Promise<void> {

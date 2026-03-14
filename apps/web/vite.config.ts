@@ -19,11 +19,11 @@ export default defineConfig({
     allowedHosts: 'all', // allow ngrok *.ngrok-free.app / *.ngrok.io hosts
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3001',
         changeOrigin: true,
       },
       '/uploads': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3001',
         changeOrigin: true,
       },
     },
