@@ -604,7 +604,7 @@ label {
 @media (max-width: 768px) {
   .edit-sale-form { gap: 12px; padding-bottom: 4px; }
 
-  .form-row { flex-direction: column; gap: 8px; }
+  .form-row { flex-direction: column; gap: 8px; align-items: stretch; }
   .field-sm { flex: 1 1 auto; }
   .field-full { min-width: 0; }
 

@@ -846,6 +846,7 @@ label {
   .form-row {
     flex-direction: column;
     gap: 8px;
+    align-items: stretch;
   }
 
   .field-sm { flex: 1 1 auto; }
