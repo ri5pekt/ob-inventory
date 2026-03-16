@@ -356,6 +356,12 @@ function handleClose() {
   margin-bottom: 8px;
 }
 
+@media (max-width: 520px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .field {
   display: flex;
   flex-direction: column;
