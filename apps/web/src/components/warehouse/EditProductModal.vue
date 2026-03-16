@@ -237,22 +237,36 @@
 
     <template #footer>
       <div class="footer-row">
-        <Button label="Cancel" text severity="secondary" :disabled="submitting" @click="handleClose" />
         <Button
-          label="Save Changes"
-          icon="pi pi-check"
-          :loading="submitting"
-          @click="submit"
+          label="Remove Product"
+          icon="pi pi-trash"
+          text
+          severity="danger"
+          :disabled="submitting"
+          @click="confirmRemove"
         />
+        <div class="footer-actions-right">
+          <Button label="Cancel" text severity="secondary" :disabled="submitting" @click="handleClose" />
+          <Button
+            label="Save Changes"
+            icon="pi pi-check"
+            :loading="submitting"
+            @click="submit"
+          />
+        </div>
       </div>
     </template>
   </Dialog>
+
+  <ConfirmDialog />
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, useTemplateRef } from 'vue'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useConfirm } from 'primevue/useconfirm'
 import Dialog from 'primevue/dialog'
+import ConfirmDialog from 'primevue/confirmdialog'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Select from 'primevue/select'
@@ -260,7 +274,7 @@ import Button from 'primevue/button'
 import DatePicker from 'primevue/datepicker'
 import { defineComponent, h } from 'vue'
 import { catalogApi } from '@/api/catalog'
-import { updateWarehouseStock } from '@/api/warehouses'
+import { updateWarehouseStock, removeWarehouseStock } from '@/api/warehouses'
 import type { StockItemDTO } from '@ob-inventory/types'
 
 const SectionLabel = defineComponent({
@@ -431,6 +445,39 @@ async function submit() {
   }
 }
 
+// ── Remove product ────────────────────────────────────────────────────────────
+const confirm = useConfirm()
+
+function confirmRemove() {
+  if (!props.item) return
+  const sku = props.item.sku
+  confirm.require({
+    message:     `Remove "${sku}" from this warehouse? The product will no longer appear in stock here.`,
+    header:      'Remove Product',
+    icon:        'pi pi-exclamation-triangle',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Remove',
+    acceptClass: 'p-button-danger',
+    accept:      async () => {
+      if (!props.item) return
+      submitting.value = true
+      errorMsg.value   = ''
+      try {
+        await removeWarehouseStock(props.warehouseId, props.item.productId)
+        await queryClient.invalidateQueries({ queryKey: ['warehouse-stock', props.warehouseId] })
+        await queryClient.invalidateQueries({ queryKey: ['warehouses'] })
+        emit('success')
+        emit('close')
+      } catch (err: unknown) {
+        const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error
+        errorMsg.value = msg ?? 'Failed to remove product. Please try again.'
+      } finally {
+        submitting.value = false
+      }
+    },
+  })
+}
+
 function handleClose() {
   if (!submitting.value) emit('close')
 }
@@ -591,10 +638,16 @@ function handleClose() {
 .footer-row {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 8px;
   width: 100%;
   padding-top: 12px;
+}
+
+.footer-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* ═══════════════════════════════════════════════
@@ -622,7 +675,13 @@ function handleClose() {
     gap: 8px;
   }
 
-  .footer-row .p-button {
+  .footer-actions-right {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .footer-row .p-button,
+  .footer-actions-right .p-button {
     width: 100%;
     justify-content: center;
   }

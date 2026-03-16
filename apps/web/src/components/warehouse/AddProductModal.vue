@@ -15,11 +15,10 @@
       <div class="form-grid">
         <div class="field">
           <label class="field-label">SKU <span class="req">*</span></label>
-          <InputText
+          <SkuAutocompleteInput
             v-model="form.sku"
-            placeholder="e.g. BGSA-RDBK-8"
             :invalid="touched.sku && !form.sku"
-            class="w-full"
+            @select="onProductAutofill"
           />
           <span v-if="touched.sku && !form.sku" class="field-error">Required</span>
         </div>
@@ -206,6 +205,8 @@ import Button from 'primevue/button'
 import DatePicker from 'primevue/datepicker'
 import { catalogApi } from '@/api/catalog'
 import { addProductToWarehouse } from '@/api/warehouses'
+import { type CatalogSearchResult } from '@/api/transfers'
+import SkuAutocompleteInput from '@/components/warehouse/SkuAutocompleteInput.vue'
 
 // ── Tiny helper component ─────────────────────────────────────────────────────
 import { defineComponent, h } from 'vue'
@@ -254,7 +255,7 @@ const emptyForm = () => ({
   brandId:       null as string | null,
   categoryId:    null as string | null,
   boxNumber:     '',
-  dateAdded:     null as Date | null,
+  dateAdded:     new Date() as Date | null,
   quantity:      0,
   model:         '',
   sizeOptionId:  null as string | null,
@@ -276,6 +277,21 @@ watch(() => props.visible, (v) => {
     errorMsg.value = ''
   }
 })
+
+// ── Autofill from catalog search ──────────────────────────────────────────────
+
+function onProductAutofill(result: CatalogSearchResult) {
+  form.value.sku          = result.sku
+  form.value.wooTitle     = result.wooTitle     ?? result.name ?? ''
+  form.value.brandId      = result.brandId      ?? null
+  form.value.categoryId   = result.categoryId   ?? null
+  form.value.model        = result.model        ?? ''
+  form.value.sizeOptionId  = result.sizeOptionId  ?? null
+  form.value.colorOptionId = result.colorOptionId ?? null
+  form.value.unitOptionId  = result.unitOptionId  ?? null
+  form.value.costPrice    = result.costPrice    != null ? parseFloat(result.costPrice)    : null
+  form.value.retailPrice  = result.retailPrice  != null ? parseFloat(result.retailPrice)  : null
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

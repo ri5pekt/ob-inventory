@@ -54,6 +54,17 @@
           class="filter-select"
           append-to="body"
         />
+        <Select
+          v-model="filterPaymentMethod"
+          :options="filterPaymentOptions"
+          option-label="name"
+          option-value="id"
+          placeholder="All Payment Methods"
+          show-clear
+          size="small"
+          class="filter-select"
+          append-to="body"
+        />
       </div>
       <InputText
         v-model="search"
@@ -176,7 +187,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import { getSales, getSale, type Sale, type SaleDetail, type SaleType } from '@/api/sales'
-import { getSaleTargets, getSaleInvoiceStatuses, type SaleMetaItem } from '@/api/saleMeta'
+import { getSaleTargets, getSaleInvoiceStatuses, getSalePaymentMethods, type SaleMetaItem } from '@/api/saleMeta'
 import SalePeriodStats from '@/components/sales/SalePeriodStats.vue'
 import SaleDetailDialog from '@/components/sales/SaleDetailDialog.vue'
 import CreateSaleModal from '@/components/sales/CreateSaleModal.vue'
@@ -191,17 +202,20 @@ function onDateRangeChange(range: { from: string; to: string } | null) {
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 const activeFilter      = ref<SaleType | undefined>(undefined)
-const filterTarget      = ref<string | null>(null)
+const filterTarget        = ref<string | null>(null)
 const filterInvoiceStatus = ref<string | null>(null)
-const filterTargetOptions   = ref<SaleMetaItem[]>([])
-const filterInvoiceOptions  = ref<SaleMetaItem[]>([])
+const filterPaymentMethod = ref<string | null>(null)
+const filterTargetOptions  = ref<SaleMetaItem[]>([])
+const filterInvoiceOptions = ref<SaleMetaItem[]>([])
+const filterPaymentOptions = ref<SaleMetaItem[]>([])
 const search       = ref('')
 
 onMounted(async () => {
   try {
-    [filterTargetOptions.value, filterInvoiceOptions.value] = await Promise.all([
+    [filterTargetOptions.value, filterInvoiceOptions.value, filterPaymentOptions.value] = await Promise.all([
       getSaleTargets(),
       getSaleInvoiceStatuses(),
+      getSalePaymentMethods(),
     ])
   } catch { /* non-critical */ }
 })
@@ -254,9 +268,10 @@ const typeFilters = computed(() => [
 
 const filteredSales = computed(() => {
   let list = sales.value
-  if (activeFilter.value)       list = list.filter(s => s.saleType === activeFilter.value)
-  if (filterTarget.value)       list = list.filter(s => s.targetId === filterTarget.value)
+  if (activeFilter.value)        list = list.filter(s => s.saleType === activeFilter.value)
+  if (filterTarget.value)        list = list.filter(s => s.targetId === filterTarget.value)
   if (filterInvoiceStatus.value) list = list.filter(s => s.invoiceStatusId === filterInvoiceStatus.value)
+  if (filterPaymentMethod.value) list = list.filter(s => s.paymentMethodId === filterPaymentMethod.value)
   const q = search.value.trim().toLowerCase()
   if (q) {
     list = list.filter(s =>

@@ -26,6 +26,38 @@ export async function searchProducts(
   return data
 }
 
+// ── Catalog search (global — used by Add Product to Warehouse modal) ──────────
+
+export interface CatalogSearchResult {
+  productId:     string
+  sku:           string
+  name:          string
+  wooTitle:      string | null
+  brandId:       string | null
+  brandName:     string | null
+  categoryId:    string | null
+  categoryName:  string | null
+  costPrice:     string | null
+  retailPrice:   string | null
+  model:         string | null
+  sizeOptionId:  string | null
+  sizeLabel:     string | null
+  colorOptionId: string | null
+  colorLabel:    string | null
+  unitOptionId:  string | null
+  unitLabel:     string | null
+}
+
+export async function searchCatalog(
+  q: string,
+  limit = 20,
+): Promise<CatalogSearchResult[]> {
+  const { data } = await apiClient.get<CatalogSearchResult[]>('/products/catalog-search', {
+    params: { q, limit },
+  })
+  return data
+}
+
 // ── Transfers ─────────────────────────────────────────────────────────────────
 
 export type TransferStatus = 'completed' | 'cancelled'

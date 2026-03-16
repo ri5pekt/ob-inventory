@@ -21,10 +21,12 @@ export interface Sale {
   notes:         string | null
   createdAt:     string
   itemCount:     number
-  targetId:         string | null
-  targetName:       string | null
-  invoiceStatusId:  string | null
+  targetId:          string | null
+  targetName:        string | null
+  invoiceStatusId:   string | null
   invoiceStatusName: string | null
+  paymentMethodId:   string | null
+  paymentMethodName: string | null
 }
 
 export interface SaleItem {
@@ -62,6 +64,7 @@ export interface CreateSaleRequest {
   notes?:           string
   targetId?:        string
   invoiceStatusId?: string
+  paymentMethodId?: string
   items:            CreateSaleItemInput[]
 }
 
@@ -104,6 +107,7 @@ export interface UpdateSaleRequest {
   notes?:           string
   targetId?:        string | null
   invoiceStatusId?: string | null
+  paymentMethodId?: string | null
   items:            UpdateSaleItemInput[]
 }
 

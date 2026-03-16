@@ -71,7 +71,7 @@
         </div>
       </div>
 
-      <!-- Target + Invoice status -->
+      <!-- Target + Invoice status + Payment method -->
       <div class="form-row">
         <div class="field">
           <label>Target</label>
@@ -95,6 +95,18 @@
             :loading="loadingMeta"
             :create-fn="createSaleInvoiceStatus"
             @created="invoiceStatuses.push($event)"
+          />
+        </div>
+        <div class="field">
+          <label>Payment Method</label>
+          <SaleMetaSelect
+            v-model="form.paymentMethodId"
+            :options="paymentMethods"
+            label="Payment Method"
+            placeholder="Select method…"
+            :loading="loadingMeta"
+            :create-fn="createSalePaymentMethod"
+            @created="paymentMethods.push($event)"
           />
         </div>
       </div>
@@ -298,7 +310,7 @@ import { ref, computed, watch } from 'vue'
 import { useQueryClient } from '@tanstack/vue-query'
 import { getWarehouses } from '@/api/warehouses'
 import { createSale, type CreateSaleItemInput } from '@/api/sales'
-import { getSaleTargets, getSaleInvoiceStatuses, createSaleTarget, createSaleInvoiceStatus, type SaleMetaItem } from '@/api/saleMeta'
+import { getSaleTargets, getSaleInvoiceStatuses, getSalePaymentMethods, createSaleTarget, createSaleInvoiceStatus, createSalePaymentMethod, type SaleMetaItem } from '@/api/saleMeta'
 import { type ProductSearchResult } from '@/api/transfers'
 import type { WarehouseDTO } from '@ob-inventory/types'
 import ProductSearchInput from '@/components/transfers/ProductSearchInput.vue'
@@ -321,6 +333,7 @@ const queryClient = useQueryClient()
 
 const targets           = ref<SaleMetaItem[]>([])
 const invoiceStatuses   = ref<SaleMetaItem[]>([])
+const paymentMethods    = ref<SaleMetaItem[]>([])
 const loadingMeta       = ref(false)
 
 // ── Warehouses ────────────────────────────────────────────────────────────────
@@ -349,9 +362,9 @@ watch(visible, async (open) => {
     try { warehouses.value = await getWarehouses(); applyMainWarehouse() }
     finally { loadingWarehouses.value = false }
   }
-  if (targets.value.length === 0 && invoiceStatuses.value.length === 0) {
+  if (targets.value.length === 0 && invoiceStatuses.value.length === 0 && paymentMethods.value.length === 0) {
     loadingMeta.value = true
-    try { [targets.value, invoiceStatuses.value] = await Promise.all([getSaleTargets(), getSaleInvoiceStatuses()]) }
+    try { [targets.value, invoiceStatuses.value, paymentMethods.value] = await Promise.all([getSaleTargets(), getSaleInvoiceStatuses(), getSalePaymentMethods()]) }
     finally { loadingMeta.value = false }
   }
 })
@@ -374,6 +387,7 @@ const defaultForm = () => ({
   notes:            '',
   targetId:         null as string | null,
   invoiceStatusId:  null as string | null,
+  paymentMethodId:  null as string | null,
   items:            [] as SaleItemRow[],
 })
 
@@ -480,6 +494,7 @@ async function submit() {
       notes:            form.value.notes.trim()            || undefined,
       targetId:         form.value.targetId        ?? undefined,
       invoiceStatusId:  form.value.invoiceStatusId ?? undefined,
+      paymentMethodId:  form.value.paymentMethodId ?? undefined,
       items,
     })
 

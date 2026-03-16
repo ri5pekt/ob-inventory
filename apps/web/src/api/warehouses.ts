@@ -51,6 +51,10 @@ export async function updateWarehouse(id: string, payload: UpdateWarehouseReques
   return data
 }
 
+export async function removeWarehouseStock(warehouseId: string, productId: string): Promise<void> {
+  await apiClient.delete(`/warehouses/${warehouseId}/stock/${productId}`)
+}
+
 export interface UpdateProductRequest extends AddProductRequest {}
 
 export async function updateWarehouseStock(

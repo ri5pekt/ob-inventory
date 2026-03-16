@@ -13,6 +13,7 @@ import {
   inventoryLedger,
   saleTargets,
   saleInvoiceStatuses,
+  salePaymentMethods,
 } from '@ob-inventory/db'
 
 export const salesRoutes: FastifyPluginAsync = async (fastify) => {
@@ -52,11 +53,13 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         currency:        sales.currency,
         notes:           sales.notes,
         createdAt:       sales.createdAt,
-        targetId:        sales.targetId,
-        targetName:      saleTargets.name,
-        invoiceStatusId: sales.invoiceStatusId,
-        invoiceStatusName: saleInvoiceStatuses.name,
-        itemCount:       sql<number>`coalesce(sum(${saleItems.quantity}), 0)`,
+        targetId:           sales.targetId,
+        targetName:         saleTargets.name,
+        invoiceStatusId:    sales.invoiceStatusId,
+        invoiceStatusName:  saleInvoiceStatuses.name,
+        paymentMethodId:    sales.paymentMethodId,
+        paymentMethodName:  salePaymentMethods.name,
+        itemCount:          sql<number>`coalesce(sum(${saleItems.quantity}), 0)`,
       })
       .from(sales)
       .leftJoin(warehouses, eq(sales.warehouseId, warehouses.id))
@@ -64,8 +67,9 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       .leftJoin(saleItems, eq(sales.id, saleItems.saleId))
       .leftJoin(saleTargets, eq(sales.targetId, saleTargets.id))
       .leftJoin(saleInvoiceStatuses, eq(sales.invoiceStatusId, saleInvoiceStatuses.id))
+      .leftJoin(salePaymentMethods, eq(sales.paymentMethodId, salePaymentMethods.id))
       .where(filters.length > 0 ? and(...filters) : undefined)
-      .groupBy(sales.id, warehouses.name, stores.name, saleTargets.name, saleInvoiceStatuses.name)
+      .groupBy(sales.id, warehouses.name, stores.name, saleTargets.name, saleInvoiceStatuses.name, salePaymentMethods.name)
       .orderBy(desc(sales.createdAt))
       .limit(q.limit)
       .offset(q.offset)
@@ -94,16 +98,19 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         notes:           sales.notes,
         createdAt:       sales.createdAt,
         updatedAt:       sales.updatedAt,
-        targetId:        sales.targetId,
-        targetName:      saleTargets.name,
-        invoiceStatusId: sales.invoiceStatusId,
+        targetId:          sales.targetId,
+        targetName:        saleTargets.name,
+        invoiceStatusId:   sales.invoiceStatusId,
         invoiceStatusName: saleInvoiceStatuses.name,
+        paymentMethodId:   sales.paymentMethodId,
+        paymentMethodName: salePaymentMethods.name,
       })
       .from(sales)
       .leftJoin(warehouses, eq(sales.warehouseId, warehouses.id))
       .leftJoin(stores, eq(sales.storeId, stores.id))
       .leftJoin(saleTargets, eq(sales.targetId, saleTargets.id))
       .leftJoin(saleInvoiceStatuses, eq(sales.invoiceStatusId, saleInvoiceStatuses.id))
+      .leftJoin(salePaymentMethods, eq(sales.paymentMethodId, salePaymentMethods.id))
       .where(eq(sales.id, request.params.id))
 
     if (!sale) return reply.status(404).send({ error: 'Sale not found' })
@@ -145,8 +152,9 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       customerAddress: z.string().optional(),
       currency:        z.string().default('ILS'),
       notes:           z.string().optional(),
-      targetId:        z.string().uuid().optional(),
-      invoiceStatusId: z.string().uuid().optional(),
+      targetId:         z.string().uuid().optional(),
+      invoiceStatusId:  z.string().uuid().optional(),
+      paymentMethodId:  z.string().uuid().optional(),
       items: z.array(z.object({
         sku:       z.string().min(1),
         name:      z.string().min(1),
@@ -236,10 +244,11 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         customerAddress: d.customerAddress ?? null,
         totalPrice:    totalPrice > 0 ? String(totalPrice) : null,
         currency:      d.currency,
-        notes:         d.notes ?? null,
-        targetId:        d.targetId        ?? null,
-        invoiceStatusId: d.invoiceStatusId ?? null,
-        createdBy:     userId,
+        notes:           d.notes            ?? null,
+        targetId:        d.targetId         ?? null,
+        invoiceStatusId: d.invoiceStatusId  ?? null,
+        paymentMethodId: d.paymentMethodId  ?? null,
+        createdBy:       userId,
       }).returning()
 
       const itemsToInsert: typeof saleItems.$inferInsert[] = []
@@ -315,6 +324,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       notes:           z.string().optional(),
       targetId:        z.string().uuid().nullable().optional(),
       invoiceStatusId: z.string().uuid().nullable().optional(),
+      paymentMethodId: z.string().uuid().nullable().optional(),
       items: z.array(z.object({
         productId: z.string().uuid().optional(),
         sku:       z.string().min(1),
@@ -443,6 +453,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
           totalPrice:      totalPrice > 0 ? String(totalPrice) : null,
           targetId:        d.targetId        !== undefined ? d.targetId        : sale.targetId,
           invoiceStatusId: d.invoiceStatusId !== undefined ? d.invoiceStatusId : sale.invoiceStatusId,
+          paymentMethodId: d.paymentMethodId !== undefined ? d.paymentMethodId : sale.paymentMethodId,
         })
         .where(eq(sales.id, sale.id))
     })

@@ -78,6 +78,13 @@
       "when": 1741910400000,
       "tag": "0010_add_product_prices",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1742083200000,
+      "tag": "0011_add_payment_methods",
+      "breakpoints": true
     }
   ]
 }

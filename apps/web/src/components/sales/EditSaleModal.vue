@@ -49,7 +49,7 @@
         </div>
       </div>
 
-      <!-- Target + Invoice status -->
+      <!-- Target + Invoice status + Payment method -->
       <div class="form-row">
         <div class="field">
           <label>Target</label>
@@ -73,6 +73,18 @@
             :loading="loadingMeta"
             :create-fn="createSaleInvoiceStatus"
             @created="invoiceStatuses.push($event)"
+          />
+        </div>
+        <div class="field">
+          <label>Payment Method</label>
+          <SaleMetaSelect
+            v-model="form.paymentMethodId"
+            :options="paymentMethods"
+            label="Payment Method"
+            placeholder="Select method…"
+            :loading="loadingMeta"
+            :create-fn="createSalePaymentMethod"
+            @created="paymentMethods.push($event)"
           />
         </div>
       </div>
@@ -191,7 +203,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { updateSale, type SaleDetail } from '@/api/sales'
-import { getSaleTargets, getSaleInvoiceStatuses, createSaleTarget, createSaleInvoiceStatus, type SaleMetaItem } from '@/api/saleMeta'
+import { getSaleTargets, getSaleInvoiceStatuses, getSalePaymentMethods, createSaleTarget, createSaleInvoiceStatus, createSalePaymentMethod, type SaleMetaItem } from '@/api/saleMeta'
 import { type ProductSearchResult } from '@/api/transfers'
 import ProductSearchInput from '@/components/transfers/ProductSearchInput.vue'
 import SaleMetaSelect from './SaleMetaSelect.vue'
@@ -219,6 +231,7 @@ interface SaleItemRow {
 
 const targets         = ref<SaleMetaItem[]>([])
 const invoiceStatuses = ref<SaleMetaItem[]>([])
+const paymentMethods  = ref<SaleMetaItem[]>([])
 const loadingMeta     = ref(false)
 
 const defaultForm = () => ({
@@ -230,6 +243,7 @@ const defaultForm = () => ({
   notes:           '',
   targetId:        null as string | null,
   invoiceStatusId: null as string | null,
+  paymentMethodId: null as string | null,
   items:           [] as SaleItemRow[],
 })
 
@@ -241,9 +255,9 @@ const insufficientItems = ref<{ sku: string; requested: number; available: numbe
 // Load meta options once
 watch(() => props.modelValue, async (open) => {
   if (!open) return
-  if (targets.value.length === 0 && invoiceStatuses.value.length === 0) {
+  if (targets.value.length === 0 && invoiceStatuses.value.length === 0 && paymentMethods.value.length === 0) {
     loadingMeta.value = true
-    try { [targets.value, invoiceStatuses.value] = await Promise.all([getSaleTargets(), getSaleInvoiceStatuses()]) }
+    try { [targets.value, invoiceStatuses.value, paymentMethods.value] = await Promise.all([getSaleTargets(), getSaleInvoiceStatuses(), getSalePaymentMethods()]) }
     finally { loadingMeta.value = false }
   }
 })
@@ -259,6 +273,7 @@ watch(() => props.sale, (sale) => {
   form.value.notes           = sale.notes           ?? ''
   form.value.targetId        = sale.targetId        ?? null
   form.value.invoiceStatusId = sale.invoiceStatusId ?? null
+  form.value.paymentMethodId = sale.paymentMethodId ?? null
   form.value.items = (sale.items ?? []).map(item => ({
     productId: item.productId,
     sku:       item.sku,
@@ -325,6 +340,7 @@ async function submit() {
       notes:           form.value.notes.trim()           || undefined,
       targetId:        form.value.targetId,
       invoiceStatusId: form.value.invoiceStatusId,
+      paymentMethodId: form.value.paymentMethodId,
       items: form.value.items.map(i => ({
         productId: i.productId ?? undefined,
         sku:       i.sku,

@@ -16,6 +16,12 @@ export const saleInvoiceStatuses = pgTable('sale_invoice_statuses', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
+export const salePaymentMethods = pgTable('sale_payment_methods', {
+  id:        uuid('id').primaryKey().defaultRandom(),
+  name:      text('name').notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
 export const saleTypeEnum = pgEnum('sale_type', ['direct', 'partner', 'woocommerce'])
 export const saleStatusEnum = pgEnum('sale_status', ['completed', 'cancelled', 'refunded'])
 
@@ -34,8 +40,9 @@ export const sales = pgTable('sales', {
   totalPrice: numeric('total_price', { precision: 10, scale: 2 }),
   currency: text('currency').notNull().default('ILS'),
   notes: text('notes'),
-  targetId:         uuid('target_id').references(() => saleTargets.id),
-  invoiceStatusId:  uuid('invoice_status_id').references(() => saleInvoiceStatuses.id),
+  targetId:          uuid('target_id').references(() => saleTargets.id),
+  invoiceStatusId:   uuid('invoice_status_id').references(() => saleInvoiceStatuses.id),
+  paymentMethodId:   uuid('payment_method_id').references(() => salePaymentMethods.id),
   createdBy: uuid('created_by').references(() => users.id),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull().$onUpdate(() => new Date()),

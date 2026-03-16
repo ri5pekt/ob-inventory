@@ -198,4 +198,39 @@ export const warehouseProductRoutes: FastifyPluginAsync = async (fastify) => {
 
     return { ok: true }
   })
+
+  // ── Remove product from warehouse stock ────────────────────────────────────
+  fastify.delete<{ Params: { id: string; productId: string } }>('/api/warehouses/:id/stock/:productId', auth, async (request, reply) => {
+    const { id: warehouseId, productId } = request.params
+    const jwtPayload = (request as { user?: { sub?: string } }).user
+    const userId = jwtPayload?.sub ?? null
+
+    const [stockRow] = await db.select().from(inventoryStock)
+      .where(and(eq(inventoryStock.productId, productId), eq(inventoryStock.warehouseId, warehouseId)))
+    if (!stockRow) return reply.status(404).send({ error: 'Stock record not found', code: 'NOT_FOUND' })
+
+    await db.transaction(async (tx) => {
+      if (stockRow.quantity > 0) {
+        await tx.insert(inventoryLedger).values({
+          productId,
+          warehouseId,
+          actionType:    'adjustment',
+          quantityDelta: -stockRow.quantity,
+          notes:         'Product removed from warehouse via UI',
+          createdBy:     userId,
+        })
+      }
+      await tx.delete(inventoryStock)
+        .where(and(eq(inventoryStock.productId, productId), eq(inventoryStock.warehouseId, warehouseId)))
+    })
+
+    const [wh] = await db.select({ type: warehouses.type }).from(warehouses).where(eq(warehouses.id, warehouseId))
+    if (wh?.type === 'main') {
+      try { await enqueueSyncWooStock(productId) } catch (err) {
+        request.log.warn({ err, productId }, '[sync-woo-stock] Failed to enqueue after stock removal')
+      }
+    }
+
+    return reply.status(200).send({ ok: true })
+  })
 }
