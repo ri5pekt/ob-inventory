@@ -15,7 +15,7 @@ export default defineConfig({
   },
   server: {
     host: true,          // listen on 0.0.0.0 so ngrok can reach it
-    port: 5173,
+    port: 5174,
     allowedHosts: 'all', // allow ngrok *.ngrok-free.app / *.ngrok.io hosts
     proxy: {
       '/api': {

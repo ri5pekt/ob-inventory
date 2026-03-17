@@ -1,0 +1,13 @@
+SKU,Title,Brand,Category,Model,Size,Color,Qty,Price,Cost Price,Retail Price,Image,Box,Date Added,Unit
+SHOE-NK-001,Nike Air Max 270,Nike,Footwear,Air Max 270,42,Black/White,10,65.00,48.00,89.99,https://example.com/images/shoe-nk-001.jpg,A1,2026-01-15,pair
+SHOE-NK-002,Nike Air Max 270,Nike,Footwear,Air Max 270,43,Black/White,8,65.00,48.00,89.99,https://example.com/images/shoe-nk-001.jpg,A1,2026-01-15,pair
+SHOE-AD-001,Adidas Ultraboost 22,Adidas,Footwear,Ultraboost 22,41,Core Black,5,80.00,60.00,119.99,https://example.com/images/shoe-ad-001.jpg,A2,2026-01-20,pair
+SHIRT-001,Basic Cotton T-Shirt,H&M,Apparel,,M,White,25,8.50,5.00,14.99,,B3,2026-02-01,pcs
+SHIRT-002,Basic Cotton T-Shirt,H&M,Apparel,,L,White,20,8.50,5.00,14.99,,B3,2026-02-01,pcs
+BAG-LV-001,Classic Tote Bag,Louis Vuitton,Accessories,Neverfull MM,,Brown,3,350.00,280.00,499.00,https://example.com/images/bag-lv-001.jpg,C1,2026-02-10,pcs
+WATCH-001,Chrono Sport Watch,Casio,Accessories,G-Shock,,Black,15,45.00,30.00,69.99,https://example.com/images/watch-001.jpg,C2,2026-02-15,pcs
+PANTS-001,Slim Fit Jeans,Levi's,Apparel,511 Slim,32/32,Blue,12,35.00,22.00,59.99,,D1,2026-03-01,pcs
+PANTS-002,Slim Fit Jeans,Levi's,Apparel,511 Slim,34/32,Blue,10,35.00,22.00,59.99,,D1,2026-03-01,pcs
+SKI-JACKET-001,Insulated Ski Jacket,Columbia,Outerwear,Whirlibird,M,Red,4,120.00,85.00,179.99,https://example.com/images/ski-jacket.jpg,E1,2026-03-05,pcs
+PERFUME-001,Midnight Bloom EDP,Chanel,Beauty,No.5,,N/A,20,95.00,60.00,139.99,https://example.com/images/perfume-001.jpg,F1,2026-03-10,pcs
+SUNGL-001,Aviator Sunglasses,Ray-Ban,Accessories,RB3025,,Gold/Green,18,75.00,50.00,119.00,https://example.com/images/sungl-001.jpg,F2,2026-03-10,pcs

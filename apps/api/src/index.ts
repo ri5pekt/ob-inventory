@@ -25,6 +25,7 @@ import { inventoryProductRoutes } from './routes/inventory-products.js'
 import { productSearchRoutes } from './routes/product-search.js'
 import { userRoutes } from './routes/users.js'
 import { importRoutes } from './routes/import.js'
+import { invoicesRoutes } from './routes/invoices.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname  = dirname(__filename)
@@ -84,6 +85,7 @@ await fastify.register(inventoryProductRoutes)
 await fastify.register(productSearchRoutes)
 await fastify.register(userRoutes)
 await fastify.register(importRoutes)
+await fastify.register(invoicesRoutes)
 
 try {
   await fastify.listen({ port: env.API_PORT, host: '0.0.0.0' })

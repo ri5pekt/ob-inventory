@@ -1,7 +1,19 @@
 <template>
   <RouterView />
-  <Toast position="top-right" />
+  <Toast position="top-right" class="app-toast" />
 </template>
+
+<style>
+@media (max-width: 640px) {
+  .app-toast.p-toast {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: calc(100vw - 24px) !important;
+    max-width: 400px !important;
+  }
+}
+</style>
 
 <script setup lang="ts">
 import { onMounted } from 'vue'

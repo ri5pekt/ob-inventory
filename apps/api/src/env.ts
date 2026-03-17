@@ -14,6 +14,12 @@ const envSchema = z.object({
   WOO_API_SECRET: z.string().optional(),
   WOO_WEBHOOK_SECRET: z.string().optional(),
   WOO_PLUGIN_API_KEY: z.string().optional(),
+  CARDCOM_API_NAME: z.string().optional(),
+  CARDCOM_API_PASSWORD: z.string().optional(),
+  CARDCOM_TERMINAL: z.coerce.number().optional(),
+  CARDCOM_TEST_API_NAME: z.string().optional(),
+  CARDCOM_TEST_API_PASSWORD: z.string().optional(),
+  CARDCOM_TEST_TERMINAL: z.coerce.number().optional(),
 })
 
 const parsed = envSchema.safeParse(process.env)

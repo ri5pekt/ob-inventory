@@ -110,6 +110,15 @@
           @click="showConfirm = true"
         />
         <div class="footer-right">
+          <Button
+            label="Cardcom"
+            icon="pi pi-file"
+            severity="secondary"
+            outlined
+            size="small"
+            :disabled="!sale"
+            @click="showCardcom = true"
+          />
           <Button label="Close" severity="secondary" outlined size="small" @click="$emit('update:visible', false)" />
           <Button
             label="Edit"
@@ -122,6 +131,11 @@
       </div>
     </template>
   </Dialog>
+
+  <CardcomDocumentsModal
+    v-model:visible="showCardcom"
+    :sale="sale"
+  />
 
   <!-- Delete confirmation -->
   <Dialog
@@ -161,6 +175,7 @@
 import { ref, computed } from 'vue'
 import type { SaleDetail, SaleType } from '@/api/sales'
 import { deleteSale } from '@/api/sales'
+import CardcomDocumentsModal from './CardcomDocumentsModal.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -173,8 +188,9 @@ const emit = defineEmits<{
   (e: 'edit', sale: SaleDetail): void
 }>()
 
-const showConfirm = ref(false)
-const deleting    = ref(false)
+const showConfirm  = ref(false)
+const showCardcom  = ref(false)
+const deleting     = ref(false)
 const deleteError = ref<string | null>(null)
 const deleteReason = ref('')
 
