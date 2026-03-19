@@ -24,11 +24,26 @@ export async function getSaleDocuments(saleId: string): Promise<CardcomDocument[
   return data
 }
 
+export type CardcomPaymentType = 'Cash' | 'BankTransfer' | 'CreditCard' | 'Bit' | 'Cheque'
+
 export interface DocumentOverride {
   customerName?:  string
   customerEmail?: string | null
   totalPrice?:    string | null
   items?: Array<{ name: string; quantity: number; unitPrice: string | null }>
+  hp_tz?:        string
+  documentDate?: string           // DD/MM/YYYY — changes the header date on the document
+  isVatFree?:    boolean
+  paymentType?:  CardcomPaymentType
+  paymentDate?:  string           // DD/MM/YYYY — payment date; shown on PDF for non-Cash payments
+  asmachta?:     string           // reference/confirmation number; printed on PDF for BankTransfer/Bit/CreditCard
+  comments?:     string
+  cheque?: {
+    chequeNumber?:  string
+    bankNumber?:    number
+    snifNumber?:    number
+    accountNumber?: string
+  }
 }
 
 export async function createSaleDocument(

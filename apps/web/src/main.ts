@@ -12,6 +12,7 @@ import App from './App.vue'
 
 // PrimeVue components — registered globally so they resolve correctly
 // even in lazily-mounted child components (modals, etc.)
+import Tooltip     from 'primevue/tooltip'
 import Button      from 'primevue/button'
 import InputText   from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
@@ -87,5 +88,7 @@ app.component('ConfirmDialog', ConfirmDialog)
 app.component('Password',      Password)
 app.component('Checkbox',      Checkbox)
 app.component('TabView',       TabView)
+
+app.directive('tooltip', Tooltip)
 
 app.mount('#app')

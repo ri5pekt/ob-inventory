@@ -65,6 +65,19 @@ export const invoicesRoutes: FastifyPluginAsync = async (fastify) => {
           quantity:  z.number().min(0),
           unitPrice: z.preprocess(v => v == null ? null : String(v), z.string().nullable()),
         })).optional(),
+        hp_tz:        z.string().optional(),
+        documentDate: z.string().optional(),   // DD/MM/YYYY — document issue date
+        isVatFree:    z.boolean().optional(),
+        paymentType:  z.enum(['Cash', 'BankTransfer', 'CreditCard', 'Bit', 'Cheque']).optional(),
+        paymentDate:  z.string().optional(),   // DD/MM/YYYY — payment date (TranDate/DateCheque); not for Cash
+        asmachta:     z.string().optional(),   // reference number; CustomFields only (BankTransfer/Bit/CreditCard)
+        comments:     z.string().optional(),
+        cheque: z.object({
+          chequeNumber:  z.string().optional(),
+          bankNumber:    z.coerce.number().optional(),
+          snifNumber:    z.coerce.number().optional(),
+          accountNumber: z.string().optional(),
+        }).optional(),
       }).optional(),
     }).parse(request.body)
 
@@ -111,6 +124,14 @@ export const invoicesRoutes: FastifyPluginAsync = async (fastify) => {
         customerEmail: effectiveCustomerEmail,
         totalPrice:    effectiveTotalPrice,
         items:         effectiveItems,
+        hp_tz:         override?.hp_tz,
+        documentDate:  override?.documentDate,
+        isVatFree:     override?.isVatFree,
+        paymentType:   override?.paymentType,
+        paymentDate:   override?.paymentDate,
+        asmachta:      override?.asmachta,
+        comments:      override?.comments,
+        cheque:        override?.cheque,
       },
       sendEmail,
     )
