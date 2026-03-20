@@ -17,7 +17,6 @@
                 <i class="pi pi-pencil"></i>
               </button>
             </div>
-            <span class="wh-type-badge" :class="`type-${warehouse.type}`">{{ warehouse.type }}</span>
           </template>
         </div>
       </div>
@@ -40,6 +39,16 @@
         class="search-input"
         :disabled="isLoading"
       />
+      <button
+        class="filter-toggle-btn"
+        :class="{ 'filter-toggle-active': activeFilterCount > 0 }"
+        @click="filtersOpen = !filtersOpen"
+        title="Toggle filters"
+      >
+        <i class="pi pi-filter"></i>
+        <span class="filter-toggle-label">Filters<span v-if="activeFilterCount > 0" class="filter-badge">{{ activeFilterCount }}</span></span>
+        <i :class="filtersOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" class="filter-chevron"></i>
+      </button>
       <span v-if="isLoading" class="loading-pill">
         <i class="pi pi-spin pi-spinner"></i> Loading…
       </span>
@@ -49,6 +58,75 @@
       <span v-else class="stock-count-label">
         {{ filteredStock.length }}<span class="count-of"> of {{ stockItems?.length ?? 0 }}</span> SKUs
       </span>
+    </div>
+
+    <!-- Filter panel -->
+    <div v-if="filtersOpen" class="filter-panel">
+      <div class="filter-dropdowns">
+        <div class="filter-field">
+          <label class="filter-label">Brand</label>
+          <MultiSelect
+            v-model="filterBrands"
+            :options="brandOptions"
+            placeholder="All brands"
+            display="chip"
+            filter
+            :max-selected-labels="2"
+            class="filter-multiselect"
+          />
+        </div>
+        <div class="filter-field">
+          <label class="filter-label">Category</label>
+          <MultiSelect
+            v-model="filterCategories"
+            :options="categoryOptions"
+            placeholder="All categories"
+            display="chip"
+            filter
+            :max-selected-labels="2"
+            class="filter-multiselect"
+          />
+        </div>
+        <div class="filter-field">
+          <label class="filter-label">Model</label>
+          <MultiSelect
+            v-model="filterModels"
+            :options="modelOptions"
+            placeholder="All models"
+            display="chip"
+            filter
+            :max-selected-labels="2"
+            class="filter-multiselect"
+          />
+        </div>
+        <div class="filter-field">
+          <label class="filter-label">Size</label>
+          <MultiSelect
+            v-model="filterSizes"
+            :options="sizeOptions"
+            placeholder="All sizes"
+            display="chip"
+            filter
+            :max-selected-labels="3"
+            class="filter-multiselect"
+          />
+        </div>
+        <div class="filter-field">
+          <label class="filter-label">Color</label>
+          <MultiSelect
+            v-model="filterColors"
+            :options="colorOptions"
+            placeholder="All colors"
+            display="chip"
+            filter
+            :max-selected-labels="2"
+            class="filter-multiselect"
+          />
+        </div>
+      </div>
+      <button v-if="activeFilterCount > 0" class="filter-reset-btn" @click="resetFilters">
+        <i class="pi pi-times-circle"></i> Reset filters
+      </button>
     </div>
 
     <!-- ── TABLE (all screen sizes) ── -->
@@ -99,6 +177,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
+import MultiSelect from 'primevue/multiselect'
 import Skeleton from 'primevue/skeleton'
 import { getWarehouses, getWarehouseStock } from '@/api/warehouses'
 import StockTable        from '@/components/warehouse/StockTable.vue'
@@ -123,29 +202,73 @@ const search            = ref('')
 const showAddProduct    = ref(false)
 const showEditProduct   = ref(false)
 const showEditWarehouse = ref(false)
-const editItem        = ref<StockItemDTO | null>(null)
+const editItem          = ref<StockItemDTO | null>(null)
+
+// ── Filter panel ──────────────────────────────────────────
+const filtersOpen      = ref(false)
+const filterBrands     = ref<string[]>([])
+const filterCategories = ref<string[]>([])
+const filterModels     = ref<string[]>([])
+const filterSizes      = ref<string[]>([])
+const filterColors     = ref<string[]>([])
+
+function uniqueSorted(values: (string | null | undefined)[]): string[] {
+  return [...new Set(values.filter(Boolean) as string[])].sort((a, b) => a.localeCompare(b))
+}
+
+const brandOptions    = computed(() => uniqueSorted(stockItems.value?.map(s => s.brand)))
+const categoryOptions = computed(() => uniqueSorted(stockItems.value?.map(s => s.category)))
+const modelOptions    = computed(() => uniqueSorted(stockItems.value?.map(s => s.model)))
+const sizeOptions     = computed(() => uniqueSorted(stockItems.value?.map(s => s.size)))
+const colorOptions    = computed(() => uniqueSorted(stockItems.value?.map(s => s.color)))
+
+const activeFilterCount = computed(() =>
+  [filterBrands, filterCategories, filterModels, filterSizes, filterColors]
+    .filter(f => f.value.length > 0).length
+)
+
+function resetFilters() {
+  filterBrands.value     = []
+  filterCategories.value = []
+  filterModels.value     = []
+  filterSizes.value      = []
+  filterColors.value     = []
+}
+// ──────────────────────────────────────────────────────────
 
 function openEdit(item: StockItemDTO) {
-  editItem.value       = item
+  editItem.value        = item
   showEditProduct.value = true
 }
 
-
 const filteredStock = computed(() => {
   if (!stockItems.value) return []
+  let items = stockItems.value
+
+  // text search
   const q = search.value.trim().toLowerCase()
-  if (!q) return stockItems.value
-  return stockItems.value.filter(s =>
-    (s.sku       ?? '').toLowerCase().includes(q) ||
-    (s.wooTitle  ?? '').toLowerCase().includes(q) ||
-    (s.name      ?? '').toLowerCase().includes(q) ||
-    (s.brand     ?? '').toLowerCase().includes(q) ||
-    (s.category  ?? '').toLowerCase().includes(q) ||
-    (s.model     ?? '').toLowerCase().includes(q) ||
-    (s.color     ?? '').toLowerCase().includes(q) ||
-    (s.size      ?? '').toLowerCase().includes(q) ||
-    (s.boxNumber ?? '').toLowerCase().includes(q),
-  )
+  if (q) {
+    items = items.filter(s =>
+      (s.sku       ?? '').toLowerCase().includes(q) ||
+      (s.wooTitle  ?? '').toLowerCase().includes(q) ||
+      (s.name      ?? '').toLowerCase().includes(q) ||
+      (s.brand     ?? '').toLowerCase().includes(q) ||
+      (s.category  ?? '').toLowerCase().includes(q) ||
+      (s.model     ?? '').toLowerCase().includes(q) ||
+      (s.color     ?? '').toLowerCase().includes(q) ||
+      (s.size      ?? '').toLowerCase().includes(q) ||
+      (s.boxNumber ?? '').toLowerCase().includes(q),
+    )
+  }
+
+  // dropdown filters (each is AND-combined, multi-select within a field is OR)
+  if (filterBrands.value.length)     items = items.filter(s => filterBrands.value.includes(s.brand ?? ''))
+  if (filterCategories.value.length) items = items.filter(s => filterCategories.value.includes(s.category ?? ''))
+  if (filterModels.value.length)     items = items.filter(s => filterModels.value.includes(s.model ?? ''))
+  if (filterSizes.value.length)      items = items.filter(s => filterSizes.value.includes(s.size ?? ''))
+  if (filterColors.value.length)     items = items.filter(s => filterColors.value.includes(s.color ?? ''))
+
+  return items
 })
 </script>
 
@@ -230,6 +353,109 @@ const filteredStock = computed(() => {
 
 .search-input { flex: 1; min-width: 0; }
 
+/* ── Filter toggle button ── */
+.filter-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 7px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  height: 34px;
+}
+.filter-toggle-btn:hover {
+  border-color: #0891b2;
+  color: #0891b2;
+  background: #f0fdff;
+}
+.filter-toggle-active {
+  border-color: #0891b2;
+  background: #e0f2fe;
+  color: #0369a1;
+}
+.filter-toggle-label { display: flex; align-items: center; gap: 4px; }
+.filter-badge {
+  background: #0891b2;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 1px 6px;
+  line-height: 1.4;
+}
+.filter-chevron { font-size: 10px; margin-left: 1px; }
+
+/* ── Filter panel ── */
+.filter-panel {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filter-dropdowns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 160px;
+  min-width: 140px;
+}
+
+.filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+:deep(.filter-multiselect) {
+  width: 100%;
+  font-size: 13px;
+}
+
+:deep(.filter-multiselect .p-multiselect-label) {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.filter-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid #fca5a5;
+  background: #fff;
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.12s, border-color 0.12s;
+}
+.filter-reset-btn:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+}
+
 .stock-count-label {
   font-size: 13px;
   font-weight: 600;
@@ -309,6 +535,15 @@ const filteredStock = computed(() => {
   .header-right-actions .p-button-label { display: none; }
   .toolbar { gap: 8px; }
   .stock-count-label { font-size: 12px; }
+
+  .filter-toggle-btn { padding: 5px 10px; font-size: 12px; }
+  .filter-toggle-label span:not(.filter-badge) { display: none; }
+
+  .filter-panel { padding: 12px; gap: 10px; }
+  .filter-dropdowns { gap: 8px; }
+  .filter-field { flex: 1 1 calc(50% - 4px); min-width: 0; }
+
+  .filter-reset-btn { align-self: stretch; justify-content: center; }
 
   /* Tighter text inside cells on small screens */
   :deep(.p-datatable-tbody td),
