@@ -30,125 +30,144 @@
       </div>
     </div>
 
-    <!-- Search + count bar -->
-    <div class="toolbar">
-      <InputText
-        v-model="search"
-        placeholder="Search SKU, name, brand, color…"
-        size="small"
-        class="search-input"
-        :disabled="isLoading"
-      />
-      <button
-        class="filter-toggle-btn"
-        :class="{ 'filter-toggle-active': activeFilterCount > 0 }"
-        @click="filtersOpen = !filtersOpen"
-        title="Toggle filters"
-      >
-        <i class="pi pi-filter"></i>
-        <span class="filter-toggle-label">Filters<span v-if="activeFilterCount > 0" class="filter-badge">{{ activeFilterCount }}</span></span>
-        <i :class="filtersOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" class="filter-chevron"></i>
-      </button>
-      <span v-if="isLoading" class="loading-pill">
-        <i class="pi pi-spin pi-spinner"></i> Loading…
-      </span>
-      <span v-else-if="isFetching" class="refresh-pill">
-        <i class="pi pi-spin pi-spinner"></i> Refreshing
-      </span>
-      <span v-else class="stock-count-label">
-        {{ filteredStock.length }}<span class="count-of"> of {{ stockItems?.length ?? 0 }}</span> SKUs
-      </span>
-    </div>
+    <!-- Tabs -->
+    <Tabs v-model:value="activeTab" class="stock-tabs">
+      <TabList>
+        <Tab value="stock">Stock</Tab>
+        <Tab value="cost-summary">Cost Summary</Tab>
+      </TabList>
 
-    <!-- Filter panel -->
-    <div v-if="filtersOpen" class="filter-panel">
-      <div class="filter-dropdowns">
-        <div class="filter-field">
-          <label class="filter-label">Brand</label>
-          <MultiSelect
-            v-model="filterBrands"
-            :options="brandOptions"
-            placeholder="All brands"
-            display="chip"
-            filter
-            :max-selected-labels="2"
-            class="filter-multiselect"
-          />
-        </div>
-        <div class="filter-field">
-          <label class="filter-label">Category</label>
-          <MultiSelect
-            v-model="filterCategories"
-            :options="categoryOptions"
-            placeholder="All categories"
-            display="chip"
-            filter
-            :max-selected-labels="2"
-            class="filter-multiselect"
-          />
-        </div>
-        <div class="filter-field">
-          <label class="filter-label">Model</label>
-          <MultiSelect
-            v-model="filterModels"
-            :options="modelOptions"
-            placeholder="All models"
-            display="chip"
-            filter
-            :max-selected-labels="2"
-            class="filter-multiselect"
-          />
-        </div>
-        <div class="filter-field">
-          <label class="filter-label">Size</label>
-          <MultiSelect
-            v-model="filterSizes"
-            :options="sizeOptions"
-            placeholder="All sizes"
-            display="chip"
-            filter
-            :max-selected-labels="3"
-            class="filter-multiselect"
-          />
-        </div>
-        <div class="filter-field">
-          <label class="filter-label">Color</label>
-          <MultiSelect
-            v-model="filterColors"
-            :options="colorOptions"
-            placeholder="All colors"
-            display="chip"
-            filter
-            :max-selected-labels="2"
-            class="filter-multiselect"
-          />
-        </div>
-      </div>
-      <button v-if="activeFilterCount > 0" class="filter-reset-btn" @click="resetFilters">
-        <i class="pi pi-times-circle"></i> Reset filters
-      </button>
-    </div>
+      <TabPanels>
 
-    <!-- ── TABLE (all screen sizes) ── -->
-    <div class="table-card">
+        <!-- ── STOCK TAB ── -->
+        <TabPanel value="stock" class="tab-panel-stock">
 
-      <!-- Skeleton rows while loading -->
-      <div v-if="isLoading" class="skeleton-table">
-        <div class="skeleton-thead">
-          <Skeleton v-for="col in 6" :key="col" height="13px" border-radius="4px" />
-        </div>
-        <div v-for="row in 10" :key="row" class="skeleton-row" :style="{ opacity: 1 - row * 0.07 }">
-          <Skeleton width="52px"  height="14px" border-radius="4px" />
-          <Skeleton width="110px" height="14px" border-radius="4px" />
-          <Skeleton :width="`${120 + (row % 3) * 30}px`" height="14px" border-radius="4px" />
-          <Skeleton width="64px"  height="18px" border-radius="4px" />
-          <Skeleton width="90px"  height="14px" border-radius="4px" />
-          <Skeleton width="32px"  height="16px" border-radius="4px" style="margin-left:auto" />
-        </div>
-      </div>
+          <!-- Search + count bar -->
+          <div class="toolbar">
+            <InputText
+              v-model="search"
+              placeholder="Search SKU, name, brand, color…"
+              size="small"
+              class="search-input"
+              :disabled="isLoading"
+            />
+            <button
+              class="filter-toggle-btn"
+              :class="{ 'filter-toggle-active': activeFilterCount > 0 }"
+              @click="filtersOpen = !filtersOpen"
+              title="Toggle filters"
+            >
+              <i class="pi pi-filter"></i>
+              <span class="filter-toggle-label">Filters<span v-if="activeFilterCount > 0" class="filter-badge">{{ activeFilterCount }}</span></span>
+              <i :class="filtersOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" class="filter-chevron"></i>
+            </button>
+            <span v-if="isLoading" class="loading-pill">
+              <i class="pi pi-spin pi-spinner"></i> Loading…
+            </span>
+            <span v-else-if="isFetching" class="refresh-pill">
+              <i class="pi pi-spin pi-spinner"></i> Refreshing
+            </span>
+            <span v-else class="stock-count-label">
+              {{ filteredStock.length }}<span class="count-of"> of {{ stockItems?.length ?? 0 }}</span> SKUs
+            </span>
+          </div>
 
-      <StockTable v-else :items="filteredStock" @edit="openEdit" />
-    </div>
+          <!-- Filter panel -->
+          <div v-if="filtersOpen" class="filter-panel">
+            <div class="filter-dropdowns">
+              <div class="filter-field">
+                <label class="filter-label">Brand</label>
+                <MultiSelect
+                  v-model="filterBrands"
+                  :options="brandOptions"
+                  placeholder="All brands"
+                  display="chip"
+                  filter
+                  :max-selected-labels="2"
+                  class="filter-multiselect"
+                />
+              </div>
+              <div class="filter-field">
+                <label class="filter-label">Category</label>
+                <MultiSelect
+                  v-model="filterCategories"
+                  :options="categoryOptions"
+                  placeholder="All categories"
+                  display="chip"
+                  filter
+                  :max-selected-labels="2"
+                  class="filter-multiselect"
+                />
+              </div>
+              <div class="filter-field">
+                <label class="filter-label">Model</label>
+                <MultiSelect
+                  v-model="filterModels"
+                  :options="modelOptions"
+                  placeholder="All models"
+                  display="chip"
+                  filter
+                  :max-selected-labels="2"
+                  class="filter-multiselect"
+                />
+              </div>
+              <div class="filter-field">
+                <label class="filter-label">Size</label>
+                <MultiSelect
+                  v-model="filterSizes"
+                  :options="sizeOptions"
+                  placeholder="All sizes"
+                  display="chip"
+                  filter
+                  :max-selected-labels="3"
+                  class="filter-multiselect"
+                />
+              </div>
+              <div class="filter-field">
+                <label class="filter-label">Color</label>
+                <MultiSelect
+                  v-model="filterColors"
+                  :options="colorOptions"
+                  placeholder="All colors"
+                  display="chip"
+                  filter
+                  :max-selected-labels="2"
+                  class="filter-multiselect"
+                />
+              </div>
+            </div>
+            <button v-if="activeFilterCount > 0" class="filter-reset-btn" @click="resetFilters">
+              <i class="pi pi-times-circle"></i> Reset filters
+            </button>
+          </div>
+
+          <!-- Table card -->
+          <div class="table-card">
+            <div v-if="isLoading" class="skeleton-table">
+              <div class="skeleton-thead">
+                <Skeleton v-for="col in 6" :key="col" height="13px" border-radius="4px" />
+              </div>
+              <div v-for="row in 10" :key="row" class="skeleton-row" :style="{ opacity: 1 - row * 0.07 }">
+                <Skeleton width="52px"  height="14px" border-radius="4px" />
+                <Skeleton width="110px" height="14px" border-radius="4px" />
+                <Skeleton :width="`${120 + (row % 3) * 30}px`" height="14px" border-radius="4px" />
+                <Skeleton width="64px"  height="18px" border-radius="4px" />
+                <Skeleton width="90px"  height="14px" border-radius="4px" />
+                <Skeleton width="32px"  height="16px" border-radius="4px" style="margin-left:auto" />
+              </div>
+            </div>
+            <StockTable v-else :items="filteredStock" @edit="openEdit" />
+          </div>
+
+        </TabPanel>
+
+        <!-- ── COST SUMMARY TAB ── -->
+        <TabPanel value="cost-summary" class="tab-panel-cost">
+          <CostSummaryTab :stock-items="stockItems" />
+        </TabPanel>
+
+      </TabPanels>
+    </Tabs>
 
     <AddProductModal
       :visible="showAddProduct"
@@ -179,10 +198,16 @@ import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import MultiSelect from 'primevue/multiselect'
 import Skeleton from 'primevue/skeleton'
+import Tabs from 'primevue/tabs'
+import TabList from 'primevue/tablist'
+import Tab from 'primevue/tab'
+import TabPanel from 'primevue/tabpanel'
+import TabPanels from 'primevue/tabpanels'
 import { getWarehouses, getWarehouseStock } from '@/api/warehouses'
-import StockTable        from '@/components/warehouse/StockTable.vue'
-import AddProductModal   from '@/components/warehouse/AddProductModal.vue'
-import EditProductModal  from '@/components/warehouse/EditProductModal.vue'
+import StockTable         from '@/components/warehouse/StockTable.vue'
+import CostSummaryTab     from '@/components/warehouse/CostSummaryTab.vue'
+import AddProductModal    from '@/components/warehouse/AddProductModal.vue'
+import EditProductModal   from '@/components/warehouse/EditProductModal.vue'
 import EditWarehouseModal from '@/components/warehouse/EditWarehouseModal.vue'
 import type { StockItemDTO } from '@ob-inventory/types'
 
@@ -198,6 +223,7 @@ const { data: stockItems, isLoading, isFetching } = useQuery({
   queryFn:  () => getWarehouseStock(warehouseId.value),
 })
 
+const activeTab         = ref('stock')
 const search            = ref('')
 const showAddProduct    = ref(false)
 const showEditProduct   = ref(false)
@@ -279,7 +305,7 @@ const filteredStock = computed(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 /* ── Header ── */
@@ -513,6 +539,55 @@ const filteredStock = computed(() => {
 /* Skeleton card (mobile) */
 .skeleton-card {
   pointer-events: none;
+}
+
+/* ── Tabs layout ── */
+.stock-tabs {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.stock-tabs :deep(.p-tablist) {
+  flex-shrink: 0;
+  background: transparent;
+  border-bottom-color: transparent;
+}
+
+.stock-tabs :deep(.p-tab) {
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+.stock-tabs :deep(.p-tabpanels) {
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: transparent;
+}
+
+.stock-tabs :deep(.p-tabpanel) {
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Stock tab ── */
+.stock-tabs :deep(.tab-panel-stock) {
+  gap: 14px;
+  overflow: hidden;
+}
+
+/* ── Cost Summary tab ── */
+.stock-tabs :deep(.tab-panel-cost) {
+  overflow-y: scroll;
+  padding-bottom: 14px;
 }
 
 /* ── Desktop table ── */
