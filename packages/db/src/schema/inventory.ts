@@ -1,5 +1,5 @@
 import {
-  pgTable, uuid, text, boolean, integer, timestamp, pgEnum, primaryKey, check,
+  pgTable, uuid, text, boolean, integer, timestamp, date, pgEnum, primaryKey, check,
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 import { products } from './catalog.js'
@@ -44,6 +44,7 @@ export const inventoryStock = pgTable('inventory_stock', {
   warehouseId: uuid('warehouse_id').notNull().references(() => warehouses.id),
   boxNumber: text('box_number'),
   quantity: integer('quantity').notNull().default(0),
+  dateAdded: date('date_added', { mode: 'string' }),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => [
   primaryKey({ columns: [t.productId, t.warehouseId] }),

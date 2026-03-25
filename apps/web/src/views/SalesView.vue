@@ -74,6 +74,25 @@
       />
     </div>
 
+    <!-- Summary bar -->
+    <div class="summary-bar">
+      <span class="summary-count">
+        <i class="pi pi-list summary-icon" />
+        {{ filteredSales.length }} sale{{ filteredSales.length !== 1 ? 's' : '' }}
+      </span>
+      <span class="summary-sep">·</span>
+      <span class="summary-totals">
+        <template v-if="filteredTotals.length">
+          <span v-for="(t, i) in filteredTotals" :key="t.currency" class="summary-total">
+            <span v-if="i > 0" class="summary-currency-sep">+</span>
+            <span class="summary-amount">{{ t.amount }}</span>
+            <span class="summary-currency">{{ t.currency }}</span>
+          </span>
+        </template>
+        <span v-else class="summary-zero">—</span>
+      </span>
+    </div>
+
     <!-- Table -->
     <div class="table-card">
       <DataTable
@@ -129,6 +148,13 @@
         <Column field="invoiceStatusName" header="Invoice" style="width:130px; white-space:nowrap" sortable>
           <template #body="{ data }">
             <Tag v-if="data.invoiceStatusName" :value="data.invoiceStatusName" severity="info" style="white-space:nowrap" />
+            <span v-else class="no-value">—</span>
+          </template>
+        </Column>
+
+        <Column field="paymentMethodName" header="Payment" style="width:130px; white-space:nowrap" sortable>
+          <template #body="{ data }">
+            <span v-if="data.paymentMethodName" class="payment-method" style="white-space:nowrap">{{ data.paymentMethodName }}</span>
             <span v-else class="no-value">—</span>
           </template>
         </Column>
@@ -284,6 +310,21 @@ const filteredSales = computed(() => {
   return list
 })
 
+const filteredTotals = computed(() => {
+  const totals: Record<string, number> = {}
+  for (const s of filteredSales.value) {
+    if (!s.totalPrice) continue
+    const cur = s.currency ?? '₪'
+    totals[cur] = (totals[cur] ?? 0) + parseFloat(s.totalPrice)
+  }
+  return Object.entries(totals)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([currency, amount]) => ({
+      currency,
+      amount: amount.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+    }))
+})
+
 async function openDetail(sale: Sale) {
   selectedSale.value = null
   showDetail.value   = true
@@ -379,6 +420,42 @@ function statusSeverity(status: string) {
   background: rgba(255, 255, 255, 0.25);
 }
 
+/* ── Summary bar ── */
+.summary-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.summary-icon { font-size: 12px; color: #94a3b8; margin-right: 2px; }
+
+.summary-count { font-weight: 500; color: #64748b; display: flex; align-items: center; gap: 4px; }
+
+.summary-sep { color: #cbd5e1; }
+
+.summary-totals { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+.summary-total { display: inline-flex; align-items: baseline; gap: 3px; }
+
+.summary-amount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.summary-currency { font-size: 12px; font-weight: 600; color: #64748b; }
+
+.summary-currency-sep { color: #94a3b8; font-size: 12px; }
+
+.summary-zero { color: #94a3b8; }
+
 .table-card {
   flex: 1;
   background: var(--p-surface-card);
@@ -395,6 +472,7 @@ function statusSeverity(status: string) {
 .item-count { font-weight: 600; }
 .total-price { font-weight: 700; font-variant-numeric: tabular-nums; }
 .no-value { color: var(--p-text-muted-color); }
+.payment-method { font-size: 13px; color: #374151; }
 
 .empty-state {
   display: flex;

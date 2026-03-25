@@ -225,12 +225,13 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
         // ── Add to destination warehouse (upsert) ─────────────────────────
         await tx
           .insert(inventoryStock)
-          .values({ productId: item.productId, warehouseId: d.toWarehouseId, quantity: item.quantity })
+          .values({ productId: item.productId, warehouseId: d.toWarehouseId, quantity: item.quantity, dateAdded: sql`CURRENT_DATE` })
           .onConflictDoUpdate({
             target: [inventoryStock.productId, inventoryStock.warehouseId],
             set: {
               quantity:  sql`${inventoryStock.quantity} + ${item.quantity}`,
               updatedAt: sql`now()`,
+              // dateAdded intentionally not updated — keeps original arrival date
             },
           })
 
@@ -373,7 +374,7 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
         // TO warehouse
         await tx
           .insert(inventoryStock)
-          .values({ productId, warehouseId: transfer.toWarehouseId, quantity: Math.max(0, toDelta) })
+          .values({ productId, warehouseId: transfer.toWarehouseId, quantity: Math.max(0, toDelta), dateAdded: sql`CURRENT_DATE` })
           .onConflictDoUpdate({
             target: [inventoryStock.productId, inventoryStock.warehouseId],
             set: {

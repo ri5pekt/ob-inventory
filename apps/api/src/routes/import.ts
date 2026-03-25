@@ -362,10 +362,11 @@ async function runImport(job: ImportJob, csvBuffer: Buffer, warehouseId: string)
 
       // Stock (always create a row, even qty=0, so product appears in warehouse)
       await db.insert(inventoryStock)
-        .values({ productId: product.id, warehouseId, quantity: qty, boxNumber: boxNum })
+        .values({ productId: product.id, warehouseId, quantity: qty, boxNumber: boxNum, dateAdded: dateAdded ?? null })
         .onConflictDoUpdate({
           target: [inventoryStock.productId, inventoryStock.warehouseId],
           set: { quantity: qty, boxNumber: boxNum },
+          // dateAdded intentionally not updated on re-import — keeps original arrival date
         })
 
       if (qty > 0) {

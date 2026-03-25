@@ -112,7 +112,7 @@ export const warehouseProductRoutes: FastifyPluginAsync = async (fastify) => {
 
     await upsertAttributes(product.id, d)
 
-    await db.insert(inventoryStock).values({ productId: product.id, warehouseId, boxNumber: d.boxNumber ?? null, quantity: d.quantity })
+    await db.insert(inventoryStock).values({ productId: product.id, warehouseId, boxNumber: d.boxNumber ?? null, quantity: d.quantity, dateAdded: sql`CURRENT_DATE` })
 
     if (d.quantity > 0) {
       await db.insert(inventoryLedger).values({ productId: product.id, warehouseId, actionType: 'receive', quantityDelta: d.quantity, notes: 'Manual entry via UI' })
