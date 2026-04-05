@@ -2,9 +2,8 @@ import { env } from '../env.js'
 
 const BASE_URL = 'https://secure.cardcom.solutions/api/v11'
 
-// Always use test terminal until explicitly switched to production
-const API_NAME     = env.CARDCOM_TEST_API_NAME!
-const API_PASSWORD = env.CARDCOM_TEST_API_PASSWORD!
+const API_NAME     = env.CARDCOM_API_NAME!
+const API_PASSWORD = env.CARDCOM_API_PASSWORD!
 
 export type CardcomDocumentType =
   | 'TaxInvoiceAndReceipt'
