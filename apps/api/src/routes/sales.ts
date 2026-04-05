@@ -308,7 +308,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
             quantityDelta: -item.quantity,
             referenceId:   sale.id,
             referenceType: 'sale',
-            notes:         `Manual sale — ${d.saleType}`,
+            notes:         `Manual sale — ${d.saleType}${d.customerName ? ` — ${d.customerName}` : ''}`,
             createdBy:     userId,
           })
         }
@@ -437,7 +437,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
             quantityDelta: old.quantity,
             referenceId:   sale.id,
             referenceType: 'sale',
-            notes:         `Sale warehouse changed — stock restored to previous warehouse (${sale.saleType})`,
+            notes:         `Sale warehouse changed — stock restored to previous warehouse (${sale.saleType})${sale.customerName ? ` — ${sale.customerName}` : ''}`,
             createdBy:     userId,
           })
         }
@@ -457,7 +457,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
             quantityDelta: -item.quantity,
             referenceId:   sale.id,
             referenceType: 'sale',
-            notes:         `Sale warehouse changed — stock deducted from new warehouse (${sale.saleType})`,
+            notes:         `Sale warehouse changed — stock deducted from new warehouse (${sale.saleType})${sale.customerName ? ` — ${sale.customerName}` : ''}`,
             createdBy:     userId,
           })
         }
@@ -584,7 +584,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
             quantityDelta: delta,
             referenceId:   sale.id,
             referenceType: 'sale',
-            notes:         `Sale edited — stock ${delta > 0 ? 'restored' : 'adjusted'} (${sale.saleType})`,
+            notes:         `Sale edited — stock ${delta > 0 ? 'restored' : 'adjusted'} (${sale.saleType})${sale.customerName ? ` — ${sale.customerName}` : ''}`,
             createdBy:     userId,
           })
         }
