@@ -54,6 +54,12 @@
           <span class="meta-label">Invoice</span>
           <span class="meta-tag meta-tag-invoice">{{ sale.invoiceStatusName }}</span>
         </div>
+        <div v-if="sale.paymentMethods?.length" class="meta-row">
+          <span class="meta-label">Payment</span>
+          <div class="payment-chips">
+            <span v-for="m in sale.paymentMethods" :key="m.id" class="meta-tag meta-tag-payment">{{ m.name }}</span>
+          </div>
+        </div>
         <div v-if="sale.notes" class="meta-row">
           <span class="meta-label">Notes</span>
           <span>{{ sale.notes }}</span>
@@ -299,6 +305,9 @@ function formatDate(iso: string) {
 
 .meta-tag-target  { background: var(--p-violet-50, #f5f3ff); color: var(--p-violet-700, #6d28d9); }
 .meta-tag-invoice { background: var(--p-amber-50, #fffbeb);  color: var(--p-amber-700,  #b45309); }
+.meta-tag-payment { background: #f0fdf4; color: #15803d; }
+
+.payment-chips { display: flex; flex-wrap: wrap; gap: 4px; }
 
 .box-badge {
   display: inline-block;

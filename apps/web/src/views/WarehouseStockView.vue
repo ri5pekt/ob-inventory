@@ -35,6 +35,7 @@
       <TabList>
         <Tab value="stock">Stock</Tab>
         <Tab value="cost-summary">Cost Summary</Tab>
+        <Tab value="movements">Movements</Tab>
       </TabList>
 
       <TabPanels>
@@ -166,6 +167,11 @@
           <CostSummaryTab :stock-items="stockItems" />
         </TabPanel>
 
+        <!-- ── MOVEMENTS TAB ── -->
+        <TabPanel value="movements" class="tab-panel-movements">
+          <StockMovementsTab :warehouse-id="warehouseId" />
+        </TabPanel>
+
       </TabPanels>
     </Tabs>
 
@@ -206,6 +212,7 @@ import TabPanels from 'primevue/tabpanels'
 import { getWarehouses, getWarehouseStock } from '@/api/warehouses'
 import StockTable         from '@/components/warehouse/StockTable.vue'
 import CostSummaryTab     from '@/components/warehouse/CostSummaryTab.vue'
+import StockMovementsTab  from '@/components/warehouse/StockMovementsTab.vue'
 import AddProductModal    from '@/components/warehouse/AddProductModal.vue'
 import EditProductModal   from '@/components/warehouse/EditProductModal.vue'
 import EditWarehouseModal from '@/components/warehouse/EditWarehouseModal.vue'
@@ -587,6 +594,12 @@ const filteredStock = computed(() => {
 /* ── Cost Summary tab ── */
 .stock-tabs :deep(.tab-panel-cost) {
   overflow-y: scroll;
+  padding-bottom: 14px;
+}
+
+/* ── Movements tab ── */
+.stock-tabs :deep(.tab-panel-movements) {
+  overflow: hidden;
   padding-bottom: 14px;
 }
 

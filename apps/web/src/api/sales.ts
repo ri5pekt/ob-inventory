@@ -25,8 +25,7 @@ export interface Sale {
   targetName:        string | null
   invoiceStatusId:   string | null
   invoiceStatusName: string | null
-  paymentMethodId:   string | null
-  paymentMethodName: string | null
+  paymentMethods:    { id: string; name: string }[]
 }
 
 export interface SaleItem {
@@ -54,18 +53,18 @@ export interface CreateSaleItemInput {
 }
 
 export interface CreateSaleRequest {
-  saleType:         'direct' | 'partner'
-  warehouseId?:     string
-  customerName?:    string
-  customerEmail?:   string
-  customerPhone?:   string
-  customerAddress?: string
-  currency?:        string
-  notes?:           string
-  targetId?:        string
-  invoiceStatusId?: string
-  paymentMethodId?: string
-  items:            CreateSaleItemInput[]
+  saleType:          'direct' | 'partner'
+  warehouseId?:      string
+  customerName?:     string
+  customerEmail?:    string
+  customerPhone?:    string
+  customerAddress?:  string
+  currency?:         string
+  notes?:            string
+  targetId?:         string
+  invoiceStatusId?:  string
+  paymentMethodIds?: string[]
+  items:             CreateSaleItemInput[]
 }
 
 export async function getSales(params?: {
@@ -99,16 +98,17 @@ export interface UpdateSaleItemInput {
 }
 
 export interface UpdateSaleRequest {
-  customerName?:    string
-  customerEmail?:   string
-  customerPhone?:   string
-  customerAddress?: string
-  currency?:        string
-  notes?:           string
-  targetId?:        string | null
-  invoiceStatusId?: string | null
-  paymentMethodId?: string | null
-  items:            UpdateSaleItemInput[]
+  warehouseId?:      string
+  customerName?:     string
+  customerEmail?:    string
+  customerPhone?:    string
+  customerAddress?:  string
+  currency?:         string
+  notes?:            string
+  targetId?:         string | null
+  invoiceStatusId?:  string | null
+  paymentMethodIds?: string[] | null
+  items:             UpdateSaleItemInput[]
 }
 
 export async function updateSale(id: string, payload: UpdateSaleRequest): Promise<void> {

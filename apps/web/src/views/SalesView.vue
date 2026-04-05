@@ -10,87 +10,95 @@
         </div>
       </div>
       <div class="header-actions">
+        <button class="panels-toggle" :aria-label="panelsOpen ? 'Collapse filters' : 'Expand filters'" @click="panelsOpen = !panelsOpen">
+          <i :class="panelsOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" />
+        </button>
         <Button label="New Sale" icon="pi pi-plus" size="small" @click="showCreate = true" />
       </div>
     </div>
 
-    <SalePeriodStats @date-range-change="onDateRangeChange" />
+    <!-- Collapsible top panels (mobile: toggleable; desktop: always open) -->
+    <div class="collapsible-panels" :class="{ expanded: panelsOpen }">
+      <div class="collapsible-inner">
+        <SalePeriodStats @date-range-change="onDateRangeChange" />
 
-    <!-- Filter chips + search -->
-    <div class="filter-bar">
-      <div class="filter-chips">
-        <button
-          v-for="f in typeFilters"
-          :key="f.value ?? 'all'"
-          class="chip"
-          :class="{ active: activeFilter === f.value }"
-          @click="activeFilter = f.value"
-        >
-          <i :class="f.icon" class="chip-icon" />
-          {{ f.label }}
-          <span class="chip-count">{{ f.count }}</span>
-        </button>
-      </div>
-      <div class="filter-selects-row">
-        <Select
-          v-model="filterTarget"
-          :options="filterTargetOptions"
-          option-label="name"
-          option-value="id"
-          placeholder="All Targets"
-          show-clear
-          size="small"
-          class="filter-select"
-          append-to="body"
-        />
-        <Select
-          v-model="filterInvoiceStatus"
-          :options="filterInvoiceOptions"
-          option-label="name"
-          option-value="id"
-          placeholder="All Invoice Statuses"
-          show-clear
-          size="small"
-          class="filter-select"
-          append-to="body"
-        />
-        <Select
-          v-model="filterPaymentMethod"
-          :options="filterPaymentOptions"
-          option-label="name"
-          option-value="id"
-          placeholder="All Payment Methods"
-          show-clear
-          size="small"
-          class="filter-select"
-          append-to="body"
-        />
-      </div>
-      <InputText
-        v-model="search"
-        placeholder="Search customer, SKU, order…"
-        size="small"
-        class="filter-search"
-      />
-    </div>
+        <!-- Filter chips + search -->
+        <div class="filter-bar">
+          <div class="filter-chips">
+            <button
+              v-for="f in typeFilters"
+              :key="f.value ?? 'all'"
+              class="chip"
+              :class="{ active: activeFilter === f.value }"
+              @click="activeFilter = f.value"
+            >
+              <i :class="f.icon" class="chip-icon" />
+              {{ f.label }}
+              <span class="chip-count">{{ f.count }}</span>
+            </button>
+          </div>
+          <div class="filter-selects-row">
+            <Select
+              v-model="filterTarget"
+              :options="filterTargetOptions"
+              option-label="name"
+              option-value="id"
+              placeholder="All Targets"
+              show-clear
+              size="small"
+              class="filter-select"
+              append-to="body"
+            />
+            <Select
+              v-model="filterInvoiceStatus"
+              :options="filterInvoiceOptions"
+              option-label="name"
+              option-value="id"
+              placeholder="All Invoice Statuses"
+              show-clear
+              size="small"
+              class="filter-select"
+              append-to="body"
+            />
+            <Select
+              v-model="filterPaymentMethod"
+              :options="filterPaymentOptions"
+              option-label="name"
+              option-value="id"
+              placeholder="All Payment Methods"
+              show-clear
+              size="small"
+              class="filter-select"
+              append-to="body"
+            />
+          </div>
+          <InputText
+            v-model="search"
+            placeholder="Search customer, SKU, order…"
+            size="small"
+            class="filter-search"
+          />
+        </div>
 
-    <!-- Summary bar -->
-    <div class="summary-bar">
-      <span class="summary-count">
-        <i class="pi pi-list summary-icon" />
-        {{ filteredSales.length }} sale{{ filteredSales.length !== 1 ? 's' : '' }}
-      </span>
-      <span class="summary-sep">·</span>
-      <span class="summary-totals">
-        <template v-if="filteredTotals.length">
-          <span v-for="(t, i) in filteredTotals" :key="t.currency" class="summary-total">
-            <span v-if="i > 0" class="summary-currency-sep">+</span>
-            <span class="summary-amount">{{ t.amount }}</span>
-            <span class="summary-currency">{{ t.currency }}</span>
+        <!-- Summary bar -->
+        <div class="summary-bar">
+          <span class="summary-count">
+            <i class="pi pi-list summary-icon" />
+            {{ filteredSales.length }} sale{{ filteredSales.length !== 1 ? 's' : '' }}
           </span>
-        </template>
-        <span v-else class="summary-zero">—</span>
-      </span>
+          <span class="summary-sep">·</span>
+          <span class="summary-totals">
+            <template v-if="filteredTotals.length">
+              <span v-for="(t, i) in filteredTotals" :key="t.currency" class="summary-total">
+                <span v-if="i > 0" class="summary-currency-sep">+</span>
+                <span class="summary-amount">{{ t.amount }}</span>
+                <span class="summary-currency">{{ t.currency }}</span>
+              </span>
+            </template>
+            <span v-else class="summary-zero">—</span>
+          </span>
+        </div>
+      </div>
     </div>
 
     <!-- Table -->
@@ -152,9 +160,11 @@
           </template>
         </Column>
 
-        <Column field="paymentMethodName" header="Payment" style="width:130px; white-space:nowrap" sortable>
+        <Column field="paymentMethods" header="Payment" style="width:150px">
           <template #body="{ data }">
-            <span v-if="data.paymentMethodName" class="payment-method" style="white-space:nowrap">{{ data.paymentMethodName }}</span>
+            <div v-if="data.paymentMethods?.length" class="payment-methods">
+              <span v-for="m in data.paymentMethods" :key="m.id" class="payment-method">{{ m.name }}</span>
+            </div>
             <span v-else class="no-value">—</span>
           </template>
         </Column>
@@ -218,6 +228,9 @@ import SalePeriodStats from '@/components/sales/SalePeriodStats.vue'
 import SaleDetailDialog from '@/components/sales/SaleDetailDialog.vue'
 import CreateSaleModal from '@/components/sales/CreateSaleModal.vue'
 import EditSaleModal from '@/components/sales/EditSaleModal.vue'
+
+// ── Collapsible panels toggle (mobile) ───────────────────────────────────────
+const panelsOpen = ref(true)
 
 // ── Date range (driven by SalePeriodStats) ────────────────────────────────────
 const dateRange = ref<{ from: string; to: string } | null>(null)
@@ -297,7 +310,7 @@ const filteredSales = computed(() => {
   if (activeFilter.value)        list = list.filter(s => s.saleType === activeFilter.value)
   if (filterTarget.value)        list = list.filter(s => s.targetId === filterTarget.value)
   if (filterInvoiceStatus.value) list = list.filter(s => s.invoiceStatusId === filterInvoiceStatus.value)
-  if (filterPaymentMethod.value) list = list.filter(s => s.paymentMethodId === filterPaymentMethod.value)
+  if (filterPaymentMethod.value) list = list.filter(s => s.paymentMethods?.some(m => m.id === filterPaymentMethod.value))
   const q = search.value.trim().toLowerCase()
   if (q) {
     list = list.filter(s =>
@@ -372,11 +385,46 @@ function statusSeverity(status: string) {
 }
 
 .header-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
 
 .header-icon { font-size: 26px; color: var(--p-primary-color); }
 
 .view-title    { margin: 0; font-size: 22px; font-weight: 700; }
 .view-subtitle { font-size: 13px; color: var(--p-text-muted-color); }
+
+/* Toggle button */
+.panels-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 8px;
+  background: var(--p-surface-card);
+  color: var(--p-text-muted-color);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.panels-toggle:hover { background: var(--p-surface-hover); color: var(--p-primary-color); }
+
+/* Collapsible panels — same grid trick on all screen sizes */
+.collapsible-panels {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease;
+}
+.collapsible-panels.expanded {
+  grid-template-rows: 1fr;
+}
+.collapsible-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+  min-height: 0;
+}
 
 .filter-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -472,7 +520,8 @@ function statusSeverity(status: string) {
 .item-count { font-weight: 600; }
 .total-price { font-weight: 700; font-variant-numeric: tabular-nums; }
 .no-value { color: var(--p-text-muted-color); }
-.payment-method { font-size: 13px; color: #374151; }
+.payment-methods { display: flex; flex-wrap: wrap; gap: 3px; }
+.payment-method  { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #f0fdf4; color: #15803d; white-space: nowrap; }
 
 .empty-state {
   display: flex;

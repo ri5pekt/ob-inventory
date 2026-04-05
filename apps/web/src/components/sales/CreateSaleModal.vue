@@ -99,11 +99,11 @@
         </div>
         <div class="field">
           <label>Payment Method</label>
-          <SaleMetaSelect
-            v-model="form.paymentMethodId"
+          <SaleMetaMultiSelect
+            v-model="form.paymentMethodIds"
             :options="paymentMethods"
             label="Payment Method"
-            placeholder="Select method…"
+            placeholder="Select method(s)…"
             :loading="loadingMeta"
             :create-fn="createSalePaymentMethod"
             @created="paymentMethods.push($event)"
@@ -314,7 +314,8 @@ import { getSaleTargets, getSaleInvoiceStatuses, getSalePaymentMethods, createSa
 import { type ProductSearchResult } from '@/api/transfers'
 import type { WarehouseDTO } from '@ob-inventory/types'
 import ProductSearchInput from '@/components/transfers/ProductSearchInput.vue'
-import SaleMetaSelect from './SaleMetaSelect.vue'
+import SaleMetaSelect      from './SaleMetaSelect.vue'
+import SaleMetaMultiSelect from './SaleMetaMultiSelect.vue'
 
 const props = defineProps<{ modelValue: boolean }>()
 const emit  = defineEmits<{
@@ -387,7 +388,7 @@ const defaultForm = () => ({
   notes:            '',
   targetId:         null as string | null,
   invoiceStatusId:  null as string | null,
-  paymentMethodId:  null as string | null,
+  paymentMethodIds: [] as string[],
   items:            [] as SaleItemRow[],
 })
 
@@ -424,6 +425,7 @@ const canSubmit = computed(() => {
 })
 
 function onTypeChange(type: 'direct' | 'partner') {
+  if (form.value.saleType === type) return   // already selected — don't reset
   form.value.saleType    = type
   form.value.warehouseId = null
   form.value.items       = []
@@ -494,7 +496,7 @@ async function submit() {
       notes:            form.value.notes.trim()            || undefined,
       targetId:         form.value.targetId        ?? undefined,
       invoiceStatusId:  form.value.invoiceStatusId ?? undefined,
-      paymentMethodId:  form.value.paymentMethodId ?? undefined,
+      paymentMethodIds: form.value.paymentMethodIds.length ? form.value.paymentMethodIds : undefined,
       items,
     })
 

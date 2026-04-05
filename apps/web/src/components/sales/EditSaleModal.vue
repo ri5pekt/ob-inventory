@@ -10,7 +10,7 @@
   >
     <div class="edit-sale-form">
 
-      <!-- Sale type + warehouse (read-only) -->
+      <!-- Sale type + warehouse -->
       <div class="form-row form-row-meta">
         <div class="field">
           <label>Sale Type</label>
@@ -21,7 +21,16 @@
         </div>
         <div class="field">
           <label>Warehouse</label>
-          <div class="meta-badge meta-badge-wh">{{ sale?.warehouseName ?? '—' }}</div>
+          <Select
+            v-model="form.warehouseId"
+            :options="warehouseList"
+            option-label="name"
+            option-value="id"
+            placeholder="Select warehouse…"
+            :loading="loadingWarehouses"
+            fluid
+            append-to="body"
+          />
         </div>
       </div>
 
@@ -77,11 +86,11 @@
         </div>
         <div class="field">
           <label>Payment Method</label>
-          <SaleMetaSelect
-            v-model="form.paymentMethodId"
+          <SaleMetaMultiSelect
+            v-model="form.paymentMethodIds"
             :options="paymentMethods"
             label="Payment Method"
-            placeholder="Select method…"
+            placeholder="Select method(s)…"
             :loading="loadingMeta"
             :create-fn="createSalePaymentMethod"
             @created="paymentMethods.push($event)"
@@ -91,7 +100,7 @@
 
       <!-- Product search -->
       <ProductSearchInput
-        :warehouse-id="sale?.warehouseId ?? null"
+        :warehouse-id="form.warehouseId"
         :added-ids="addedProductIds"
         @select="addItem"
       />
@@ -204,9 +213,12 @@
 import { ref, computed, watch } from 'vue'
 import { updateSale, type SaleDetail } from '@/api/sales'
 import { getSaleTargets, getSaleInvoiceStatuses, getSalePaymentMethods, createSaleTarget, createSaleInvoiceStatus, createSalePaymentMethod, type SaleMetaItem } from '@/api/saleMeta'
+import { getWarehouses } from '@/api/warehouses'
 import { type ProductSearchResult } from '@/api/transfers'
-import ProductSearchInput from '@/components/transfers/ProductSearchInput.vue'
-import SaleMetaSelect from './SaleMetaSelect.vue'
+import type { WarehouseDTO } from '@ob-inventory/types'
+import ProductSearchInput    from '@/components/transfers/ProductSearchInput.vue'
+import SaleMetaSelect        from './SaleMetaSelect.vue'
+import SaleMetaMultiSelect   from './SaleMetaMultiSelect.vue'
 
 const props = defineProps<{ modelValue: boolean; sale: SaleDetail | null }>()
 const emit  = defineEmits<{
@@ -234,7 +246,11 @@ const invoiceStatuses = ref<SaleMetaItem[]>([])
 const paymentMethods  = ref<SaleMetaItem[]>([])
 const loadingMeta     = ref(false)
 
+const warehouseList    = ref<WarehouseDTO[]>([])
+const loadingWarehouses = ref(false)
+
 const defaultForm = () => ({
+  warehouseId:     null as string | null,
   customerName:    '',
   customerEmail:   '',
   customerPhone:   '',
@@ -243,7 +259,7 @@ const defaultForm = () => ({
   notes:           '',
   targetId:        null as string | null,
   invoiceStatusId: null as string | null,
-  paymentMethodId: null as string | null,
+  paymentMethodIds: [] as string[],
   items:           [] as SaleItemRow[],
 })
 
@@ -252,19 +268,33 @@ const submitting        = ref(false)
 const error             = ref<string | null>(null)
 const insufficientItems = ref<{ sku: string; requested: number; available: number }[]>([])
 
-// Load meta options once
+// Load meta options + warehouses once
 watch(() => props.modelValue, async (open) => {
   if (!open) return
+  const promises: Promise<unknown>[] = []
   if (targets.value.length === 0 && invoiceStatuses.value.length === 0 && paymentMethods.value.length === 0) {
     loadingMeta.value = true
-    try { [targets.value, invoiceStatuses.value, paymentMethods.value] = await Promise.all([getSaleTargets(), getSaleInvoiceStatuses(), getSalePaymentMethods()]) }
-    finally { loadingMeta.value = false }
+    promises.push(
+      Promise.all([getSaleTargets(), getSaleInvoiceStatuses(), getSalePaymentMethods()])
+        .then(([t, s, p]) => { targets.value = t; invoiceStatuses.value = s; paymentMethods.value = p })
+        .finally(() => { loadingMeta.value = false }),
+    )
   }
+  if (warehouseList.value.length === 0) {
+    loadingWarehouses.value = true
+    promises.push(
+      getWarehouses()
+        .then(ws => { warehouseList.value = ws })
+        .finally(() => { loadingWarehouses.value = false }),
+    )
+  }
+  await Promise.all(promises)
 })
 
 // Pre-fill when modal opens with a sale
 watch(() => props.sale, (sale) => {
   if (!sale) return
+  form.value.warehouseId     = sale.warehouseId     ?? null
   form.value.customerName    = sale.customerName    ?? ''
   form.value.customerEmail   = sale.customerEmail   ?? ''
   form.value.customerPhone   = sale.customerPhone   ?? ''
@@ -273,7 +303,7 @@ watch(() => props.sale, (sale) => {
   form.value.notes           = sale.notes           ?? ''
   form.value.targetId        = sale.targetId        ?? null
   form.value.invoiceStatusId = sale.invoiceStatusId ?? null
-  form.value.paymentMethodId = sale.paymentMethodId ?? null
+  form.value.paymentMethodIds = sale.paymentMethods?.map(m => m.id) ?? []
   form.value.items = (sale.items ?? []).map(item => ({
     productId: item.productId,
     sku:       item.sku,
@@ -282,6 +312,11 @@ watch(() => props.sale, (sale) => {
     unitPrice: item.unitPrice ? parseFloat(item.unitPrice) : null,
   }))
 }, { immediate: true })
+
+function onWarehouseChange() {
+  // Keep existing items — backend validates stock in the new warehouse
+  // and returns INSUFFICIENT_STOCK if any item isn't available there
+}
 
 const addedProductIds = computed(() => form.value.items.map(i => i.productId).filter(Boolean) as string[])
 
@@ -332,6 +367,7 @@ async function submit() {
   submitting.value = true
   try {
     await updateSale(props.sale.id, {
+      warehouseId:     form.value.warehouseId     ?? undefined,
       customerName:    form.value.customerName.trim()    || undefined,
       customerEmail:   form.value.customerEmail.trim()   || undefined,
       customerPhone:   form.value.customerPhone.trim()   || undefined,
@@ -340,7 +376,7 @@ async function submit() {
       notes:           form.value.notes.trim()           || undefined,
       targetId:        form.value.targetId,
       invoiceStatusId: form.value.invoiceStatusId,
-      paymentMethodId: form.value.paymentMethodId,
+      paymentMethodIds: form.value.paymentMethodIds,
       items: form.value.items.map(i => ({
         productId: i.productId ?? undefined,
         sku:       i.sku,

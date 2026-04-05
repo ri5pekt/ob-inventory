@@ -42,10 +42,15 @@ export const sales = pgTable('sales', {
   notes: text('notes'),
   targetId:          uuid('target_id').references(() => saleTargets.id),
   invoiceStatusId:   uuid('invoice_status_id').references(() => saleInvoiceStatuses.id),
-  paymentMethodId:   uuid('payment_method_id').references(() => salePaymentMethods.id),
   createdBy: uuid('created_by').references(() => users.id),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull().$onUpdate(() => new Date()),
+})
+
+export const salePaymentMethodLinks = pgTable('sale_payment_method_links', {
+  id:              uuid('id').primaryKey().defaultRandom(),
+  saleId:          uuid('sale_id').notNull().references(() => sales.id, { onDelete: 'cascade' }),
+  paymentMethodId: uuid('payment_method_id').notNull().references(() => salePaymentMethods.id, { onDelete: 'cascade' }),
 })
 
 export const saleItems = pgTable('sale_items', {

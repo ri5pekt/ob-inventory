@@ -14,6 +14,7 @@ import {
   saleTargets,
   saleInvoiceStatuses,
   salePaymentMethods,
+  salePaymentMethodLinks,
 } from '@ob-inventory/db'
 
 export const salesRoutes: FastifyPluginAsync = async (fastify) => {
@@ -57,8 +58,6 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         targetName:         saleTargets.name,
         invoiceStatusId:    sales.invoiceStatusId,
         invoiceStatusName:  saleInvoiceStatuses.name,
-        paymentMethodId:    sales.paymentMethodId,
-        paymentMethodName:  salePaymentMethods.name,
         itemCount:          sql<number>`coalesce(sum(${saleItems.quantity}), 0)`,
       })
       .from(sales)
@@ -67,14 +66,28 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       .leftJoin(saleItems, eq(sales.id, saleItems.saleId))
       .leftJoin(saleTargets, eq(sales.targetId, saleTargets.id))
       .leftJoin(saleInvoiceStatuses, eq(sales.invoiceStatusId, saleInvoiceStatuses.id))
-      .leftJoin(salePaymentMethods, eq(sales.paymentMethodId, salePaymentMethods.id))
       .where(filters.length > 0 ? and(...filters) : undefined)
-      .groupBy(sales.id, warehouses.name, stores.name, saleTargets.name, saleInvoiceStatuses.name, salePaymentMethods.name)
+      .groupBy(sales.id, warehouses.name, stores.name, saleTargets.name, saleInvoiceStatuses.name)
       .orderBy(desc(sales.createdAt))
       .limit(q.limit)
       .offset(q.offset)
 
-    return rows
+    const saleIds = rows.map(r => r.id)
+    const paymentLinks = saleIds.length > 0
+      ? await db
+          .select({ saleId: salePaymentMethodLinks.saleId, id: salePaymentMethods.id, name: salePaymentMethods.name })
+          .from(salePaymentMethodLinks)
+          .leftJoin(salePaymentMethods, eq(salePaymentMethodLinks.paymentMethodId, salePaymentMethods.id))
+          .where(inArray(salePaymentMethodLinks.saleId, saleIds))
+      : []
+
+    const paymentsBySaleId = new Map<string, { id: string; name: string }[]>()
+    for (const link of paymentLinks) {
+      if (!paymentsBySaleId.has(link.saleId)) paymentsBySaleId.set(link.saleId, [])
+      if (link.id && link.name) paymentsBySaleId.get(link.saleId)!.push({ id: link.id, name: link.name })
+    }
+
+    return rows.map(r => ({ ...r, paymentMethods: paymentsBySaleId.get(r.id) ?? [] }))
   })
 
   // ── Get single sale with items ─────────────────────────────────────────────
@@ -102,18 +115,22 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         targetName:        saleTargets.name,
         invoiceStatusId:   sales.invoiceStatusId,
         invoiceStatusName: saleInvoiceStatuses.name,
-        paymentMethodId:   sales.paymentMethodId,
-        paymentMethodName: salePaymentMethods.name,
       })
       .from(sales)
       .leftJoin(warehouses, eq(sales.warehouseId, warehouses.id))
       .leftJoin(stores, eq(sales.storeId, stores.id))
       .leftJoin(saleTargets, eq(sales.targetId, saleTargets.id))
       .leftJoin(saleInvoiceStatuses, eq(sales.invoiceStatusId, saleInvoiceStatuses.id))
-      .leftJoin(salePaymentMethods, eq(sales.paymentMethodId, salePaymentMethods.id))
       .where(eq(sales.id, request.params.id))
 
     if (!sale) return reply.status(404).send({ error: 'Sale not found' })
+
+    const paymentMethodRows = await db
+      .select({ id: salePaymentMethods.id, name: salePaymentMethods.name })
+      .from(salePaymentMethodLinks)
+      .leftJoin(salePaymentMethods, eq(salePaymentMethodLinks.paymentMethodId, salePaymentMethods.id))
+      .where(eq(salePaymentMethodLinks.saleId, sale.id))
+    const paymentMethods = paymentMethodRows.filter((r): r is { id: string; name: string } => r.id != null && r.name != null)
 
     const items = await db
       .select({
@@ -138,7 +155,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       .where(eq(saleItems.saleId, request.params.id))
       .orderBy(saleItems.sku)
 
-    return { ...sale, items }
+    return { ...sale, paymentMethods, items }
   })
 
   // ── Create manual sale (direct / partner) ──────────────────────────────────
@@ -152,9 +169,9 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       customerAddress: z.string().optional(),
       currency:        z.string().default('ILS'),
       notes:           z.string().optional(),
-      targetId:         z.string().uuid().optional(),
-      invoiceStatusId:  z.string().uuid().optional(),
-      paymentMethodId:  z.string().uuid().optional(),
+      targetId:          z.string().uuid().optional(),
+      invoiceStatusId:   z.string().uuid().optional(),
+      paymentMethodIds:  z.array(z.string().uuid()).optional(),
       items: z.array(z.object({
         sku:       z.string().min(1),
         name:      z.string().min(1),
@@ -174,9 +191,10 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
     }
     const d = parsed.data
 
-    // Resolve warehouse
+    // Resolve warehouse — if no warehouseId provided, fall back to main warehouse.
+    // A provided warehouseId is used as-is for both direct and partner sales.
     let warehouseId = d.warehouseId
-    if (!warehouseId || d.saleType === 'direct') {
+    if (!warehouseId) {
       const [main] = await db.select().from(warehouses).where(eq(warehouses.type, 'main'))
       if (!main) return reply.status(500).send({ error: 'No main warehouse configured' })
       warehouseId = main.id
@@ -247,9 +265,14 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         notes:           d.notes            ?? null,
         targetId:        d.targetId         ?? null,
         invoiceStatusId: d.invoiceStatusId  ?? null,
-        paymentMethodId: d.paymentMethodId  ?? null,
         createdBy:       userId,
       }).returning()
+
+      if (d.paymentMethodIds?.length) {
+        await tx.insert(salePaymentMethodLinks).values(
+          d.paymentMethodIds.map(methodId => ({ saleId: sale.id, paymentMethodId: methodId })),
+        )
+      }
 
       const itemsToInsert: typeof saleItems.$inferInsert[] = []
 
@@ -316,15 +339,16 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
   // ── Edit sale ──────────────────────────────────────────────────────────────
   fastify.put<{ Params: { id: string } }>('/api/sales/:id', auth, async (request, reply) => {
     const bodySchema = z.object({
+      warehouseId:     z.string().uuid().optional(),
       customerName:    z.string().optional(),
       customerEmail:   z.string().optional(),
       customerPhone:   z.string().optional(),
       customerAddress: z.string().optional(),
       currency:        z.string().optional(),
       notes:           z.string().optional(),
-      targetId:        z.string().uuid().nullable().optional(),
-      invoiceStatusId: z.string().uuid().nullable().optional(),
-      paymentMethodId: z.string().uuid().nullable().optional(),
+      targetId:         z.string().uuid().nullable().optional(),
+      invoiceStatusId:  z.string().uuid().nullable().optional(),
+      paymentMethodIds: z.array(z.string().uuid()).nullable().optional(),
       items: z.array(z.object({
         productId: z.string().uuid().optional(),
         sku:       z.string().min(1),
@@ -347,6 +371,15 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
     const jwtPayload = (request as { user?: { sub?: string } }).user
     const userId = jwtPayload?.sub ?? null
 
+    // Determine target warehouse (may differ from current)
+    const targetWarehouseId   = d.warehouseId ?? sale.warehouseId
+    const warehouseIsChanging = d.warehouseId != null && d.warehouseId !== sale.warehouseId
+
+    if (warehouseIsChanging) {
+      const [newWh] = await db.select({ id: warehouses.id }).from(warehouses).where(eq(warehouses.id, targetWarehouseId))
+      if (!newWh) return reply.status(404).send({ error: 'Target warehouse not found' })
+    }
+
     // Load current items
     const oldItems = await db.select().from(saleItems).where(eq(saleItems.saleId, sale.id))
 
@@ -358,120 +391,266 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       .where(inArray(products.sku, newSkus))
     const productBySku = new Map(foundProducts.map(p => [p.sku, p]))
 
-    // Build stock delta map: productId -> net change (positive = restore, negative = deduct)
-    const stockDeltas = new Map<string, number>()
-    for (const old of oldItems) {
-      if (old.productId) stockDeltas.set(old.productId, (stockDeltas.get(old.productId) ?? 0) + old.quantity)
-    }
-    for (const item of d.items) {
-      const product = productBySku.get(item.sku)
-      if (product) stockDeltas.set(product.id, (stockDeltas.get(product.id) ?? 0) - item.quantity)
-    }
-
-    // Validate stock for items that need more than what's available
-    const productIds = [...stockDeltas.keys()]
-    const stockRows = productIds.length > 0
-      ? await db
-          .select({ productId: inventoryStock.productId, quantity: inventoryStock.quantity })
-          .from(inventoryStock)
-          .where(and(inArray(inventoryStock.productId, productIds), eq(inventoryStock.warehouseId, sale.warehouseId)))
-      : []
-    const stockByProductId = new Map(stockRows.map(s => [s.productId, s.quantity]))
-
-    const insufficientItems: { sku: string; requested: number; available: number }[] = []
-    for (const item of d.items) {
-      const product = productBySku.get(item.sku)
-      if (product) {
-        const currentStock = stockByProductId.get(product.id) ?? 0
-        const oldQty       = oldItems.find(o => o.productId === product.id)?.quantity ?? 0
-        const effectiveAvailable = currentStock + oldQty
-        if (item.quantity > effectiveAvailable) {
-          insufficientItems.push({ sku: item.sku, requested: item.quantity, available: effectiveAvailable })
-        }
-      }
-    }
-    if (insufficientItems.length > 0) {
-      return reply.status(422).send({ error: 'Insufficient stock', code: 'INSUFFICIENT_STOCK', items: insufficientItems })
-    }
-
     const totalPrice = d.items.reduce((sum, item) => {
       const lt = item.lineTotal ?? (item.unitPrice != null ? item.unitPrice * item.quantity : null)
       return lt != null ? sum + lt : sum
     }, 0)
 
-    await db.transaction(async (tx) => {
-      // Apply stock deltas + ledger entries
-      for (const [productId, delta] of stockDeltas.entries()) {
-        if (delta === 0) continue
-        await tx
-          .update(inventoryStock)
-          .set({ quantity: sql`${inventoryStock.quantity} + ${delta}`, updatedAt: sql`now()` })
-          .where(and(eq(inventoryStock.productId, productId), eq(inventoryStock.warehouseId, sale.warehouseId)))
+    if (warehouseIsChanging) {
+      // ── Warehouse migration path ─────────────────────────────────────────
+      // Validate: new warehouse must have enough stock for ALL new items
+      const newItemProductIds = d.items.map(i => productBySku.get(i.sku)?.id).filter((id): id is string => !!id)
+      const newStockRows = newItemProductIds.length > 0
+        ? await db
+            .select({ productId: inventoryStock.productId, quantity: inventoryStock.quantity })
+            .from(inventoryStock)
+            .where(and(inArray(inventoryStock.productId, newItemProductIds), eq(inventoryStock.warehouseId, targetWarehouseId)))
+        : []
+      const newStockByProductId = new Map(newStockRows.map(s => [s.productId, s.quantity]))
 
-        await tx.insert(inventoryLedger).values({
-          productId,
-          warehouseId:   sale.warehouseId,
-          actionType:    delta > 0 ? 'return' : 'sale',
-          quantityDelta: delta,
-          referenceId:   sale.id,
-          referenceType: 'sale',
-          notes:         `Sale edited — stock ${delta > 0 ? 'restored' : 'adjusted'} (${sale.saleType})`,
-          createdBy:     userId,
-        })
+      const insufficientItems: { sku: string; requested: number; available: number }[] = []
+      for (const item of d.items) {
+        const product = productBySku.get(item.sku)
+        if (product) {
+          const available = newStockByProductId.get(product.id) ?? 0
+          if (item.quantity > available) {
+            insufficientItems.push({ sku: item.sku, requested: item.quantity, available })
+          }
+        }
+      }
+      if (insufficientItems.length > 0) {
+        return reply.status(422).send({ error: 'Insufficient stock', code: 'INSUFFICIENT_STOCK', items: insufficientItems })
       }
 
-      // Replace sale items
-      await tx.delete(saleItems).where(eq(saleItems.saleId, sale.id))
-      await tx.insert(saleItems).values(
-        d.items.map(item => {
+      await db.transaction(async (tx) => {
+        // 1. Restore all old items back to the old warehouse
+        for (const old of oldItems) {
+          if (!old.productId) continue
+          await tx
+            .update(inventoryStock)
+            .set({ quantity: sql`${inventoryStock.quantity} + ${old.quantity}`, updatedAt: sql`now()` })
+            .where(and(eq(inventoryStock.productId, old.productId), eq(inventoryStock.warehouseId, sale.warehouseId)))
+          await tx.insert(inventoryLedger).values({
+            productId:     old.productId,
+            warehouseId:   sale.warehouseId,
+            actionType:    'return',
+            quantityDelta: old.quantity,
+            referenceId:   sale.id,
+            referenceType: 'sale',
+            notes:         `Sale warehouse changed — stock restored to previous warehouse (${sale.saleType})`,
+            createdBy:     userId,
+          })
+        }
+
+        // 2. Deduct all new items from the new warehouse
+        for (const item of d.items) {
           const product = productBySku.get(item.sku)
-          const lt: string | null = item.lineTotal != null
-            ? String(item.lineTotal)
-            : item.unitPrice != null ? String(item.unitPrice * item.quantity) : null
-          return {
-            saleId:    sale.id,
-            productId: product?.id ?? null,
-            sku:       item.sku,
-            name:      item.name,
-            quantity:  item.quantity,
-            unitPrice: item.unitPrice != null ? String(item.unitPrice) : null,
-            lineTotal: lt,
+          if (!product) continue
+          await tx
+            .update(inventoryStock)
+            .set({ quantity: sql`${inventoryStock.quantity} - ${item.quantity}`, updatedAt: sql`now()` })
+            .where(and(eq(inventoryStock.productId, product.id), eq(inventoryStock.warehouseId, targetWarehouseId)))
+          await tx.insert(inventoryLedger).values({
+            productId:     product.id,
+            warehouseId:   targetWarehouseId,
+            actionType:    'sale',
+            quantityDelta: -item.quantity,
+            referenceId:   sale.id,
+            referenceType: 'sale',
+            notes:         `Sale warehouse changed — stock deducted from new warehouse (${sale.saleType})`,
+            createdBy:     userId,
+          })
+        }
+
+        // 3. Replace sale items
+        await tx.delete(saleItems).where(eq(saleItems.saleId, sale.id))
+        await tx.insert(saleItems).values(
+          d.items.map(item => {
+            const product = productBySku.get(item.sku)
+            const lt: string | null = item.lineTotal != null
+              ? String(item.lineTotal)
+              : item.unitPrice != null ? String(item.unitPrice * item.quantity) : null
+            return {
+              saleId:    sale.id,
+              productId: product?.id ?? null,
+              sku:       item.sku,
+              name:      item.name,
+              quantity:  item.quantity,
+              unitPrice: item.unitPrice != null ? String(item.unitPrice) : null,
+              lineTotal: lt,
+            }
+          }),
+        )
+
+        // 4. Update sale metadata + new warehouseId
+        await tx
+          .update(sales)
+          .set({
+            warehouseId:     targetWarehouseId,
+            customerName:    d.customerName    ?? null,
+            customerEmail:   d.customerEmail   ?? null,
+            customerPhone:   d.customerPhone   ?? null,
+            customerAddress: d.customerAddress ?? null,
+            currency:        d.currency        ?? sale.currency,
+            notes:           d.notes           ?? null,
+            totalPrice:      totalPrice > 0 ? String(totalPrice) : null,
+            targetId:        d.targetId        !== undefined ? d.targetId        : sale.targetId,
+            invoiceStatusId: d.invoiceStatusId !== undefined ? d.invoiceStatusId : sale.invoiceStatusId,
+          })
+          .where(eq(sales.id, sale.id))
+
+        // 5. Replace payment method links if provided
+        if (d.paymentMethodIds !== undefined) {
+          await tx.delete(salePaymentMethodLinks).where(eq(salePaymentMethodLinks.saleId, sale.id))
+          if (d.paymentMethodIds?.length) {
+            await tx.insert(salePaymentMethodLinks).values(
+              d.paymentMethodIds.map(methodId => ({ saleId: sale.id, paymentMethodId: methodId })),
+            )
           }
-        }),
-      )
+        }
+      })
 
-      // Update sale metadata
-      await tx
-        .update(sales)
-        .set({
-          customerName:    d.customerName    ?? null,
-          customerEmail:   d.customerEmail   ?? null,
-          customerPhone:   d.customerPhone   ?? null,
-          customerAddress: d.customerAddress ?? null,
-          currency:        d.currency        ?? sale.currency,
-          notes:           d.notes           ?? null,
-          totalPrice:      totalPrice > 0 ? String(totalPrice) : null,
-          targetId:        d.targetId        !== undefined ? d.targetId        : sale.targetId,
-          invoiceStatusId: d.invoiceStatusId !== undefined ? d.invoiceStatusId : sale.invoiceStatusId,
-          paymentMethodId: d.paymentMethodId !== undefined ? d.paymentMethodId : sale.paymentMethodId,
-        })
-        .where(eq(sales.id, sale.id))
-    })
-
-    // Trigger Woo sync for all affected products
-    const [wh] = await db.select({ type: warehouses.type }).from(warehouses).where(eq(warehouses.id, sale.warehouseId))
-    if (wh?.type === 'main') {
-      const affectedIds = [
+      // Woo sync — trigger for affected products in both old and new warehouses if either is main
+      const allAffectedIds = [
         ...new Set([
           ...oldItems.map(i => i.productId).filter(Boolean) as string[],
           ...d.items.map(i => productBySku.get(i.sku)?.id).filter((id): id is string => !!id),
         ]),
       ]
-      for (const productId of affectedIds) {
-        try {
-          await enqueueSyncWooStock(productId)
-        } catch (err) {
-          (request as { log?: { warn: (o: object, msg: string) => void } }).log?.warn?.({ err, productId }, 'Failed to enqueue sync-woo-stock after sale edit')
+      const [oldWhInfo, newWhInfo] = await Promise.all([
+        db.select({ type: warehouses.type }).from(warehouses).where(eq(warehouses.id, sale.warehouseId)).then(r => r[0]),
+        db.select({ type: warehouses.type }).from(warehouses).where(eq(warehouses.id, targetWarehouseId)).then(r => r[0]),
+      ])
+      if (oldWhInfo?.type === 'main' || newWhInfo?.type === 'main') {
+        for (const productId of allAffectedIds) {
+          try {
+            await enqueueSyncWooStock(productId)
+          } catch (err) {
+            (request as { log?: { warn: (o: object, msg: string) => void } }).log?.warn?.({ err, productId }, 'Failed to enqueue sync-woo-stock after sale warehouse change')
+          }
+        }
+      }
+    } else {
+      // ── Same warehouse path (existing delta logic) ───────────────────────
+      // Build stock delta map: productId -> net change (positive = restore, negative = deduct)
+      const stockDeltas = new Map<string, number>()
+      for (const old of oldItems) {
+        if (old.productId) stockDeltas.set(old.productId, (stockDeltas.get(old.productId) ?? 0) + old.quantity)
+      }
+      for (const item of d.items) {
+        const product = productBySku.get(item.sku)
+        if (product) stockDeltas.set(product.id, (stockDeltas.get(product.id) ?? 0) - item.quantity)
+      }
+
+      // Validate stock for items that need more than what's available
+      const productIds = [...stockDeltas.keys()]
+      const stockRows = productIds.length > 0
+        ? await db
+            .select({ productId: inventoryStock.productId, quantity: inventoryStock.quantity })
+            .from(inventoryStock)
+            .where(and(inArray(inventoryStock.productId, productIds), eq(inventoryStock.warehouseId, sale.warehouseId)))
+        : []
+      const stockByProductId = new Map(stockRows.map(s => [s.productId, s.quantity]))
+
+      const insufficientItems: { sku: string; requested: number; available: number }[] = []
+      for (const item of d.items) {
+        const product = productBySku.get(item.sku)
+        if (product) {
+          const currentStock = stockByProductId.get(product.id) ?? 0
+          const oldQty       = oldItems.find(o => o.productId === product.id)?.quantity ?? 0
+          const effectiveAvailable = currentStock + oldQty
+          if (item.quantity > effectiveAvailable) {
+            insufficientItems.push({ sku: item.sku, requested: item.quantity, available: effectiveAvailable })
+          }
+        }
+      }
+      if (insufficientItems.length > 0) {
+        return reply.status(422).send({ error: 'Insufficient stock', code: 'INSUFFICIENT_STOCK', items: insufficientItems })
+      }
+
+      await db.transaction(async (tx) => {
+        // Apply stock deltas + ledger entries
+        for (const [productId, delta] of stockDeltas.entries()) {
+          if (delta === 0) continue
+          await tx
+            .update(inventoryStock)
+            .set({ quantity: sql`${inventoryStock.quantity} + ${delta}`, updatedAt: sql`now()` })
+            .where(and(eq(inventoryStock.productId, productId), eq(inventoryStock.warehouseId, sale.warehouseId)))
+
+          await tx.insert(inventoryLedger).values({
+            productId,
+            warehouseId:   sale.warehouseId,
+            actionType:    delta > 0 ? 'return' : 'sale',
+            quantityDelta: delta,
+            referenceId:   sale.id,
+            referenceType: 'sale',
+            notes:         `Sale edited — stock ${delta > 0 ? 'restored' : 'adjusted'} (${sale.saleType})`,
+            createdBy:     userId,
+          })
+        }
+
+        // Replace sale items
+        await tx.delete(saleItems).where(eq(saleItems.saleId, sale.id))
+        await tx.insert(saleItems).values(
+          d.items.map(item => {
+            const product = productBySku.get(item.sku)
+            const lt: string | null = item.lineTotal != null
+              ? String(item.lineTotal)
+              : item.unitPrice != null ? String(item.unitPrice * item.quantity) : null
+            return {
+              saleId:    sale.id,
+              productId: product?.id ?? null,
+              sku:       item.sku,
+              name:      item.name,
+              quantity:  item.quantity,
+              unitPrice: item.unitPrice != null ? String(item.unitPrice) : null,
+              lineTotal: lt,
+            }
+          }),
+        )
+
+        // Update sale metadata
+        await tx
+          .update(sales)
+          .set({
+            customerName:    d.customerName    ?? null,
+            customerEmail:   d.customerEmail   ?? null,
+            customerPhone:   d.customerPhone   ?? null,
+            customerAddress: d.customerAddress ?? null,
+            currency:        d.currency        ?? sale.currency,
+            notes:           d.notes           ?? null,
+            totalPrice:      totalPrice > 0 ? String(totalPrice) : null,
+            targetId:        d.targetId        !== undefined ? d.targetId        : sale.targetId,
+            invoiceStatusId: d.invoiceStatusId !== undefined ? d.invoiceStatusId : sale.invoiceStatusId,
+          })
+          .where(eq(sales.id, sale.id))
+
+        // Replace payment method links if provided
+        if (d.paymentMethodIds !== undefined) {
+          await tx.delete(salePaymentMethodLinks).where(eq(salePaymentMethodLinks.saleId, sale.id))
+          if (d.paymentMethodIds?.length) {
+            await tx.insert(salePaymentMethodLinks).values(
+              d.paymentMethodIds.map(methodId => ({ saleId: sale.id, paymentMethodId: methodId })),
+            )
+          }
+        }
+      })
+
+      // Trigger Woo sync for all affected products
+      const [wh] = await db.select({ type: warehouses.type }).from(warehouses).where(eq(warehouses.id, sale.warehouseId))
+      if (wh?.type === 'main') {
+        const affectedIds = [
+          ...new Set([
+            ...oldItems.map(i => i.productId).filter(Boolean) as string[],
+            ...d.items.map(i => productBySku.get(i.sku)?.id).filter((id): id is string => !!id),
+          ]),
+        ]
+        for (const productId of affectedIds) {
+          try {
+            await enqueueSyncWooStock(productId)
+          } catch (err) {
+            (request as { log?: { warn: (o: object, msg: string) => void } }).log?.warn?.({ err, productId }, 'Failed to enqueue sync-woo-stock after sale edit')
+          }
         }
       }
     }

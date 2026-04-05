@@ -92,6 +92,13 @@
       "when": 1742256000000,
       "tag": "0012_add_stock_date_added",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1743811200000,
+      "tag": "0013_sale_payment_method_links",
+      "breakpoints": true
     }
   ]
 }

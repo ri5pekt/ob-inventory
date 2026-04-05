@@ -51,6 +51,29 @@ export async function updateWarehouse(id: string, payload: UpdateWarehouseReques
   return data
 }
 
+export type LedgerActionType = 'receive' | 'transfer_in' | 'transfer_out' | 'sale' | 'return' | 'adjustment'
+
+export interface WarehouseLedgerEntry {
+  id:            string
+  createdAt:     string
+  actionType:    LedgerActionType
+  quantityDelta: number
+  referenceType: string | null
+  referenceId:   string | null
+  notes:         string | null
+  productId:     string
+  productSku:    string | null
+  productName:   string | null
+}
+
+export async function getWarehouseLedger(
+  warehouseId: string,
+  params?: { actionType?: LedgerActionType; q?: string; limit?: number; offset?: number },
+): Promise<WarehouseLedgerEntry[]> {
+  const { data } = await apiClient.get<WarehouseLedgerEntry[]>(`/warehouses/${warehouseId}/ledger`, { params })
+  return data
+}
+
 export async function removeWarehouseStock(warehouseId: string, productId: string): Promise<void> {
   await apiClient.delete(`/warehouses/${warehouseId}/stock/${productId}`)
 }

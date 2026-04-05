@@ -41,6 +41,7 @@ import ConfirmDialog from 'primevue/confirmdialog'
 import Password      from 'primevue/password'
 import Checkbox      from 'primevue/checkbox'
 import TabView       from 'primevue/tabview'
+import MultiSelect   from 'primevue/multiselect'
 
 const app = createApp(App)
 
@@ -88,6 +89,7 @@ app.component('ConfirmDialog', ConfirmDialog)
 app.component('Password',      Password)
 app.component('Checkbox',      Checkbox)
 app.component('TabView',       TabView)
+app.component('MultiSelect',   MultiSelect)
 
 app.directive('tooltip', Tooltip)
 
