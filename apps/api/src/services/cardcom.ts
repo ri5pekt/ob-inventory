@@ -2,8 +2,9 @@ import { env } from '../env.js'
 
 const BASE_URL = 'https://secure.cardcom.solutions/api/v11'
 
-const API_NAME     = env.CARDCOM_API_NAME!
-const API_PASSWORD = env.CARDCOM_API_PASSWORD!
+const API_NAME      = env.CARDCOM_API_NAME!
+const API_PASSWORD  = env.CARDCOM_API_PASSWORD!
+const TERMINAL_NUM  = env.CARDCOM_TERMINAL!
 
 export type CardcomDocumentType =
   | 'TaxInvoiceAndReceipt'
@@ -114,9 +115,10 @@ export async function createDocument(
   if (sale.comments)     doc.Comments     = sale.comments
 
   const body: Record<string, unknown> = {
-    ApiName:     API_NAME,
-    ApiPassword: API_PASSWORD,
-    Document:    doc,
+    TerminalNumber: TERMINAL_NUM,
+    ApiName:        API_NAME,
+    ApiPassword:    API_PASSWORD,
+    Document:       doc,
   }
 
   if (needsPayment) {
@@ -170,6 +172,7 @@ export async function getDocumentUrl(
   documentNumber: number,
 ): Promise<string> {
   const data = await post<CardcomUrlResponse>('/Documents/CreateDocumentUrl', {
+    TerminalNumber: TERMINAL_NUM,
     ApiName:        API_NAME,
     ApiPassword:    API_PASSWORD,
     DocumentType:   documentType,
