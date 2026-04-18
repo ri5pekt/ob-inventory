@@ -48,6 +48,17 @@
           <label>Reference</label>
           <InputText v-model="form.reference" placeholder="e.g. TR-2025-01" fluid />
         </div>
+        <div class="field field-date">
+          <label>Transfer Date</label>
+          <DatePicker
+            v-model="form.transferDate"
+            date-format="dd/mm/yy"
+            :show-icon="true"
+            :show-button-bar="true"
+            fluid
+            append-to="body"
+          />
+        </div>
       </div>
 
       <!-- Product search -->
@@ -194,6 +205,7 @@ const defaultForm = () => ({
   toWarehouseId:   null as string | null,
   reference:       '',
   notes:           '',
+  transferDate:    new Date() as Date,
   items:           [] as TransferItemRow[],
 })
 
@@ -259,6 +271,7 @@ async function submit() {
       toWarehouseId:   form.value.toWarehouseId!,
       reference:       form.value.reference.trim() || undefined,
       notes:           form.value.notes.trim()     || undefined,
+      transferDate:    form.value.transferDate.toISOString(),
       items:           form.value.items.map(i => ({ productId: i.productId, quantity: i.quantity })),
     })
     showConfirm.value = false
@@ -283,7 +296,7 @@ async function submit() {
 
 .warehouse-row {
   display: grid;
-  grid-template-columns: 1fr auto 1fr 160px;
+  grid-template-columns: 1fr auto 1fr 150px 160px;
   gap: 12px;
   align-items: end;
 }
@@ -297,7 +310,8 @@ async function submit() {
 }
 
 .field { display: flex; flex-direction: column; gap: 6px; }
-.field-ref { max-width: 160px; }
+.field-ref  { max-width: 150px; }
+.field-date { max-width: 160px; }
 
 label {
   font-size: 12px;
@@ -391,6 +405,8 @@ label {
     grid-template-columns: 1fr;
     gap: 10px;
   }
+
+  .field-date { max-width: none; }
 
   .transfer-arrow {
     padding: 0;

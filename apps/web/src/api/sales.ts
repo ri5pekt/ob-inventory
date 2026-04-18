@@ -19,6 +19,7 @@ export interface Sale {
   totalPrice:    string | null
   currency:      string
   notes:         string | null
+  saleDate:      string
   createdAt:     string
   itemCount:     number
   targetId:          string | null
@@ -64,6 +65,7 @@ export interface CreateSaleRequest {
   targetId?:         string
   invoiceStatusId?:  string
   paymentMethodIds?: string[]
+  saleDate?:         string
   items:             CreateSaleItemInput[]
 }
 
@@ -108,6 +110,7 @@ export interface UpdateSaleRequest {
   targetId?:         string | null
   invoiceStatusId?:  string | null
   paymentMethodIds?: string[] | null
+  saleDate?:         string
   items:             UpdateSaleItemInput[]
 }
 

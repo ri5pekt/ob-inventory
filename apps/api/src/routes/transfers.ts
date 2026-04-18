@@ -28,8 +28,8 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
     const { limit, offset, dateFrom, dateTo } = qSchema.parse((request as { query: unknown }).query)
 
     const dateFilters: ReturnType<typeof and>[] = []
-    if (dateFrom) dateFilters.push(gte(transfers.createdAt, new Date(dateFrom)) as ReturnType<typeof and>)
-    if (dateTo)   dateFilters.push(lte(transfers.createdAt, new Date(dateTo))   as ReturnType<typeof and>)
+    if (dateFrom) dateFilters.push(gte(transfers.transferDate, new Date(dateFrom)) as ReturnType<typeof and>)
+    if (dateTo)   dateFilters.push(lte(transfers.transferDate, new Date(dateTo))   as ReturnType<typeof and>)
 
     const rows = await db
       .select({
@@ -37,6 +37,7 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
         status:           transfers.status,
         reference:        transfers.reference,
         notes:            transfers.notes,
+        transferDate:     transfers.transferDate,
         createdAt:        transfers.createdAt,
         fromWarehouseId:  transfers.fromWarehouseId,
         toWarehouseId:    transfers.toWarehouseId,
@@ -46,7 +47,7 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
       .leftJoin(transferItems, eq(transfers.id, transferItems.transferId))
       .where(dateFilters.length > 0 ? and(...dateFilters) : undefined)
       .groupBy(transfers.id)
-      .orderBy(desc(transfers.createdAt))
+      .orderBy(desc(transfers.transferDate))
       .limit(limit)
       .offset(offset)
 
@@ -118,6 +119,7 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
       toWarehouseId:   z.string().uuid(),
       reference:       z.string().optional(),
       notes:           z.string().optional(),
+      transferDate:    z.string().optional(),
       items: z.array(z.object({
         productId: z.string().uuid(),
         quantity:  z.number().int().positive(),
@@ -188,6 +190,7 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
         status:          'completed',
         reference:       d.reference ?? null,
         notes:           d.notes     ?? null,
+        transferDate:    d.transferDate ? new Date(d.transferDate) : new Date(),
         createdBy:       userId,
       }).returning()
 
@@ -270,8 +273,9 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
   // ── Edit transfer (items + metadata, warehouses frozen) ────────────────────
   fastify.put<{ Params: { id: string } }>('/api/transfers/:id', auth, async (request, reply) => {
     const bodySchema = z.object({
-      reference: z.string().optional(),
-      notes:     z.string().optional(),
+      reference:    z.string().optional(),
+      notes:        z.string().optional(),
+      transferDate: z.string().optional(),
       items: z.array(z.object({
         productId: z.string().uuid(),
         quantity:  z.number().int().positive(),
@@ -411,8 +415,9 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
       await tx
         .update(transfers)
         .set({
-          reference: d.reference ?? null,
-          notes:     d.notes     ?? null,
+          reference:    d.reference    ?? null,
+          notes:        d.notes        ?? null,
+          transferDate: d.transferDate ? new Date(d.transferDate) : transfer.transferDate,
         })
         .where(eq(transfers.id, transfer.id))
     })

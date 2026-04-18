@@ -118,80 +118,80 @@
         row-hover
         @row-click="openDetail($event.data)"
       >
-        <Column field="createdAt" header="Date" style="width:160px; white-space:nowrap" sortable>
+        <Column field="saleDate" header="Date" sortable class="col-date">
           <template #body="{ data }">
-            <span style="white-space:nowrap">{{ formatDate(data.createdAt) }}</span>
+            <span class="date-text">{{ formatDate(data.saleDate) }}</span>
           </template>
         </Column>
 
-        <Column field="customerName" header="Customer" sortable>
+        <Column field="customerName" header="Customer" class="col-customer" sortable>
           <template #body="{ data }">
             <div v-if="data.customerName" class="customer-cell">
-              <span>{{ data.customerName }}</span>
+              <span class="customer-name">{{ data.customerName }}</span>
               <span v-if="data.customerEmail" class="customer-email">{{ data.customerEmail }}</span>
             </div>
             <span v-else class="no-value">—</span>
           </template>
         </Column>
 
-        <Column field="warehouseName" header="Warehouse" style="width:180px; white-space:nowrap" sortable>
+        <Column field="warehouseName" header="Warehouse" class="col-warehouse" sortable>
           <template #body="{ data }">
-            <span style="white-space:nowrap">{{ data.warehouseName ?? '—' }}</span>
+            <span class="warehouse-text">{{ data.warehouseName ?? '—' }}</span>
           </template>
         </Column>
 
-        <Column field="saleType" header="Type" style="width:130px" sortable>
+        <Column field="saleType" header="Type" class="col-type" sortable>
           <template #body="{ data }">
             <Tag :value="typeLabel(data.saleType)" :severity="typeSeverity(data.saleType)" />
           </template>
         </Column>
 
-        <Column field="targetName" header="Target" style="width:130px; white-space:nowrap" sortable>
+        <Column field="targetName" header="Target" class="col-meta" sortable>
           <template #body="{ data }">
-            <Tag v-if="data.targetName" :value="data.targetName" severity="secondary" style="white-space:nowrap" />
+            <Tag v-if="data.targetName" :value="data.targetName" severity="secondary" />
             <span v-else class="no-value">—</span>
           </template>
         </Column>
 
-        <Column field="invoiceStatusName" header="Invoice" style="width:130px; white-space:nowrap" sortable>
+        <Column field="invoiceStatusName" header="Invoice" class="col-meta" sortable>
           <template #body="{ data }">
-            <Tag v-if="data.invoiceStatusName" :value="data.invoiceStatusName" severity="info" style="white-space:nowrap" />
+            <Tag v-if="data.invoiceStatusName" :value="data.invoiceStatusName" severity="info" />
             <span v-else class="no-value">—</span>
           </template>
         </Column>
 
-        <Column field="paymentMethods" header="Payment" style="width:150px">
+        <Column field="paymentMethods" header="Payment" class="col-payment">
           <template #body="{ data }">
             <div v-if="data.paymentMethods?.length" class="payment-methods">
-              <span v-for="m in data.paymentMethods" :key="m.id" class="payment-method">{{ m.name }}</span>
+              <span v-for="m in data.paymentMethods" :key="m.id" class="payment-badge">{{ m.name }}</span>
             </div>
             <span v-else class="no-value">—</span>
           </template>
         </Column>
 
-        <Column field="wooOrderId" header="Order #" style="width:110px">
+        <Column field="wooOrderId" header="Order #" class="col-order">
           <template #body="{ data }">
             <span v-if="data.wooOrderId" class="order-ref">#{{ data.wooOrderId }}</span>
             <span v-else class="no-value">—</span>
           </template>
         </Column>
 
-        <Column field="itemCount" header="Items" style="width:70px; text-align:right" sortable>
+        <Column field="itemCount" header="Items" class="col-items" sortable>
           <template #body="{ data }">
             <span class="item-count">{{ data.itemCount }}</span>
           </template>
         </Column>
 
-        <Column field="totalPrice" header="Total" style="width:110px; text-align:right; white-space:nowrap" sortable>
+        <Column field="totalPrice" header="Total" class="col-total" sortable>
           <template #body="{ data }">
-            <span v-if="data.totalPrice" class="total-price" style="white-space:nowrap">
+            <span v-if="data.totalPrice" class="total-price">
               {{ parseFloat(data.totalPrice).toFixed(2) }} {{ data.currency }}
             </span>
             <span v-else class="no-value">—</span>
           </template>
         </Column>
 
-        <Column field="status" header="Status" style="width:110px" sortable>
+        <Column field="status" header="Status" class="col-status" sortable>
           <template #body="{ data }">
             <Tag :value="data.status" :severity="statusSeverity(data.status)" />
           </template>
@@ -514,14 +514,44 @@ function statusSeverity(status: string) {
   flex-direction: column;
 }
 
-.customer-cell { display: flex; flex-direction: column; }
+/* ── Column widths ── */
+:deep(.col-date)      { width: 150px; min-width: 150px; }
+:deep(.col-customer)  { min-width: 160px; }
+:deep(.col-warehouse) { width: 160px; min-width: 120px; }
+:deep(.col-type)      { width: 110px; min-width: 100px; }
+:deep(.col-meta)      { width: 120px; min-width: 100px; }
+:deep(.col-payment)   { width: 140px; min-width: 110px; }
+:deep(.col-order)     { width: 100px; min-width: 90px; }
+:deep(.col-items)     { width: 70px;  min-width: 60px;  text-align: right; }
+:deep(.col-total)     { width: 120px; min-width: 100px; text-align: right; white-space: nowrap; }
+:deep(.col-status)    { width: 100px; min-width: 90px; }
+
+/* ── Cell styles ── */
+.date-text {
+  font-size: 12px;
+  color: var(--p-text-color);
+  white-space: nowrap;
+}
+
+.customer-cell  { display: flex; flex-direction: column; gap: 1px; }
+.customer-name  { font-size: 13px; }
 .customer-email { font-size: 11px; color: var(--p-text-muted-color); }
-.order-ref { font-family: monospace; font-size: 13px; color: var(--p-primary-color); }
-.item-count { font-weight: 600; }
-.total-price { font-weight: 700; font-variant-numeric: tabular-nums; }
-.no-value { color: var(--p-text-muted-color); }
+
+.warehouse-text { font-size: 12px; white-space: nowrap; }
+
+.order-ref  { font-family: monospace; font-size: 12px; color: var(--p-primary-color); }
+.item-count { font-weight: 700; font-size: 13px; }
+.total-price {
+  font-weight: 700;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .payment-methods { display: flex; flex-wrap: wrap; gap: 3px; }
-.payment-method  { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #f0fdf4; color: #15803d; white-space: nowrap; }
+.payment-badge   { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #f0fdf4; color: #15803d; white-space: nowrap; }
+
+.no-value { color: var(--p-text-muted-color); font-size: 12px; }
 
 .empty-state {
   display: flex;
@@ -570,5 +600,10 @@ function statusSeverity(status: string) {
     padding: 6px 8px;
     font-size: 12px;
   }
+
+  :deep(.col-date)      { width: 130px; min-width: 130px; }
+  :deep(.col-warehouse) { width: 130px; min-width: 100px; }
+  :deep(.col-meta)      { width: 100px; min-width: 90px; }
+  .date-text { font-size: 11px; }
 }
 </style>

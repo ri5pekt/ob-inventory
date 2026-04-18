@@ -33,8 +33,8 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
 
     const filters: ReturnType<typeof eq>[] = []
     if (q.type)     filters.push(eq(sales.saleType, q.type))
-    if (q.dateFrom) filters.push(gte(sales.createdAt, new Date(q.dateFrom)) as ReturnType<typeof eq>)
-    if (q.dateTo)   filters.push(lte(sales.createdAt, new Date(q.dateTo))   as ReturnType<typeof eq>)
+    if (q.dateFrom) filters.push(gte(sales.saleDate, new Date(q.dateFrom)) as ReturnType<typeof eq>)
+    if (q.dateTo)   filters.push(lte(sales.saleDate, new Date(q.dateTo))   as ReturnType<typeof eq>)
 
     const rows = await db
       .select({
@@ -53,6 +53,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         totalPrice:      sales.totalPrice,
         currency:        sales.currency,
         notes:           sales.notes,
+        saleDate:        sales.saleDate,
         createdAt:       sales.createdAt,
         targetId:           sales.targetId,
         targetName:         saleTargets.name,
@@ -68,7 +69,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       .leftJoin(saleInvoiceStatuses, eq(sales.invoiceStatusId, saleInvoiceStatuses.id))
       .where(filters.length > 0 ? and(...filters) : undefined)
       .groupBy(sales.id, warehouses.name, stores.name, saleTargets.name, saleInvoiceStatuses.name)
-      .orderBy(desc(sales.createdAt))
+      .orderBy(desc(sales.saleDate))
       .limit(q.limit)
       .offset(q.offset)
 
@@ -109,6 +110,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         totalPrice:      sales.totalPrice,
         currency:        sales.currency,
         notes:           sales.notes,
+        saleDate:        sales.saleDate,
         createdAt:       sales.createdAt,
         updatedAt:       sales.updatedAt,
         targetId:          sales.targetId,
@@ -172,6 +174,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       targetId:          z.string().uuid().optional(),
       invoiceStatusId:   z.string().uuid().optional(),
       paymentMethodIds:  z.array(z.string().uuid()).optional(),
+      saleDate:          z.string().optional(),
       items: z.array(z.object({
         sku:       z.string().min(1),
         name:      z.string().min(1),
@@ -265,6 +268,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         notes:           d.notes            ?? null,
         targetId:        d.targetId         ?? null,
         invoiceStatusId: d.invoiceStatusId  ?? null,
+        saleDate:        d.saleDate ? new Date(d.saleDate) : new Date(),
         createdBy:       userId,
       }).returning()
 
@@ -349,6 +353,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       targetId:         z.string().uuid().nullable().optional(),
       invoiceStatusId:  z.string().uuid().nullable().optional(),
       paymentMethodIds: z.array(z.string().uuid()).nullable().optional(),
+      saleDate:         z.string().optional(),
       items: z.array(z.object({
         productId: z.string().uuid().optional(),
         sku:       z.string().min(1),
@@ -496,6 +501,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
             totalPrice:      totalPrice > 0 ? String(totalPrice) : null,
             targetId:        d.targetId        !== undefined ? d.targetId        : sale.targetId,
             invoiceStatusId: d.invoiceStatusId !== undefined ? d.invoiceStatusId : sale.invoiceStatusId,
+            saleDate:        d.saleDate ? new Date(d.saleDate) : sale.saleDate,
           })
           .where(eq(sales.id, sale.id))
 
@@ -622,6 +628,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
             totalPrice:      totalPrice > 0 ? String(totalPrice) : null,
             targetId:        d.targetId        !== undefined ? d.targetId        : sale.targetId,
             invoiceStatusId: d.invoiceStatusId !== undefined ? d.invoiceStatusId : sale.invoiceStatusId,
+            saleDate:        d.saleDate ? new Date(d.saleDate) : sale.saleDate,
           })
           .where(eq(sales.id, sale.id))
 

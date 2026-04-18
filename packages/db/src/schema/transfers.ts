@@ -12,8 +12,9 @@ export const transfers = pgTable('transfers', {
   status: transferStatusEnum('status').notNull().default('completed'),
   reference: text('reference'),
   notes: text('notes'),
-  createdBy: uuid('created_by').references(() => users.id),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  createdBy:    uuid('created_by').references(() => users.id),
+  transferDate: timestamp('transfer_date', { withTimezone: true }).defaultNow().notNull(),
+  createdAt:    timestamp('created_at',    { withTimezone: true }).defaultNow().notNull(),
 })
 
 export const transferItems = pgTable('transfer_items', {

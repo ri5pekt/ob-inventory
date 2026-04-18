@@ -25,6 +25,17 @@
           <label>Reference</label>
           <InputText v-model="form.reference" placeholder="e.g. TR-2025-01" fluid />
         </div>
+        <div class="field field-date">
+          <label>Transfer Date</label>
+          <DatePicker
+            v-model="form.transferDate"
+            date-format="dd/mm/yy"
+            :show-icon="true"
+            :show-button-bar="true"
+            fluid
+            append-to="body"
+          />
+        </div>
       </div>
 
       <!-- Product search (scoped to fromWarehouse) -->
@@ -101,9 +112,10 @@ const visible = computed({
 // ── Form ──────────────────────────────────────────────────────────────────────
 
 const defaultForm = () => ({
-  reference: '',
-  notes:     '',
-  items:     [] as TransferItemRow[],
+  reference:    '',
+  notes:        '',
+  transferDate: new Date() as Date,
+  items:        [] as TransferItemRow[],
 })
 
 const form              = ref(defaultForm())
@@ -114,8 +126,9 @@ const insufficientItems = ref<{ sku: string; requested: number; available: numbe
 // Pre-fill when a transfer is provided
 watch(() => props.transfer, (transfer) => {
   if (!transfer) return
-  form.value.reference = transfer.reference ?? ''
-  form.value.notes     = transfer.notes     ?? ''
+  form.value.reference    = transfer.reference    ?? ''
+  form.value.notes        = transfer.notes        ?? ''
+  form.value.transferDate = transfer.transferDate ? new Date(transfer.transferDate) : new Date()
   form.value.items     = (transfer.items ?? []).map(item => ({
     productId:    item.productId,
     sku:          item.sku,
@@ -167,9 +180,10 @@ async function submit() {
   submitting.value = true
   try {
     await updateTransfer(props.transfer.id, {
-      reference: form.value.reference.trim() || undefined,
-      notes:     form.value.notes.trim()     || undefined,
-      items:     form.value.items.map(i => ({ productId: i.productId, quantity: i.quantity })),
+      reference:    form.value.reference.trim() || undefined,
+      notes:        form.value.notes.trim()     || undefined,
+      transferDate: form.value.transferDate.toISOString(),
+      items:        form.value.items.map(i => ({ productId: i.productId, quantity: i.quantity })),
     })
     visible.value = false
     emit('updated')
@@ -191,7 +205,7 @@ async function submit() {
 
 .route-row {
   display: grid;
-  grid-template-columns: 1fr auto 1fr 160px;
+  grid-template-columns: 1fr auto 1fr 150px 160px;
   gap: 12px;
   align-items: end;
 }
@@ -205,7 +219,8 @@ async function submit() {
 }
 
 .field { display: flex; flex-direction: column; gap: 6px; }
-.field-ref { max-width: 160px; }
+.field-ref  { max-width: 150px; }
+.field-date { max-width: 160px; }
 
 label {
   font-size: 12px;
@@ -256,7 +271,8 @@ label {
     transform: rotate(90deg);
   }
 
-  .field-ref { max-width: none; }
+  .field-ref  { max-width: none; }
+  .field-date { max-width: none; }
 
   .footer-row { flex-direction: column; align-items: stretch; gap: 12px; }
   .footer-actions { flex-direction: column-reverse; gap: 8px; }

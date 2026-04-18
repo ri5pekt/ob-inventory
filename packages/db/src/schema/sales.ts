@@ -43,6 +43,7 @@ export const sales = pgTable('sales', {
   targetId:          uuid('target_id').references(() => saleTargets.id),
   invoiceStatusId:   uuid('invoice_status_id').references(() => saleInvoiceStatuses.id),
   createdBy: uuid('created_by').references(() => users.id),
+  saleDate:  timestamp('sale_date',  { withTimezone: true }).defaultNow().notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull().$onUpdate(() => new Date()),
 })

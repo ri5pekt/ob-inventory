@@ -39,8 +39,8 @@
         class="transfers-datatable"
         @row-click="openDetail($event.data)"
       >
-        <Column field="createdAt" header="Date" :frozen="!isMobile" sortable class="col-date">
-          <template #body="{ data }"><span class="date-text">{{ formatDate(data.createdAt) }}</span></template>
+        <Column field="transferDate" header="Date" :frozen="!isMobile" sortable class="col-date">
+          <template #body="{ data }"><span class="date-text">{{ formatDate(data.transferDate) }}</span></template>
         </Column>
 
         <Column header="Route" :frozen="!isMobile" class="col-route">

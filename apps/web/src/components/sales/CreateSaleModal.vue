@@ -71,6 +71,19 @@
         </div>
       </div>
 
+      <!-- Sale Date -->
+      <div class="field field-date">
+        <label>Sale Date</label>
+        <DatePicker
+          v-model="form.saleDate"
+          date-format="dd/mm/yy"
+          :show-icon="true"
+          :show-button-bar="true"
+          fluid
+          append-to="body"
+        />
+      </div>
+
       <!-- Target + Invoice status + Payment method -->
       <div class="form-row">
         <div class="field">
@@ -389,6 +402,7 @@ const defaultForm = () => ({
   targetId:         null as string | null,
   invoiceStatusId:  null as string | null,
   paymentMethodIds: [] as string[],
+  saleDate:         new Date() as Date,
   items:            [] as SaleItemRow[],
 })
 
@@ -497,6 +511,7 @@ async function submit() {
       targetId:         form.value.targetId        ?? undefined,
       invoiceStatusId:  form.value.invoiceStatusId ?? undefined,
       paymentMethodIds: form.value.paymentMethodIds.length ? form.value.paymentMethodIds : undefined,
+      saleDate:         form.value.saleDate.toISOString(),
       items,
     })
 

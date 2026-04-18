@@ -67,6 +67,7 @@ export interface TransferSummary {
   status:            TransferStatus
   reference:         string | null
   notes:             string | null
+  transferDate:      string
   createdAt:         string
   fromWarehouseId:   string
   toWarehouseId:     string
@@ -94,6 +95,7 @@ export interface CreateTransferRequest {
   toWarehouseId:   string
   reference?:      string
   notes?:          string
+  transferDate?:   string
   items: { productId: string; quantity: number }[]
 }
 
@@ -122,9 +124,10 @@ export async function createTransfer(payload: CreateTransferRequest): Promise<{ 
 }
 
 export interface UpdateTransferRequest {
-  reference?: string
-  notes?:     string
-  items:      { productId: string; quantity: number }[]
+  reference?:    string
+  notes?:        string
+  transferDate?: string
+  items:         { productId: string; quantity: number }[]
 }
 
 export async function updateTransfer(id: string, payload: UpdateTransferRequest): Promise<void> {

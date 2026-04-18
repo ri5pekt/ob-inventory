@@ -99,6 +99,20 @@
       "when": 1743811200000,
       "tag": "0013_sale_payment_method_links",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1744848000000,
+      "tag": "0014_add_sale_date",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1744848060000,
+      "tag": "0015_add_transfer_date",
+      "breakpoints": true
     }
   ]
 }

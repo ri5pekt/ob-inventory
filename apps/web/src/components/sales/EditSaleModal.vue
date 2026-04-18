@@ -58,6 +58,19 @@
         </div>
       </div>
 
+      <!-- Sale Date -->
+      <div class="field field-date">
+        <label>Sale Date</label>
+        <DatePicker
+          v-model="form.saleDate"
+          date-format="dd/mm/yy"
+          :show-icon="true"
+          :show-button-bar="true"
+          fluid
+          append-to="body"
+        />
+      </div>
+
       <!-- Target + Invoice status + Payment method -->
       <div class="form-row">
         <div class="field">
@@ -260,6 +273,7 @@ const defaultForm = () => ({
   targetId:        null as string | null,
   invoiceStatusId: null as string | null,
   paymentMethodIds: [] as string[],
+  saleDate:        new Date() as Date,
   items:           [] as SaleItemRow[],
 })
 
@@ -304,6 +318,7 @@ watch(() => props.sale, (sale) => {
   form.value.targetId        = sale.targetId        ?? null
   form.value.invoiceStatusId = sale.invoiceStatusId ?? null
   form.value.paymentMethodIds = sale.paymentMethods?.map(m => m.id) ?? []
+  form.value.saleDate        = sale.saleDate ? new Date(sale.saleDate) : new Date()
   form.value.items = (sale.items ?? []).map(item => ({
     productId: item.productId,
     sku:       item.sku,
@@ -377,6 +392,7 @@ async function submit() {
       targetId:        form.value.targetId,
       invoiceStatusId: form.value.invoiceStatusId,
       paymentMethodIds: form.value.paymentMethodIds,
+      saleDate:         form.value.saleDate.toISOString(),
       items: form.value.items.map(i => ({
         productId: i.productId ?? undefined,
         sku:       i.sku,
