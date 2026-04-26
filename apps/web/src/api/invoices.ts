@@ -11,13 +11,17 @@ export interface CardcomDocument {
 export const DOCUMENT_TYPE_LABELS: Record<string, string> = {
   TaxInvoiceAndReceipt: 'חשבונית מס קבלה',
   TaxInvoice:           'חשבונית מס',
-  Receipt:              'קבלה',
+  Receipt:              'קבלה לחשבונית',
+  ReceiptForTaxInvoice: 'קבלה לחשבונית',
   TaxInvoiceRefund:     'חשבונית מס זיכוי',
 }
 
-export const ALL_DOCUMENT_TYPES = Object.keys(DOCUMENT_TYPE_LABELS) as Array<
-  keyof typeof DOCUMENT_TYPE_LABELS
->
+export const ALL_DOCUMENT_TYPES = [
+  'TaxInvoiceAndReceipt',
+  'TaxInvoice',
+  'Receipt',
+  'TaxInvoiceRefund',
+] as const
 
 export async function getSaleDocuments(saleId: string): Promise<CardcomDocument[]> {
   const { data } = await apiClient.get<CardcomDocument[]>(`/sales/${saleId}/documents`)

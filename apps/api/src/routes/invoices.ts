@@ -122,6 +122,8 @@ export const invoicesRoutes: FastifyPluginAsync = async (fastify) => {
         id:            sale.id,
         customerName:  effectiveCustomerName,
         customerEmail: effectiveCustomerEmail,
+        customerPhone: sale.customerPhone,
+        customerAddress: sale.customerAddress,
         totalPrice:    effectiveTotalPrice,
         items:         effectiveItems,
         hp_tz:         override?.hp_tz,

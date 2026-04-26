@@ -63,12 +63,12 @@ CREATE INDEX IF NOT EXISTS cardcom_documents_sale_id_idx ON cardcom_documents(sa
 
 ## Document Types
 
-| Hebrew | `documentType` value | Requires payment field |
-|---|---|---|
-| חשבונית מס קבלה | `TaxInvoiceAndReceipt` | Yes (`Cash = totalPrice`) |
-| חשבונית מס | `TaxInvoice` | No |
-| קבלה | `Receipt` | Yes (`Cash = totalPrice`) |
-| חשבונית מס זיכוי | `TaxInvoiceRefund` | No |
+| Hebrew | `documentType` value | `CreateTaxInvoice.InvoiceType` | Requires payment field |
+|---|---|---|---|
+| חשבונית מס קבלה | `TaxInvoiceAndReceipt` | `1` | Yes |
+| חשבונית מס | `TaxInvoice` | `305` | No |
+| קבלה לחשבונית | `Receipt` | `400` | Yes |
+| חשבונית מס זיכוי | `TaxInvoiceRefund` | `330` | No |
 
 ---
 
