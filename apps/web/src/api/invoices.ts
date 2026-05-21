@@ -63,3 +63,33 @@ export async function createSaleDocument(
   })
   return data
 }
+
+export interface ChargeCardRequest {
+  cardNumber:    string
+  cardExpiry:    string   // MMYY
+  cvv:           string
+  numOfPayments: number
+  customerName?: string
+  customerEmail?: string | null
+  isVatFree?:    boolean
+  items?: Array<{ name: string; quantity: number; unitPrice: number }>
+}
+
+export interface ChargeCardResult {
+  id:             string
+  documentType:   string
+  documentNumber: number
+  transactionId:  number
+  last4Digits:    string
+  cardBrand:      string
+  createdAt:      string
+  docUrl:         string | null
+}
+
+export async function chargeCardForSale(
+  saleId:  string,
+  payload: ChargeCardRequest,
+): Promise<ChargeCardResult> {
+  const { data } = await apiClient.post<ChargeCardResult>(`/sales/${saleId}/charge-card`, payload)
+  return data
+}

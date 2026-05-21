@@ -20,6 +20,7 @@ const envSchema = z.object({
   CARDCOM_TEST_API_NAME: z.string().optional(),
   CARDCOM_TEST_API_PASSWORD: z.string().optional(),
   CARDCOM_TEST_TERMINAL: z.coerce.number().optional(),
+  CARDCOM_USE_TEST: z.string().optional(),
 })
 
 const parsed = envSchema.safeParse(process.env)

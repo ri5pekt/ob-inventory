@@ -113,6 +113,13 @@
       "when": 1744848060000,
       "tag": "0015_add_transfer_date",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1748426400000,
+      "tag": "0016_add_cardcom_transaction_fields",
+      "breakpoints": true
     }
   ]
 }

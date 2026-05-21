@@ -212,6 +212,7 @@
       :sale="selectedSale"
       @deleted="onSaleDeleted"
       @edit="onEditSale"
+      @refreshed="refreshKey++"
     />
     <CreateSaleModal v-model="showCreate" @created="onSaleCreated" />
     <EditSaleModal v-model="showEdit" :sale="editingSale" @updated="onSaleUpdated" />

@@ -107,12 +107,12 @@
     <template #footer>
       <div class="detail-footer">
         <Button
-          label="Delete Sale"
           icon="pi pi-trash"
           severity="danger"
           outlined
           size="small"
           :disabled="!sale"
+          v-tooltip.top="'Delete Sale'"
           @click="showConfirm = true"
         />
         <div class="footer-right">
@@ -125,7 +125,16 @@
             :disabled="!sale"
             @click="showCardcom = true"
           />
-          <Button label="Close" severity="secondary" outlined size="small" @click="$emit('update:visible', false)" />
+          <Button
+            label="Charge"
+            icon="pi pi-credit-card"
+            severity="success"
+            outlined
+            size="small"
+            :disabled="!sale || !sale.totalPrice"
+            v-tooltip.top="!sale?.totalPrice ? 'No total price on this sale' : undefined"
+            @click="showTerminal = true"
+          />
           <Button
             label="Edit"
             icon="pi pi-pencil"
@@ -141,6 +150,12 @@
   <CardcomDocumentsModal
     v-model:visible="showCardcom"
     :sale="sale"
+  />
+
+  <CardcomTerminalModal
+    v-model:visible="showTerminal"
+    :sale="sale"
+    @charged="onCharged"
   />
 
   <!-- Delete confirmation -->
@@ -181,7 +196,9 @@
 import { ref, computed } from 'vue'
 import type { SaleDetail, SaleType } from '@/api/sales'
 import { deleteSale } from '@/api/sales'
-import CardcomDocumentsModal from './CardcomDocumentsModal.vue'
+import CardcomDocumentsModal  from './CardcomDocumentsModal.vue'
+import CardcomTerminalModal   from './CardcomTerminalModal.vue'
+import type { ChargeCardResult } from '@/api/invoices'
 
 const props = defineProps<{
   visible: boolean
@@ -192,11 +209,18 @@ const emit = defineEmits<{
   (e: 'update:visible', v: boolean): void
   (e: 'deleted'): void
   (e: 'edit', sale: SaleDetail): void
+  (e: 'refreshed'): void
 }>()
 
 const showConfirm  = ref(false)
 const showCardcom  = ref(false)
+const showTerminal = ref(false)
 const deleting     = ref(false)
+
+function onCharged(_result: ChargeCardResult) {
+  // Refresh the sale list so the new payment method chip appears
+  emit('refreshed')
+}
 const deleteError = ref<string | null>(null)
 const deleteReason = ref('')
 
@@ -352,20 +376,18 @@ function formatDate(iso: string) {
 
 .footer-right { display: flex; gap: 8px; align-items: center; }
 
+/* Uniform padding for all footer buttons regardless of severity */
+.detail-footer :deep(.p-button) { padding: 0.35rem 0.75rem; }
+
 @media (max-width: 768px) {
   .detail-footer {
-    flex-direction: column-reverse;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
   }
 
-  .footer-right { flex-direction: row-reverse; }
+  .footer-right { flex-direction: row; flex-wrap: wrap; }
 
-  .detail-footer .p-button {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .footer-right .p-button { width: auto; flex: 1; }
+  .footer-right .p-button { flex: 1; justify-content: center; }
 
   .detail-meta { padding: 12px; }
   .meta-row { font-size: 13px; }

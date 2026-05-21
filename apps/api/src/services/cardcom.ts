@@ -2,9 +2,11 @@ import { env } from '../env.js'
 
 const BASE_URL = 'https://secure.cardcom.solutions/api/v11'
 
-const API_NAME      = env.CARDCOM_API_NAME!
-const API_PASSWORD  = env.CARDCOM_API_PASSWORD!
-const TERMINAL_NUM  = env.CARDCOM_TERMINAL!
+const USE_TEST = env.CARDCOM_USE_TEST === 'true'
+
+const API_NAME     = (USE_TEST ? env.CARDCOM_TEST_API_NAME     : env.CARDCOM_API_NAME)!
+const API_PASSWORD = (USE_TEST ? env.CARDCOM_TEST_API_PASSWORD : env.CARDCOM_API_PASSWORD)!
+const TERMINAL_NUM = (USE_TEST ? env.CARDCOM_TEST_TERMINAL     : env.CARDCOM_TERMINAL)!
 
 export type CardcomDocumentType =
   | 'TaxInvoiceAndReceipt'
@@ -39,9 +41,16 @@ const PAYMENT_TYPE_LABEL: Record<CardcomPaymentType, string> = {
   Cheque:       'המחאה',
 }
 
-// CustomLines TransactionID for non-cash custom payments on this terminal.
-// Any small integer works; 1 is the generic custom-transaction slot.
-const CUSTOM_PAYMENT_TRANSACTION_ID = 1
+// TransactionID values per payment type — these are the "מספר רץ" (running numbers)
+// from the terminal's "Additional Payment Methods" list in Cardcom admin.
+// Settings → Documents → Additional Payment Methods list.
+// Bit=28, BankTransfer(הפקדה בנקאית)=31 — confirmed by Cardcom support May 2026.
+// CreditCard=1 (generic fallback; credit cards are usually linked via DealNumbers instead).
+const CUSTOM_PAYMENT_TRANSACTION_ID: Record<string, number> = {
+  BankTransfer: 31,
+  Bit:          28,
+  CreditCard:   1,
+}
 
 export interface SaleForDocument {
   id:            string
@@ -71,6 +80,32 @@ export interface SaleForDocument {
   } | null
 }
 
+export interface ChargeCardParams {
+  saleId:         string
+  customerName:   string
+  customerEmail:  string | null
+  amount:         number
+  cardNumber:     string
+  cardExpiry:     string   // MMYY
+  cvv:            string
+  numOfPayments:  number
+  isVatFree:      boolean
+  items: Array<{
+    name:      string
+    quantity:  number
+    unitPrice: number
+  }>
+}
+
+export interface ChargeCardResult {
+  transactionId:  number
+  documentNumber: number
+  documentType:   string
+  last4Digits:    string
+  cardBrand:      string
+  documentUrl:    string | null
+}
+
 interface CardcomCreateTaxInvoiceResponse {
   ResponseCode:   number
   Description:    string | null
@@ -82,6 +117,18 @@ interface CardcomUrlResponse {
   ResponseCode: number
   Description:  string | null
   DocUrl:       string
+}
+
+interface CardcomDoTransactionResponse {
+  ResponseCode:     number
+  Description:      string | null
+  TranzactionId:    number
+  Last4CardDigits:  string
+  CardName:         string
+  Brand:            string
+  DocumentNumber:   number
+  DocumentType:     string
+  DocumentUrl:      string | null
 }
 
 async function post<T>(path: string, body: unknown): Promise<T> {
@@ -112,10 +159,13 @@ export async function createDocument(
 
   if (sale.customerPhone)   invoiceHead.CustMobilePH    = sale.customerPhone
   if (sale.customerAddress) invoiceHead.CustAddresLine1 = sale.customerAddress
+
+  // Always create/update a customer card in Cardcom.
+  // Cardcom searches by: CompID → AccountForeignKey → Email (first match wins).
+  invoiceHead.IsAutoCreateUpdateAccount = 'true'
+  invoiceHead.AccountForeignKey         = sale.id  // our sale ID as external key
   if (sale.hp_tz) {
-    invoiceHead.CompID                    = sale.hp_tz
-    invoiceHead.IsAutoCreateUpdateAccount = 'true'
-    invoiceHead.AccountForeignKey         = sale.id
+    invoiceHead.CompID = sale.hp_tz  // ת.ז. / ח.פ. when provided — strongest match
   }
   if (sale.documentDate) invoiceHead.InvDate      = sale.documentDate
   if (sale.isVatFree)    invoiceHead.ExtIsVatFree = true
@@ -161,7 +211,7 @@ export async function createDocument(
     } else {
       // BankTransfer / Bit / CreditCard → CustomLines with TranDate.
       const customField: Record<string, unknown> = {
-        TransactionID: CUSTOM_PAYMENT_TRANSACTION_ID,
+        TransactionID: CUSTOM_PAYMENT_TRANSACTION_ID[paymentType] ?? 1,
         Description:   PAYMENT_TYPE_LABEL[paymentType],
         Sum:           amount,
       }
@@ -180,6 +230,56 @@ export async function createDocument(
   return {
     documentNumber: data.InvoiceNumber,
     documentType:   CREATED_DOCUMENT_TYPE_BY_DOCUMENT_TYPE[documentType],
+  }
+}
+
+export async function chargeCard(params: ChargeCardParams): Promise<ChargeCardResult> {
+  const body: Record<string, unknown> = {
+    TerminalNumber:            Number(TERMINAL_NUM),
+    ApiName:                   API_NAME,
+    Amount:                    params.amount,
+    CardNumber:                params.cardNumber,
+    CardExpirationMMYY:        params.cardExpiry,
+    CVV2:                      params.cvv,
+    NumOfPayments:             params.numOfPayments,
+    // Unique per attempt — sale ID + timestamp so retries are never blocked
+    ExternalUniqTranId:         `${params.saleId}-${Date.now()}`,
+    ExternalUniqTranIdResponse: false,
+    Document: {
+      DocumentTypeToCreate: 'TaxInvoiceAndReceipt',
+      Name:          params.customerName,
+      Email:         params.customerEmail ?? undefined,
+      IsSendByEmail: !!params.customerEmail,
+      IsVatFree:     params.isVatFree,
+      Language:      'he',
+      ExternalId:    params.saleId,
+      // Create/link a Cardcom customer card automatically.
+      // When true, Cardcom searches by AccountForeignKey → SiteUniqueId → Email.
+      AdvancedDefinition: {
+        IsAutoCreateUpdateAccount: true,
+        AccountForeignKey:         params.saleId,
+      },
+      Products:      params.items.map(item => ({
+        Description: item.name,
+        Quantity:    item.quantity,
+        UnitCost:    item.unitPrice,
+      })),
+    },
+  }
+
+  const data = await post<CardcomDoTransactionResponse>('/Transactions/Transaction', body)
+
+  if (data.ResponseCode !== 0) {
+    throw new Error(data.Description ?? `Cardcom charge error ${data.ResponseCode}`)
+  }
+
+  return {
+    transactionId:  data.TranzactionId,
+    documentNumber: data.DocumentNumber,
+    documentType:   data.DocumentType ?? 'TaxInvoiceAndReceipt',
+    last4Digits:    String(data.Last4CardDigits),
+    cardBrand:      data.Brand ?? data.CardName ?? '',
+    documentUrl:    data.DocumentUrl ?? null,
   }
 }
 

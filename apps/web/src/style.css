@@ -99,6 +99,16 @@ html {
   font-size: 12px !important;
 }
 
+/* Dialog footer — add top padding, reduce bottom */
+:root {
+  --p-dialog-footer-padding: 0.75rem 1.25rem 0.75rem 1.25rem;
+}
+.p-dialog .p-dialog-footer,
+div.p-dialog-footer {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+}
+
 /* RowsPerPageDropdown: prevent full-width / wrapping */
 .p-paginator .p-dropdown,
 .p-paginator [data-pc-section="rowPerPageDropdown"],

@@ -1,9 +1,9 @@
 import type { FastifyPluginAsync } from 'fastify'
-import { eq } from 'drizzle-orm'
+import { eq, ilike } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../db.js'
-import { sales, saleItems, cardcomDocuments } from '@ob-inventory/db'
-import { createDocument, getDocumentUrl } from '../services/cardcom.js'
+import { sales, saleItems, cardcomDocuments, salePaymentMethods, salePaymentMethodLinks } from '@ob-inventory/db'
+import { createDocument, getDocumentUrl, chargeCard } from '../services/cardcom.js'
 import type { CardcomDocumentType } from '../services/cardcom.js'
 
 const DOCUMENT_TYPES: CardcomDocumentType[] = [
@@ -162,6 +162,116 @@ export const invoicesRoutes: FastifyPluginAsync = async (fastify) => {
       documentNumber: row.documentNumber,
       createdAt:      row.createdAt,
       docUrl,
+    })
+  })
+
+  // ── POST /api/sales/:id/charge-card ────────────────────────────────────────
+  // Charges a credit card via Cardcom terminal and creates a TaxInvoiceAndReceipt.
+  fastify.post('/api/sales/:id/charge-card', auth, async (request, reply) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(request.params)
+
+    const body = z.object({
+      cardNumber:    z.string().min(13).max(19),
+      cardExpiry:    z.string().regex(/^\d{4}$/, 'Must be MMYY'),
+      cvv:           z.string().min(3).max(4),
+      numOfPayments: z.coerce.number().int().min(1).max(36).default(1),
+      // Optional overrides (pre-filled from sale but admin can edit)
+      customerName:  z.string().min(1).optional(),
+      customerEmail: z.string().nullable().optional(),
+      isVatFree:     z.boolean().default(false),
+      items: z.array(z.object({
+        name:      z.string(),
+        quantity:  z.number().min(1),
+        unitPrice: z.number().min(0),
+      })).optional(),
+    }).parse(request.body)
+
+    // Load sale
+    const [sale] = await db.select().from(sales).where(eq(sales.id, id)).limit(1)
+    if (!sale) return reply.status(404).send({ error: 'Sale not found' })
+
+    // Resolve items
+    const dbItems = body.items == null
+      ? await db.select().from(saleItems).where(eq(saleItems.saleId, id))
+      : []
+
+    const resolvedItems = body.items ?? dbItems.map(i => ({
+      name:      i.name,
+      quantity:  i.quantity,
+      unitPrice: parseFloat(i.unitPrice ?? '0'),
+    }))
+
+    const resolvedName  = body.customerName  ?? sale.customerName  ?? 'לקוח'
+    const resolvedEmail = body.customerEmail !== undefined ? body.customerEmail : sale.customerEmail
+
+    if (resolvedItems.length === 0) {
+      return reply.status(400).send({ error: 'No items — cannot charge an empty sale' })
+    }
+
+    const amount = resolvedItems.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0)
+
+    // Charge card + create document in one Cardcom call
+    let result: Awaited<ReturnType<typeof chargeCard>>
+    try {
+      result = await chargeCard({
+        saleId:        id,
+        customerName:  resolvedName,
+        customerEmail: resolvedEmail,
+        amount,
+        cardNumber:    body.cardNumber,
+        cardExpiry:    body.cardExpiry,
+        cvv:           body.cvv,
+        numOfPayments: body.numOfPayments,
+        isVatFree:     body.isVatFree,
+        items:         resolvedItems,
+      })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Cardcom charge failed'
+      return reply.status(422).send({ error: msg })
+    }
+
+    // Save document to DB
+    const [row] = await db.insert(cardcomDocuments).values({
+      saleId:         id,
+      documentType:   result.documentType,
+      documentNumber: result.documentNumber,
+      transactionId:  result.transactionId,
+      last4Digits:    result.last4Digits,
+      cardBrand:      result.cardBrand,
+    }).returning()
+
+    // Auto-assign the "קארדקום OB" payment method
+    const [cardcomPM] = await db
+      .select()
+      .from(salePaymentMethods)
+      .where(ilike(salePaymentMethods.name, 'קארדקום OB'))
+      .limit(1)
+
+    if (cardcomPM) {
+      // Upsert — don't add duplicate link if it's already there
+      const existingLinks = await db
+        .select()
+        .from(salePaymentMethodLinks)
+        .where(eq(salePaymentMethodLinks.saleId, id))
+
+      const alreadyLinked = existingLinks.some(l => l.paymentMethodId === cardcomPM.id)
+      if (!alreadyLinked) {
+        await db.insert(salePaymentMethodLinks).values({
+          saleId:          id,
+          paymentMethodId: cardcomPM.id,
+        })
+      }
+    }
+
+    return reply.status(201).send({
+      id:             row.id,
+      documentType:   row.documentType,
+      documentNumber: row.documentNumber,
+      transactionId:  row.transactionId,
+      last4Digits:    row.last4Digits,
+      cardBrand:      row.cardBrand,
+      createdAt:      row.createdAt,
+      docUrl:         result.documentUrl,
     })
   })
 }
