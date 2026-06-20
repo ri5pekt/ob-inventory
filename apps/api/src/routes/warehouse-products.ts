@@ -73,12 +73,26 @@ async function upsertAttributes(
   }
 }
 
+function warehouseAccessCheck(
+  request: { user?: { role?: string; warehouseIds?: string[] } },
+  reply: { status: (code: number) => { send: (body: unknown) => unknown } },
+  warehouseId: string,
+) {
+  const user = request.user as { role: string; warehouseIds: string[] }
+  if (user.role === 'warehouse_admin' && !user.warehouseIds.includes(warehouseId)) {
+    return reply.status(403).send({ error: 'Access to this warehouse is not allowed', code: 'FORBIDDEN' })
+  }
+}
+
 export const warehouseProductRoutes: FastifyPluginAsync = async (fastify) => {
   const auth = { onRequest: [fastify.authenticate] }
 
   // ── Add product to warehouse stock ─────────────────────────────────────────
   fastify.post<{ Params: { id: string } }>('/api/warehouses/:id/stock', auth, async (request, reply) => {
     const { id: warehouseId } = request.params
+
+    const forbidden = warehouseAccessCheck(request as never, reply as never, warehouseId)
+    if (forbidden) return forbidden
 
     const body = addProductSchema.safeParse(request.body)
     if (!body.success) return reply.status(400).send({ error: 'Invalid input', code: 'VALIDATION_ERROR', details: body.error.flatten() })
@@ -135,6 +149,9 @@ export const warehouseProductRoutes: FastifyPluginAsync = async (fastify) => {
   // ── Update product stock ────────────────────────────────────────────────────
   fastify.put<{ Params: { id: string; productId: string } }>('/api/warehouses/:id/stock/:productId', auth, async (request, reply) => {
     const { id: warehouseId, productId } = request.params
+
+    const forbidden = warehouseAccessCheck(request as never, reply as never, warehouseId)
+    if (forbidden) return forbidden
 
     const body = updateProductSchema.safeParse(request.body)
     if (!body.success) return reply.status(400).send({ error: 'Invalid input', code: 'VALIDATION_ERROR', details: body.error.flatten() })
@@ -202,8 +219,11 @@ export const warehouseProductRoutes: FastifyPluginAsync = async (fastify) => {
   // ── Remove product from warehouse stock ────────────────────────────────────
   fastify.delete<{ Params: { id: string; productId: string } }>('/api/warehouses/:id/stock/:productId', auth, async (request, reply) => {
     const { id: warehouseId, productId } = request.params
-    const jwtPayload = (request as { user?: { sub?: string } }).user
-    const userId = jwtPayload?.sub ?? null
+
+    const forbidden = warehouseAccessCheck(request as never, reply as never, warehouseId)
+    if (forbidden) return forbidden
+
+    const userId = (request.user as { id?: string })?.id ?? null
 
     const [stockRow] = await db.select().from(inventoryStock)
       .where(and(eq(inventoryStock.productId, productId), eq(inventoryStock.warehouseId, warehouseId)))

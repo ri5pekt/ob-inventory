@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'staff'
+export type UserRole = 'admin' | 'warehouse_admin'
 export type WarehouseType = 'main' | 'partner' | 'other'
 export type AttributeInputType = 'select' | 'text' | 'number'
 export type LedgerActionType = 'receive' | 'transfer_in' | 'transfer_out' | 'sale' | 'return' | 'adjustment'
@@ -12,6 +12,7 @@ export interface AuthUser {
   email: string
   name: string
   role: UserRole
+  warehouseIds: string[]
 }
 
 export interface LoginRequest {

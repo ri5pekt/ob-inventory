@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify'
-import { eq, desc, count, and, gt, gte, lte, inArray, sql } from 'drizzle-orm'
+import { eq, desc, count, and, gt, gte, lte, inArray, sql, or } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../db.js'
 import { enqueueSyncWooStock } from '../queue.js'
@@ -27,9 +27,17 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
     })
     const { limit, offset, dateFrom, dateTo } = qSchema.parse((request as { query: unknown }).query)
 
+    const listUser = request.user as { role: string; warehouseIds: string[] }
     const dateFilters: ReturnType<typeof and>[] = []
     if (dateFrom) dateFilters.push(gte(transfers.transferDate, new Date(dateFrom)) as ReturnType<typeof and>)
     if (dateTo)   dateFilters.push(lte(transfers.transferDate, new Date(dateTo))   as ReturnType<typeof and>)
+    if (listUser.role === 'warehouse_admin') {
+      if (listUser.warehouseIds.length === 0) return []
+      dateFilters.push(or(
+        inArray(transfers.fromWarehouseId, listUser.warehouseIds),
+        inArray(transfers.toWarehouseId,   listUser.warehouseIds),
+      ) as ReturnType<typeof and>)
+    }
 
     const rows = await db
       .select({
@@ -131,9 +139,18 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(400).send({ error: 'Invalid input', code: 'VALIDATION_ERROR', details: parsed.error.flatten() })
     }
     const d = parsed.data
+    const createUser = request.user as { role: string; warehouseIds: string[] }
 
     if (d.fromWarehouseId === d.toWarehouseId) {
       return reply.status(400).send({ error: 'Source and destination warehouses must be different', code: 'SAME_WAREHOUSE' })
+    }
+
+    // Warehouse admins can only transfer from/to their assigned warehouses
+    if (createUser.role === 'warehouse_admin') {
+      const allowed = createUser.warehouseIds
+      if (!allowed.includes(d.fromWarehouseId) || !allowed.includes(d.toWarehouseId)) {
+        return reply.status(403).send({ error: 'Access to one or both warehouses is not allowed', code: 'FORBIDDEN' })
+      }
     }
 
     // Validate warehouses exist
@@ -180,8 +197,7 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     // Execute everything in a transaction
-    const jwtPayload = (request as { user?: { sub?: string } }).user
-    const userId = jwtPayload?.sub ?? null
+    const userId = (request.user as { id?: string })?.id ?? null
 
     const result = await db.transaction(async (tx) => {
       const [transfer] = await tx.insert(transfers).values({
@@ -291,8 +307,7 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
     const [transfer] = await db.select().from(transfers).where(eq(transfers.id, request.params.id))
     if (!transfer) return reply.status(404).send({ error: 'Transfer not found' })
 
-    const jwtPayload = (request as { user?: { sub?: string } }).user
-    const userId = jwtPayload?.sub ?? null
+    const userId = (request.user as { id?: string })?.id ?? null
 
     // Load current items
     const oldItems = await db.select().from(transferItems).where(eq(transferItems.transferId, transfer.id))
@@ -444,8 +459,7 @@ export const transferRoutes: FastifyPluginAsync = async (fastify) => {
   // ── Delete transfer (reverse stock + ledger) ────────────────────────────────
   fastify.delete<{ Params: { id: string } }>('/api/transfers/:id', auth, async (request, reply) => {
     const { id } = request.params
-    const jwtPayload = (request as { user?: { sub?: string } }).user
-    const userId = jwtPayload?.sub ?? null
+    const userId = (request.user as { id?: string })?.id ?? null
 
     const bodySchema = z.object({ reason: z.string().optional() })
     const { reason } = bodySchema.parse(request.body ?? {})

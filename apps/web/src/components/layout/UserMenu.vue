@@ -14,7 +14,9 @@
           <div class="dropdown-identity">
             <div class="dropdown-name">{{ auth.user?.name }}</div>
             <div class="dropdown-email">{{ auth.user?.email }}</div>
-            <span class="role-chip" :class="`role-${auth.user?.role}`">{{ auth.user?.role }}</span>
+            <span class="role-chip" :class="`role-${auth.user?.role}`">
+              {{ auth.user?.role === 'admin' ? 'Main Admin' : 'Warehouse Admin' }}
+            </span>
           </div>
         </div>
 
@@ -123,8 +125,8 @@ function openProfile() {
   text-transform: uppercase; letter-spacing: 0.04em;
   padding: 1px 7px; border-radius: 20px; margin-top: 2px; width: fit-content;
 }
-.role-admin { background: #fee2e2; color: #b91c1c; }
-.role-staff { background: #dbeafe; color: #1d4ed8; }
+.role-admin           { background: #fee2e2; color: #b91c1c; }
+.role-warehouse_admin { background: #dbeafe; color: #1d4ed8; }
 
 .dropdown-divider { height: 1px; background: #f1f5f9; }
 

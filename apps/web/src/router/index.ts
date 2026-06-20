@@ -14,14 +14,14 @@ const routes = [
     children: [
       { path: '', redirect: '/inventory' },
       { path: 'inventory', name: 'inventory', component: () => import('@/views/InventoryView.vue') },
-      { path: 'inventory/logs', name: 'inventory-logs', component: () => import('@/views/InventoryLogsView.vue') },
+      { path: 'inventory/logs', name: 'inventory-logs', component: () => import('@/views/InventoryLogsView.vue'), meta: { adminOnly: true } },
       { path: 'inventory/:id', name: 'warehouse-stock', component: () => import('@/views/WarehouseStockView.vue') },
       { path: 'transfers', name: 'transfers', component: () => import('@/views/TransfersView.vue') },
       { path: 'sales', name: 'sales', component: () => import('@/views/SalesView.vue') },
-      { path: 'settings', redirect: '/settings/parameters' },
-      { path: 'settings/parameters',   name: 'settings-parameters',   component: () => import('@/views/settings/ParametersView.vue') },
-      { path: 'settings/woocommerce',  name: 'settings-woocommerce',  component: () => import('@/views/settings/WooCommerceView.vue') },
-      { path: 'settings/users',        name: 'settings-users',        component: () => import('@/views/settings/UsersView.vue') },
+      { path: 'settings', redirect: '/settings/parameters', meta: { adminOnly: true } },
+      { path: 'settings/parameters',   name: 'settings-parameters',   component: () => import('@/views/settings/ParametersView.vue'),  meta: { adminOnly: true } },
+      { path: 'settings/woocommerce',  name: 'settings-woocommerce',  component: () => import('@/views/settings/WooCommerceView.vue'), meta: { adminOnly: true } },
+      { path: 'settings/users',        name: 'settings-users',        component: () => import('@/views/settings/UsersView.vue'),       meta: { adminOnly: true } },
     ],
   },
 ]
@@ -35,4 +35,5 @@ router.beforeEach((to) => {
   const auth = useAuthStore()
   if (!to.meta.public && !auth.isAuthenticated) return '/login'
   if (to.path === '/login' && auth.isAuthenticated) return '/inventory'
+  if (to.meta.adminOnly && auth.user?.role !== 'admin') return '/sales'
 })

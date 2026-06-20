@@ -96,16 +96,22 @@ import { useQuery } from '@tanstack/vue-query'
 import { getWarehouses } from '@/api/warehouses'
 import StoreSelector from '@/components/layout/StoreSelector.vue'
 import UserMenu from '@/components/layout/UserMenu.vue'
+import { useAuthStore } from '@/stores/auth'
 
 declare const __APP_VERSION__: string
 const appVersion = __APP_VERSION__
 
 const route       = useRoute()
+const auth        = useAuthStore()
 const sidebarOpen = ref(false)
 
 const { data: warehouseList } = useQuery({ queryKey: ['warehouses'], queryFn: getWarehouses })
 
 const mainWarehouseLink = computed(() => {
+  if (auth.isWarehouseAdmin) {
+    const first = warehouseList.value?.[0]
+    return first ? `/inventory/${first.id}` : '/inventory'
+  }
   const main = warehouseList.value?.find(w => w.type === 'main')
   return main ? `/inventory/${main.id}` : '/inventory'
 })
@@ -123,26 +129,50 @@ function toggleGroup(label: string) {
 interface NavChild { to: string; label: string; icon: string }
 interface NavItem  { to?: string; label: string; icon: string; matchPath?: string; children?: NavChild[] }
 
-const navItems = computed((): NavItem[] => [
-  {
-    label: 'Inventory', icon: 'pi-box', matchPath: '/inventory',
-    children: [
-      { to: mainWarehouseLink.value, label: 'Main Warehouse', icon: 'pi-home'       },
-      { to: '/inventory',            label: 'All Warehouses', icon: 'pi-th-large'   },
-      { to: '/inventory/logs',       label: 'Logs',           icon: 'pi-history'    },
-    ],
-  },
-  { to: '/transfers', label: 'Stock Transfers', icon: 'pi-arrow-right-arrow-left' },
-  { to: '/sales',     label: 'Sales',           icon: 'pi-shopping-cart' },
-  {
-    label: 'Settings', icon: 'pi-cog', matchPath: '/settings',
-    children: [
-      { to: '/settings/parameters',  label: 'Parameters',  icon: 'pi-sliders-h' },
-      { to: '/settings/woocommerce', label: 'WooCommerce', icon: 'pi-shop'       },
-      { to: '/settings/users',       label: 'Users',       icon: 'pi-users'      },
-    ],
-  },
-])
+const inventoryChildren = computed(() => {
+  const children: NavChild[] = []
+
+  if (auth.isWarehouseAdmin) {
+    // Show only the warehouses assigned to this user
+    const assigned = warehouseList.value ?? []
+    for (const wh of assigned) {
+      children.push({ to: `/inventory/${wh.id}`, label: wh.name, icon: 'pi-building' })
+    }
+    // "All Warehouses" grid only makes sense when there are multiple
+    if (assigned.length > 1) {
+      children.push({ to: '/inventory', label: 'All Warehouses', icon: 'pi-th-large' })
+    }
+  } else {
+    // Main admin: standard links
+    children.push({ to: mainWarehouseLink.value, label: 'Main Warehouse', icon: 'pi-home'     })
+    children.push({ to: '/inventory',            label: 'All Warehouses', icon: 'pi-th-large' })
+    children.push({ to: '/inventory/logs',       label: 'Logs',           icon: 'pi-history'  })
+  }
+
+  return children
+})
+
+const navItems = computed((): NavItem[] => {
+  const items: NavItem[] = [
+    {
+      label: 'Inventory', icon: 'pi-box', matchPath: '/inventory',
+      children: inventoryChildren.value,
+    },
+    { to: '/transfers', label: 'Stock Transfers', icon: 'pi-arrow-right-arrow-left' },
+    { to: '/sales',     label: 'Sales',           icon: 'pi-shopping-cart' },
+  ]
+  if (auth.isAdmin) {
+    items.push({
+      label: 'Settings', icon: 'pi-cog', matchPath: '/settings',
+      children: [
+        { to: '/settings/parameters',  label: 'Parameters',  icon: 'pi-sliders-h' },
+        { to: '/settings/woocommerce', label: 'WooCommerce', icon: 'pi-shop'       },
+        { to: '/settings/users',       label: 'Users',       icon: 'pi-users'      },
+      ],
+    })
+  }
+  return items
+})
 
 const pageTitles: Record<string, string> = {
   '/inventory/logs':       'Inventory · Logs',

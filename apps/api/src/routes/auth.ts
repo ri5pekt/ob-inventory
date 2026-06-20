@@ -4,7 +4,7 @@ import argon2 from 'argon2'
 import { eq, and, isNull, gt } from 'drizzle-orm'
 import crypto from 'node:crypto'
 import { db } from '../db.js'
-import { users, refreshTokens } from '@ob-inventory/db'
+import { users, refreshTokens, userWarehouses } from '@ob-inventory/db'
 import { env } from '../env.js'
 
 const loginSchema = z.object({
@@ -23,6 +23,14 @@ function parseDurationToMs(duration: string): number {
 
 const REFRESH_TOKEN_MS = parseDurationToMs(env.JWT_REFRESH_EXPIRES_IN)
 const COOKIE_MAX_AGE_S = Math.floor(REFRESH_TOKEN_MS / 1000)
+
+async function getUserWarehouseIds(userId: string): Promise<string[]> {
+  const rows = await db
+    .select({ warehouseId: userWarehouses.warehouseId })
+    .from(userWarehouses)
+    .where(eq(userWarehouses.userId, userId))
+  return rows.map(r => r.warehouseId)
+}
 
 export const authRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post('/api/auth/login', async (request, reply) => {
@@ -45,8 +53,9 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(401).send({ error: 'Invalid credentials', code: 'INVALID_CREDENTIALS' })
     }
 
+    const warehouseIds = user.role === 'warehouse_admin' ? await getUserWarehouseIds(user.id) : []
     const accessToken = fastify.jwt.sign(
-      { id: user.id, email: user.email, name: user.name, role: user.role },
+      { id: user.id, email: user.email, name: user.name, role: user.role, warehouseIds },
       { expiresIn: env.JWT_ACCESS_EXPIRES_IN },
     )
 
@@ -67,7 +76,7 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
       maxAge: COOKIE_MAX_AGE_S,
     })
 
-    return { accessToken, user: { id: user.id, email: user.email, name: user.name, role: user.role } }
+    return { accessToken, user: { id: user.id, email: user.email, name: user.name, role: user.role, warehouseIds } }
   })
 
   fastify.post('/api/auth/refresh', async (request, reply) => {
@@ -101,12 +110,13 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(401).send({ error: 'User not found', code: 'USER_NOT_FOUND' })
     }
 
+    const warehouseIds = user.role === 'warehouse_admin' ? await getUserWarehouseIds(user.id) : []
     const accessToken = fastify.jwt.sign(
-      { id: user.id, email: user.email, name: user.name, role: user.role },
+      { id: user.id, email: user.email, name: user.name, role: user.role, warehouseIds },
       { expiresIn: env.JWT_ACCESS_EXPIRES_IN },
     )
 
-    return { accessToken, user: { id: user.id, email: user.email, name: user.name, role: user.role } }
+    return { accessToken, user: { id: user.id, email: user.email, name: user.name, role: user.role, warehouseIds } }
   })
 
   fastify.post('/api/auth/logout', async (request, reply) => {

@@ -363,17 +363,18 @@ const warehouseOptions = computed(() =>
     : warehouses.value,
 )
 
-function applyMainWarehouse() {
-  if (form.value.saleType === 'direct' && mainWarehouse.value) {
-    form.value.warehouseId = mainWarehouse.value.id
-  }
+function applyDefaultWarehouse() {
+  if (form.value.saleType !== 'direct') return
+  // Prefer the main warehouse; fall back to the first available (e.g. warehouse admin with no main)
+  const target = mainWarehouse.value ?? warehouses.value[0] ?? null
+  if (target) form.value.warehouseId = target.id
 }
 
 watch(visible, async (open) => {
   if (!open) return
   if (warehouses.value.length === 0) {
     loadingWarehouses.value = true
-    try { warehouses.value = await getWarehouses(); applyMainWarehouse() }
+    try { warehouses.value = await getWarehouses(); applyDefaultWarehouse() }
     finally { loadingWarehouses.value = false }
   }
   if (targets.value.length === 0 && invoiceStatuses.value.length === 0 && paymentMethods.value.length === 0) {
@@ -443,7 +444,7 @@ function onTypeChange(type: 'direct' | 'partner') {
   form.value.saleType    = type
   form.value.warehouseId = null
   form.value.items       = []
-  if (type === 'direct') applyMainWarehouse()
+  if (type === 'direct') applyDefaultWarehouse()
 }
 
 function clearItems() {

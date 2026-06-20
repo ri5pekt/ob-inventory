@@ -9,7 +9,8 @@ declare module 'fastify' {
       id: string
       email: string
       name: string
-      role: 'admin' | 'staff'
+      role: 'admin' | 'warehouse_admin'
+      warehouseIds: string[]
     }
   }
 }

@@ -87,9 +87,21 @@ await fastify.register(userRoutes)
 await fastify.register(importRoutes)
 await fastify.register(invoicesRoutes)
 
-try {
-  await fastify.listen({ port: env.API_PORT, host: '0.0.0.0' })
-} catch (err) {
-  fastify.log.error(err)
-  process.exit(1)
+async function startWithRetry(retries = 5, delayMs = 1000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      await fastify.listen({ port: env.API_PORT, host: '0.0.0.0' })
+      return
+    } catch (err: unknown) {
+      if ((err as { code?: string })?.code === 'EADDRINUSE' && i < retries - 1) {
+        fastify.log.warn(`Port ${env.API_PORT} in use, retrying in ${delayMs}ms… (attempt ${i + 1}/${retries})`)
+        await new Promise(r => setTimeout(r, delayMs))
+      } else {
+        fastify.log.error(err)
+        process.exit(1)
+      }
+    }
+  }
 }
+
+await startWithRetry()

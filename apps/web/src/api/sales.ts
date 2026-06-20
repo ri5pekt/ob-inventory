@@ -26,6 +26,7 @@ export interface Sale {
   targetName:        string | null
   invoiceStatusId:   string | null
   invoiceStatusName: string | null
+  createdByName:     string | null
   paymentMethods:    { id: string; name: string }[]
 }
 

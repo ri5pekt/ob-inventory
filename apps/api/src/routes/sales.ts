@@ -15,6 +15,7 @@ import {
   saleInvoiceStatuses,
   salePaymentMethods,
   salePaymentMethodLinks,
+  users,
 } from '@ob-inventory/db'
 
 export const salesRoutes: FastifyPluginAsync = async (fastify) => {
@@ -31,10 +32,15 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
     })
     const q = qSchema.parse((request as { query: unknown }).query)
 
+    const user = request.user as { role: string; warehouseIds: string[] }
     const filters: ReturnType<typeof eq>[] = []
     if (q.type)     filters.push(eq(sales.saleType, q.type))
     if (q.dateFrom) filters.push(gte(sales.saleDate, new Date(q.dateFrom)) as ReturnType<typeof eq>)
     if (q.dateTo)   filters.push(lte(sales.saleDate, new Date(q.dateTo))   as ReturnType<typeof eq>)
+    if (user.role === 'warehouse_admin') {
+      if (user.warehouseIds.length === 0) return []
+      filters.push(inArray(sales.warehouseId, user.warehouseIds) as ReturnType<typeof eq>)
+    }
 
     const rows = await db
       .select({
@@ -59,6 +65,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         targetName:         saleTargets.name,
         invoiceStatusId:    sales.invoiceStatusId,
         invoiceStatusName:  saleInvoiceStatuses.name,
+        createdByName:      users.name,
         itemCount:          sql<number>`coalesce(sum(${saleItems.quantity}), 0)`,
       })
       .from(sales)
@@ -67,8 +74,9 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       .leftJoin(saleItems, eq(sales.id, saleItems.saleId))
       .leftJoin(saleTargets, eq(sales.targetId, saleTargets.id))
       .leftJoin(saleInvoiceStatuses, eq(sales.invoiceStatusId, saleInvoiceStatuses.id))
+      .leftJoin(users, eq(sales.createdBy, users.id))
       .where(filters.length > 0 ? and(...filters) : undefined)
-      .groupBy(sales.id, warehouses.name, stores.name, saleTargets.name, saleInvoiceStatuses.name)
+      .groupBy(sales.id, warehouses.name, stores.name, saleTargets.name, saleInvoiceStatuses.name, users.name)
       .orderBy(desc(sales.saleDate))
       .limit(q.limit)
       .offset(q.offset)
@@ -117,12 +125,14 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         targetName:        saleTargets.name,
         invoiceStatusId:   sales.invoiceStatusId,
         invoiceStatusName: saleInvoiceStatuses.name,
+        createdByName:     users.name,
       })
       .from(sales)
       .leftJoin(warehouses, eq(sales.warehouseId, warehouses.id))
       .leftJoin(stores, eq(sales.storeId, stores.id))
       .leftJoin(saleTargets, eq(sales.targetId, saleTargets.id))
       .leftJoin(saleInvoiceStatuses, eq(sales.invoiceStatusId, saleInvoiceStatuses.id))
+      .leftJoin(users, eq(sales.createdBy, users.id))
       .where(eq(sales.id, request.params.id))
 
     if (!sale) return reply.status(404).send({ error: 'Sale not found' })
@@ -193,6 +203,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       })
     }
     const d = parsed.data
+    const postUser = request.user as { role: string; warehouseIds: string[] }
 
     // Resolve warehouse — if no warehouseId provided, fall back to main warehouse.
     // A provided warehouseId is used as-is for both direct and partner sales.
@@ -204,6 +215,11 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
     } else {
       const [wh] = await db.select().from(warehouses).where(eq(warehouses.id, warehouseId))
       if (!wh) return reply.status(404).send({ error: 'Warehouse not found' })
+    }
+
+    // Warehouse admins can only create sales in their assigned warehouses
+    if (postUser.role === 'warehouse_admin' && !postUser.warehouseIds.includes(warehouseId)) {
+      return reply.status(403).send({ error: 'Access to this warehouse is not allowed', code: 'FORBIDDEN' })
     }
 
     // Resolve products by SKU
@@ -252,8 +268,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
 
     // Execute in transaction
     const result = await db.transaction(async (tx) => {
-      const jwtPayload = (request as { user?: { sub?: string } }).user
-      const userId = jwtPayload?.sub ?? null
+      const userId = (request.user as { id?: string })?.id ?? null
 
       const [sale] = await tx.insert(sales).values({
         saleType:      d.saleType,
@@ -373,8 +388,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
     const [sale] = await db.select().from(sales).where(eq(sales.id, request.params.id))
     if (!sale) return reply.status(404).send({ error: 'Sale not found' })
 
-    const jwtPayload = (request as { user?: { sub?: string } }).user
-    const userId = jwtPayload?.sub ?? null
+    const userId = (request.user as { id?: string })?.id ?? null
 
     // Determine target warehouse (may differ from current)
     const targetWarehouseId   = d.warehouseId ?? sale.warehouseId
@@ -668,8 +682,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
   // ── Delete sale (restore stock + ledger) ───────────────────────────────────
   fastify.delete<{ Params: { id: string } }>('/api/sales/:id', auth, async (request, reply) => {
     const { id } = request.params
-    const jwtPayload = (request as { user?: { sub?: string } }).user
-    const userId = jwtPayload?.sub ?? null
+    const userId = (request.user as { id?: string })?.id ?? null
 
     const bodySchema = z.object({ reason: z.string().optional() })
     const { reason } = bodySchema.parse(request.body ?? {})

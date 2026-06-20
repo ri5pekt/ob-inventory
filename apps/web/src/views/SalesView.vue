@@ -140,6 +140,13 @@
           </template>
         </Column>
 
+        <Column field="createdByName" header="Admin" class="col-admin" sortable>
+          <template #body="{ data }">
+            <span v-if="data.createdByName" class="admin-name">{{ data.createdByName }}</span>
+            <span v-else class="no-value">—</span>
+          </template>
+        </Column>
+
         <Column field="saleType" header="Type" class="col-type" sortable>
           <template #body="{ data }">
             <Tag :value="typeLabel(data.saleType)" :severity="typeSeverity(data.saleType)" />
@@ -318,7 +325,8 @@ const filteredSales = computed(() => {
       s.customerName?.toLowerCase().includes(q) ||
       s.customerEmail?.toLowerCase().includes(q) ||
       s.wooOrderId?.toLowerCase().includes(q) ||
-      s.warehouseName?.toLowerCase().includes(q),
+      s.warehouseName?.toLowerCase().includes(q) ||
+      s.createdByName?.toLowerCase().includes(q),
     )
   }
   return list
@@ -518,7 +526,8 @@ function statusSeverity(status: string) {
 /* ── Column widths ── */
 :deep(.col-date)      { width: 150px; min-width: 150px; }
 :deep(.col-customer)  { min-width: 160px; }
-:deep(.col-warehouse) { width: 160px; min-width: 120px; }
+:deep(.col-warehouse) { width: 140px; min-width: 110px; }
+:deep(.col-admin)     { width: 120px; min-width: 100px; }
 :deep(.col-type)      { width: 110px; min-width: 100px; }
 :deep(.col-meta)      { width: 120px; min-width: 100px; }
 :deep(.col-payment)   { width: 140px; min-width: 110px; }
@@ -539,6 +548,7 @@ function statusSeverity(status: string) {
 .customer-email { font-size: 11px; color: var(--p-text-muted-color); }
 
 .warehouse-text { font-size: 12px; white-space: nowrap; }
+.admin-name     { font-size: 12px; white-space: nowrap; color: var(--p-text-color); }
 
 .order-ref  { font-family: monospace; font-size: 12px; color: var(--p-primary-color); }
 .item-count { font-weight: 700; font-size: 13px; }

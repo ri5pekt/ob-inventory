@@ -7,7 +7,9 @@ export const useAuthStore = defineStore('auth', () => {
   const storedUser = localStorage.getItem('user')
   const user = ref<AuthUser | null>(storedUser ? JSON.parse(storedUser) : null)
   const accessToken = ref<string | null>(localStorage.getItem('accessToken'))
-  const isAuthenticated = computed(() => !!accessToken.value && !!user.value)
+  const isAuthenticated  = computed(() => !!accessToken.value && !!user.value)
+  const isAdmin          = computed(() => user.value?.role === 'admin')
+  const isWarehouseAdmin = computed(() => user.value?.role === 'warehouse_admin')
 
   function setAuth(token: string, userData: AuthUser) {
     accessToken.value = token
@@ -59,5 +61,5 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, accessToken, isAuthenticated, login, logout, fetchMe, refreshToken, setAuth, clearAuth, updateProfile }
+  return { user, accessToken, isAuthenticated, isAdmin, isWarehouseAdmin, login, logout, fetchMe, refreshToken, setAuth, clearAuth, updateProfile }
 })

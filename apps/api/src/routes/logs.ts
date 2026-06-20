@@ -4,6 +4,12 @@ import { z } from 'zod'
 import { db } from '../db.js'
 import { inventoryLedger, products, warehouses, wooSyncLog, stores } from '@ob-inventory/db'
 
+const adminOnly = (request: { user?: { role?: string } }, reply: { status: (code: number) => { send: (body: unknown) => unknown } }) => {
+  if ((request.user as { role: string })?.role !== 'admin') {
+    return reply.status(403).send({ error: 'Admin access required', code: 'FORBIDDEN' })
+  }
+}
+
 export const logsRoutes: FastifyPluginAsync = async (fastify) => {
   const auth = { onRequest: [fastify.authenticate] }
 
@@ -14,7 +20,9 @@ export const logsRoutes: FastifyPluginAsync = async (fastify) => {
   // Returns merged ledger + woo_sync_log entries in one list, ordered by most recent.
   // Action types: receive, transfer_in, transfer_out, sale, return, adjustment,
   //               woo_push_success, woo_push_failed
-  fastify.get('/api/inventory/logs', auth, async (request) => {
+  fastify.get('/api/inventory/logs', auth, async (request, reply) => {
+    const forbidden = adminOnly(request as never, reply as never)
+    if (forbidden) return forbidden
     const qSchema = z.object({
       actionType:  z.enum([
         'receive', 'transfer_in', 'transfer_out', 'sale', 'return', 'adjustment',

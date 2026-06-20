@@ -1,26 +1,29 @@
 import { apiClient } from './client'
 
 export interface UserDTO {
-  id:        string
-  name:      string
-  email:     string
-  role:      'admin' | 'staff'
-  isActive:  boolean
-  createdAt: string
+  id:           string
+  name:         string
+  email:        string
+  role:         'admin' | 'warehouse_admin'
+  warehouseIds: string[]
+  isActive:     boolean
+  createdAt:    string
 }
 
 export interface CreateUserRequest {
-  name:     string
-  email:    string
-  password: string
-  role:     'admin' | 'staff'
+  name:         string
+  email:        string
+  password:     string
+  role:         'admin' | 'warehouse_admin'
+  warehouseIds: string[]
 }
 
 export interface UpdateUserRequest {
-  name?:     string
-  email?:    string
-  role?:     'admin' | 'staff'
-  password?: string
+  name?:         string
+  email?:        string
+  role?:         'admin' | 'warehouse_admin'
+  password?:     string
+  warehouseIds?: string[]
 }
 
 export const usersApi = {

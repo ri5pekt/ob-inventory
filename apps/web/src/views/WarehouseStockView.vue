@@ -13,7 +13,7 @@
           <template v-else>
             <div class="title-row">
               <h2 class="view-title">{{ warehouse.name }}</h2>
-              <button class="edit-wh-btn" title="Edit warehouse" @click="showEditWarehouse = true">
+              <button v-if="auth.isAdmin" class="edit-wh-btn" title="Edit warehouse" @click="showEditWarehouse = true">
                 <i class="pi pi-pencil"></i>
               </button>
             </div>
@@ -200,6 +200,7 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
+import { useAuthStore } from '@/stores/auth'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import MultiSelect from 'primevue/multiselect'
@@ -220,6 +221,7 @@ import type { StockItemDTO } from '@ob-inventory/types'
 
 const route       = useRoute()
 const router      = useRouter()
+const auth        = useAuthStore()
 const warehouseId = computed(() => route.params.id as string)
 
 const { data: allWarehouses } = useQuery({ queryKey: ['warehouses'], queryFn: getWarehouses })

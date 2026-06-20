@@ -1,8 +1,14 @@
 import type { FastifyPluginAsync } from 'fastify'
-import { eq, count, desc, and, or, ilike } from 'drizzle-orm'
+import { eq, count, desc, and, or, ilike, inArray } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../db.js'
 import { warehouses, inventoryStock, inventoryLedger, products } from '@ob-inventory/db'
+
+const adminOnly = (request: { user?: { role?: string } }, reply: { status: (code: number) => { send: (body: unknown) => unknown } }) => {
+  if ((request.user as { role: string })?.role !== 'admin') {
+    return reply.status(403).send({ error: 'Admin access required', code: 'FORBIDDEN' })
+  }
+}
 
 // Stock and product CRUD live in warehouse-stock.ts and warehouse-products.ts
 
@@ -23,7 +29,14 @@ const updateWarehouseSchema = z.object({
 
 export const warehouseRoutes: FastifyPluginAsync = async (fastify) => {
   // ── List warehouses with stock count ───────────────────────────────────────
-  fastify.get('/api/warehouses', { onRequest: [fastify.authenticate] }, async () => {
+  fastify.get('/api/warehouses', { onRequest: [fastify.authenticate] }, async (request) => {
+    const user = request.user as { role: string; warehouseIds: string[] }
+    const scopeFilter = user.role === 'warehouse_admin' && user.warehouseIds.length > 0
+      ? inArray(warehouses.id, user.warehouseIds)
+      : user.role === 'warehouse_admin'
+        ? eq(warehouses.id, '00000000-0000-0000-0000-000000000000') // no warehouses assigned → empty list
+        : undefined
+
     const rows = await db
       .select({
         id: warehouses.id,
@@ -39,17 +52,21 @@ export const warehouseRoutes: FastifyPluginAsync = async (fastify) => {
       })
       .from(warehouses)
       .leftJoin(inventoryStock, eq(warehouses.id, inventoryStock.warehouseId))
+      .where(scopeFilter)
       .groupBy(warehouses.id)
       .orderBy(warehouses.type, warehouses.name)
 
     return rows
   })
 
-  // ── Update warehouse (name / type / notes / color / icon) ──────────────────
+  // ── Update warehouse (admin only) ──────────────────────────────────────────
   fastify.put<{ Params: { id: string } }>(
     '/api/warehouses/:id',
     { onRequest: [fastify.authenticate] },
     async (request, reply) => {
+      const forbidden = adminOnly(request as never, reply as never)
+      if (forbidden) return forbidden
+
       const body = updateWarehouseSchema.safeParse(request.body)
       if (!body.success) return reply.status(400).send({ error: 'Invalid input', details: body.error.flatten() })
 

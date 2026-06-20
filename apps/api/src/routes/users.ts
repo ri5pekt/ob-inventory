@@ -1,9 +1,9 @@
 import type { FastifyPluginAsync } from 'fastify'
-import { eq, ne, asc } from 'drizzle-orm'
+import { eq, ne, asc, inArray } from 'drizzle-orm'
 import { z } from 'zod'
 import argon2 from 'argon2'
 import { db } from '../db.js'
-import { users, refreshTokens } from '@ob-inventory/db'
+import { users, refreshTokens, userWarehouses } from '@ob-inventory/db'
 
 const adminOnly = async (request: Parameters<FastifyPluginAsync>[0] & { user?: { role?: string } }, reply: { status: (code: number) => { send: (body: unknown) => unknown } }) => {
   if ((request.user as { role: string })?.role !== 'admin') {
@@ -12,9 +12,9 @@ const adminOnly = async (request: Parameters<FastifyPluginAsync>[0] & { user?: {
 }
 
 export const userRoutes: FastifyPluginAsync = async (fastify) => {
-  const auth      = { onRequest: [fastify.authenticate] }
+  const auth = { onRequest: [fastify.authenticate] }
 
-  // ── List all active users ─────────────────────────────────────────────────
+  // ── List all active users with their warehouse assignments ────────────────
   fastify.get('/api/users', auth, async (request, reply) => {
     await adminOnly(request as never, reply)
     const rows = await db
@@ -28,7 +28,23 @@ export const userRoutes: FastifyPluginAsync = async (fastify) => {
       })
       .from(users)
       .orderBy(asc(users.createdAt))
-    return rows
+
+    // Attach warehouse IDs for each user
+    const userIds = rows.map(r => r.id)
+    const assignments = userIds.length > 0
+      ? await db
+          .select({ userId: userWarehouses.userId, warehouseId: userWarehouses.warehouseId })
+          .from(userWarehouses)
+          .where(inArray(userWarehouses.userId, userIds))
+      : []
+
+    const warehousesByUser = assignments.reduce<Record<string, string[]>>((acc, row) => {
+      if (!acc[row.userId]) acc[row.userId] = []
+      acc[row.userId].push(row.warehouseId)
+      return acc
+    }, {})
+
+    return rows.map(r => ({ ...r, warehouseIds: warehousesByUser[r.id] ?? [] }))
   })
 
   // ── Create user ───────────────────────────────────────────────────────────
@@ -36,10 +52,11 @@ export const userRoutes: FastifyPluginAsync = async (fastify) => {
     await adminOnly(request as never, reply)
 
     const schema = z.object({
-      name:     z.string().min(1),
-      email:    z.string().email(),
-      password: z.string().min(6),
-      role:     z.enum(['admin', 'staff']).default('staff'),
+      name:         z.string().min(1),
+      email:        z.string().email(),
+      password:     z.string().min(6),
+      role:         z.enum(['admin', 'warehouse_admin']).default('warehouse_admin'),
+      warehouseIds: z.array(z.string().uuid()).default([]),
     })
     const body = schema.safeParse(request.body)
     if (!body.success) return reply.status(400).send({ error: 'Invalid input', details: body.error.flatten() })
@@ -53,18 +70,26 @@ export const userRoutes: FastifyPluginAsync = async (fastify) => {
       .values({ name: d.name, email: d.email, passwordHash, role: d.role })
       .returning({ id: users.id, name: users.name, email: users.email, role: users.role, createdAt: users.createdAt })
 
-    return reply.status(201).send(user)
+    // Insert warehouse assignments
+    if (d.role === 'warehouse_admin' && d.warehouseIds.length > 0) {
+      await db.insert(userWarehouses)
+        .values(d.warehouseIds.map(wid => ({ userId: user.id, warehouseId: wid })))
+        .onConflictDoNothing()
+    }
+
+    return reply.status(201).send({ ...user, warehouseIds: d.role === 'warehouse_admin' ? d.warehouseIds : [] })
   })
 
-  // ── Update user (name / email / role / password) ──────────────────────────
+  // ── Update user (name / email / role / password / warehouseIds) ───────────
   fastify.put<{ Params: { id: string } }>('/api/users/:id', auth, async (request, reply) => {
     await adminOnly(request as never, reply)
 
     const schema = z.object({
-      name:     z.string().min(1).optional(),
-      email:    z.string().email().optional(),
-      role:     z.enum(['admin', 'staff']).optional(),
-      password: z.string().min(6).optional(),
+      name:         z.string().min(1).optional(),
+      email:        z.string().email().optional(),
+      role:         z.enum(['admin', 'warehouse_admin']).optional(),
+      password:     z.string().min(6).optional(),
+      warehouseIds: z.array(z.string().uuid()).optional(),
     })
     const body = schema.safeParse(request.body)
     if (!body.success) return reply.status(400).send({ error: 'Invalid input', details: body.error.flatten() })
@@ -88,7 +113,24 @@ export const userRoutes: FastifyPluginAsync = async (fastify) => {
       .returning({ id: users.id, name: users.name, email: users.email, role: users.role, createdAt: users.createdAt })
 
     if (!updated) return reply.status(404).send({ error: 'User not found' })
-    return updated
+
+    // Sync warehouse assignments when provided
+    if (d.warehouseIds !== undefined) {
+      await db.delete(userWarehouses).where(eq(userWarehouses.userId, request.params.id))
+      const effectiveRole = d.role ?? updated.role
+      if (effectiveRole === 'warehouse_admin' && d.warehouseIds.length > 0) {
+        await db.insert(userWarehouses)
+          .values(d.warehouseIds.map(wid => ({ userId: request.params.id, warehouseId: wid })))
+          .onConflictDoNothing()
+      }
+    }
+
+    // Return updated warehouse assignments
+    const assignments = await db
+      .select({ warehouseId: userWarehouses.warehouseId })
+      .from(userWarehouses)
+      .where(eq(userWarehouses.userId, updated.id))
+    return { ...updated, warehouseIds: assignments.map(r => r.warehouseId) }
   })
 
   // ── Delete (deactivate) user ──────────────────────────────────────────────
@@ -102,12 +144,10 @@ export const userRoutes: FastifyPluginAsync = async (fastify) => {
     const [user] = await db.select({ id: users.id }).from(users).where(eq(users.id, request.params.id))
     if (!user) return reply.status(404).send({ error: 'User not found' })
 
-    // Revoke all refresh tokens
     await db.update(refreshTokens)
       .set({ revokedAt: new Date() })
       .where(eq(refreshTokens.userId, request.params.id))
 
-    // Soft-delete
     await db.update(users)
       .set({ isActive: false })
       .where(eq(users.id, request.params.id))

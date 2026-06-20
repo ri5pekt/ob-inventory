@@ -32,9 +32,50 @@
         </div>
 
         <div class="field">
-          <label class="field-label">Role</label>
-          <Select v-model="form.role" :options="roleOptions" option-label="label" option-value="value" class="w-full" append-to="body" />
+          <label class="field-label">User Type</label>
+          <div class="type-toggle">
+            <button
+              type="button"
+              class="type-btn"
+              :class="{ active: form.role === 'admin' }"
+              @click="form.role = 'admin'"
+            >
+              <i class="pi pi-shield" />
+              Main Admin
+            </button>
+            <button
+              type="button"
+              class="type-btn"
+              :class="{ active: form.role === 'warehouse_admin' }"
+              @click="form.role = 'warehouse_admin'"
+            >
+              <i class="pi pi-building" />
+              Warehouse Admin
+            </button>
+          </div>
         </div>
+      </div>
+
+      <!-- Warehouse assignment — only shown for warehouse_admin -->
+      <div v-if="form.role === 'warehouse_admin'" class="field wh-field">
+        <label class="field-label">
+          Assigned Warehouses
+          <span v-if="touched && form.role === 'warehouse_admin' && form.warehouseIds.length === 0" class="req"> *</span>
+        </label>
+        <MultiSelect
+          v-model="form.warehouseIds"
+          :options="warehouses"
+          option-label="name"
+          option-value="id"
+          placeholder="Select warehouses..."
+          :invalid="touched && form.role === 'warehouse_admin' && form.warehouseIds.length === 0"
+          class="w-full"
+          append-to="body"
+          display="chip"
+        />
+        <span v-if="touched && form.role === 'warehouse_admin' && form.warehouseIds.length === 0" class="field-error">
+          At least one warehouse required
+        </span>
       </div>
 
       <div v-if="createError" class="error-banner">
@@ -48,21 +89,28 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
+import MultiSelect from 'primevue/multiselect'
 import { usersApi } from '@/api/users'
+import { getWarehouses } from '@/api/warehouses'
 
 const emit = defineEmits<{ created: [] }>()
 
-const roleOptions = [
-  { label: 'Staff', value: 'staff' },
-  { label: 'Admin', value: 'admin' },
-]
+const { data: warehouseList } = useQuery({ queryKey: ['warehouses'], queryFn: getWarehouses })
+const warehouses = warehouseList
 
-const emptyForm = () => ({ name: '', email: '', password: '', role: 'staff' as 'admin' | 'staff' })
-const form       = ref(emptyForm())
-const touched    = ref(false)
-const creating   = ref(false)
+const emptyForm = () => ({
+  name:         '',
+  email:        '',
+  password:     '',
+  role:         'warehouse_admin' as 'admin' | 'warehouse_admin',
+  warehouseIds: [] as string[],
+})
+const form        = ref(emptyForm())
+const touched     = ref(false)
+const creating    = ref(false)
 const createError = ref('')
-const showPass   = ref(false)
+const showPass    = ref(false)
 
 function genPass(len = 12): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$'
@@ -73,10 +121,11 @@ function generatePassword() { form.value.password = genPass(); showPass.value = 
 async function submit() {
   touched.value = true
   if (!form.value.name || !form.value.email || form.value.password.length < 6) return
+  if (form.value.role === 'warehouse_admin' && form.value.warehouseIds.length === 0) return
   creating.value = true; createError.value = ''
   try {
     await usersApi.create({ ...form.value })
-    form.value   = emptyForm()
+    form.value    = emptyForm()
     touched.value = false
     showPass.value = false
     emit('created')
@@ -102,12 +151,41 @@ async function submit() {
 }
 
 .field { display: flex; flex-direction: column; gap: 5px; }
+.wh-field { margin-bottom: 16px; }
 .field-label { font-size: 13px; font-weight: 500; color: #475569; }
 .req         { color: #ef4444; }
 .field-error { font-size: 12px; color: #ef4444; }
 
 .pass-row { display: flex; gap: 4px; align-items: center; }
 .pass-row .w-full { flex: 1; min-width: 0; }
+
+.type-toggle {
+  display: flex;
+  gap: 8px;
+}
+.type-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.type-btn:hover { border-color: #94a3b8; color: #334155; }
+.type-btn.active {
+  border-color: #0891b2;
+  background: #ecfeff;
+  color: #0e7490;
+}
+.type-btn .pi { font-size: 13px; }
 
 .error-banner {
   display: flex; align-items: center; gap: 8px;

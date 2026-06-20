@@ -18,6 +18,11 @@ export const warehouseStockRoutes: FastifyPluginAsync = async (fastify) => {
     { onRequest: [fastify.authenticate] },
     async (request, reply) => {
       const { id } = request.params
+      const user = request.user as { role: string; warehouseIds: string[] }
+
+      if (user.role === 'warehouse_admin' && !user.warehouseIds.includes(id)) {
+        return reply.status(403).send({ error: 'Access to this warehouse is not allowed', code: 'FORBIDDEN' })
+      }
 
       const [warehouse] = await db.select().from(warehouses).where(eq(warehouses.id, id))
       if (!warehouse) return reply.status(404).send({ error: 'Warehouse not found', code: 'NOT_FOUND' })
