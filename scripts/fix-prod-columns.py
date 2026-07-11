@@ -3,13 +3,14 @@ Emergency fix: add sale_date and transfer_date columns directly to production DB
 Run from project root: python scripts/fix-prod-columns.py
 """
 import paramiko, sys, io, os, time
+from _vps_creds import VPS_HOST, VPS_USER, VPS_PASSWORD
 
 os.environ.setdefault('PYTHONIOENCODING', 'utf-8')
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace', line_buffering=True)
 
-HOST     = "187.124.160.50"
-USER     = "root"
-PASSWORD = "ct3JzHM18F/4kpfL"
+HOST     = VPS_HOST
+USER     = VPS_USER
+PASSWORD = VPS_PASSWORD
 COMPOSE  = "docker compose -f /opt/ob-inventory/docker-compose.yml"
 
 client = paramiko.SSHClient()

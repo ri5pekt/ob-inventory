@@ -15,10 +15,10 @@ Usage:
 import os
 import sys
 import subprocess
+from _vps_creds import VPS_HOST, VPS_USER
 
-# Optional: load from .env.production or similar
-SSH_HOST = os.environ.get("PRODUCTION_SSH_HOST", "187.124.160.50")
-SSH_USER = os.environ.get("PRODUCTION_SSH_USER", "root")
+SSH_HOST = os.environ.get("PRODUCTION_SSH_HOST", VPS_HOST)
+SSH_USER = os.environ.get("PRODUCTION_SSH_USER", VPS_USER)
 SCHEMA_OUT = "scripts/production-schema.sql"
 
 

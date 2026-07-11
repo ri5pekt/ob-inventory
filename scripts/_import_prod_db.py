@@ -4,10 +4,11 @@ Wipes local data and replaces with prod data.
 Clears store credentials so no accidental Woo syncs happen.
 """
 import paramiko, subprocess, sys, os, time, tempfile
+from _vps_creds import VPS_HOST, VPS_USER, VPS_PASSWORD
 
-HOST     = "187.124.160.50"
-USER     = "root"
-PASSWORD = "ct3JzHM18F/4kpfL"
+HOST     = VPS_HOST
+USER     = VPS_USER
+PASSWORD = VPS_PASSWORD
 
 LOCAL_CONTAINER = "ob-inventory-postgres-1"
 LOCAL_DB_USER   = "ob_user"

@@ -9,15 +9,16 @@ import secrets
 import sys
 import os
 import io
+from _vps_creds import VPS_HOST, VPS_USER, VPS_PASSWORD
 
 # Force UTF-8 output so remote Unicode chars don't crash on Windows cp1252
 os.environ.setdefault('PYTHONIOENCODING', 'utf-8')
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace', line_buffering=True)
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace', line_buffering=True)
 
-HOST     = "187.124.160.50"
-USER     = "root"
-PASSWORD = "ct3JzHM18F/4kpfL"
+HOST     = VPS_HOST
+USER     = VPS_USER
+PASSWORD = VPS_PASSWORD
 REPO_URL = "https://github.com/ri5pekt/ob-inventory.git"
 APP_DIR  = "/opt/ob-inventory"
 DOMAIN   = "activebrands.cloud"

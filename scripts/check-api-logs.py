@@ -1,10 +1,11 @@
 import paramiko, sys, io, os, time
+from _vps_creds import VPS_HOST, VPS_USER, VPS_PASSWORD
 os.environ.setdefault('PYTHONIOENCODING', 'utf-8')
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace', line_buffering=True)
 
 client = paramiko.SSHClient()
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-client.connect("187.124.160.50", username="root", password="ct3JzHM18F/4kpfL", timeout=30)
+client.connect(VPS_HOST, username=VPS_USER, password=VPS_PASSWORD, timeout=30)
 
 def run(cmd, timeout=300):
     print(f"\n$ {cmd[:100]}")
