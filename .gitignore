@@ -56,3 +56,6 @@ docs/cardcom/credentials.txt
 
 # DB schema dumps (regenerate with scripts/compare-production-db.py dump)
 scripts/production-schema.sql
+
+# Production DB backups / app archives (contain real customer PII — never commit)
+scripts/backups/
