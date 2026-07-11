@@ -20,29 +20,45 @@ import {
 } from '@ob-inventory/db'
 
 // ── Shared helper: upsert customer from sale data ─────────────────────────────
-// Only creates if email is present and no customer with that email already exists.
-export async function upsertCustomerFromSale(data: {
-  customerName?:    string | null
-  customerEmail?:   string | null
-  customerPhone?:   string | null
-  customerAddress?: string | null
-}) {
+// If a customer with this email already exists, only backfills a blank ID
+// number (never overwrites existing data). If no customer exists, creates one
+// — unless `allowCreate` is false (e.g. the "save as new customer" checkbox
+// was left unchecked and this customer wasn't picked from the lookup either).
+export async function upsertCustomerFromSale(
+  data: {
+    customerName?:     string | null
+    customerEmail?:    string | null
+    customerPhone?:    string | null
+    customerAddress?:  string | null
+    customerIdNumber?: string | null
+  },
+  opts: { allowCreate?: boolean } = {},
+) {
   if (!data.customerEmail) return
-  const email = data.customerEmail.toLowerCase().trim()
+  const email    = data.customerEmail.toLowerCase().trim()
+  const idNumber = data.customerIdNumber?.trim() || null
 
   const [existing] = await db
-    .select({ id: customers.id })
+    .select({ id: customers.id, idNumber: customers.idNumber })
     .from(customers)
     .where(eq(sql`lower(${customers.email})`, email))
 
-  if (!existing) {
-    await db.insert(customers).values({
-      name:    data.customerName || data.customerEmail,
-      email:   data.customerEmail.trim(),
-      phone:   data.customerPhone   ?? null,
-      address: data.customerAddress ?? null,
-    })
+  if (existing) {
+    if (idNumber && !existing.idNumber) {
+      await db.update(customers).set({ idNumber }).where(eq(customers.id, existing.id))
+    }
+    return
   }
+
+  if (opts.allowCreate === false) return
+
+  await db.insert(customers).values({
+    name:     data.customerName || data.customerEmail,
+    email:    data.customerEmail.trim(),
+    phone:    data.customerPhone   ?? null,
+    address:  data.customerAddress ?? null,
+    idNumber,
+  })
 }
 
 export const salesRoutes: FastifyPluginAsync = async (fastify) => {
@@ -83,6 +99,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         customerEmail:   sales.customerEmail,
         customerPhone:   sales.customerPhone,
         customerAddress: sales.customerAddress,
+        customerIdNumber: sales.customerIdNumber,
         totalPrice:      sales.totalPrice,
         currency:        sales.currency,
         notes:           sales.notes,
@@ -142,6 +159,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         customerEmail:   sales.customerEmail,
         customerPhone:   sales.customerPhone,
         customerAddress: sales.customerAddress,
+        customerIdNumber: sales.customerIdNumber,
         totalPrice:      sales.totalPrice,
         currency:        sales.currency,
         notes:           sales.notes,
@@ -206,6 +224,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       customerEmail:   z.string().optional(),
       customerPhone:   z.string().optional(),
       customerAddress: z.string().optional(),
+      customerIdNumber: z.string().optional(),
       currency:        z.string().default('ILS'),
       notes:           z.string().optional(),
       targetId:          z.string().uuid().optional(),
@@ -306,6 +325,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         customerEmail:   d.customerEmail   ?? null,
         customerPhone:   d.customerPhone   ?? null,
         customerAddress: d.customerAddress ?? null,
+        customerIdNumber: d.customerIdNumber ?? null,
         totalPrice:    totalPrice > 0 ? String(totalPrice) : null,
         currency:      d.currency,
         notes:           d.notes            ?? null,
@@ -380,15 +400,19 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       }
     }
 
-    // Auto-create customer if requested and email is present
-    if (d.createCustomer) {
-      await upsertCustomerFromSale({
-        customerName:    d.customerName,
-        customerEmail:   d.customerEmail,
-        customerPhone:   d.customerPhone,
-        customerAddress: d.customerAddress,
-      })
-    }
+    // Backfill/create the customer record — always fills a blank ID number on
+    // an existing customer match; only creates a brand-new customer if the
+    // "save as new customer" checkbox was checked (d.createCustomer).
+    await upsertCustomerFromSale(
+      {
+        customerName:     d.customerName,
+        customerEmail:    d.customerEmail,
+        customerPhone:    d.customerPhone,
+        customerAddress:  d.customerAddress,
+        customerIdNumber: d.customerIdNumber,
+      },
+      { allowCreate: d.createCustomer },
+    )
 
     return reply.status(201).send(result)
   })
@@ -401,6 +425,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       customerEmail:   z.string().optional(),
       customerPhone:   z.string().optional(),
       customerAddress: z.string().optional(),
+      customerIdNumber: z.string().optional(),
       currency:        z.string().optional(),
       notes:           z.string().optional(),
       targetId:         z.string().uuid().nullable().optional(),
@@ -548,6 +573,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
             customerEmail:   d.customerEmail   ?? null,
             customerPhone:   d.customerPhone   ?? null,
             customerAddress: d.customerAddress ?? null,
+            customerIdNumber: d.customerIdNumber ?? null,
             currency:        d.currency        ?? sale.currency,
             notes:           d.notes           ?? null,
             totalPrice:      totalPrice > 0 ? String(totalPrice) : null,
@@ -675,6 +701,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
             customerEmail:   d.customerEmail   ?? null,
             customerPhone:   d.customerPhone   ?? null,
             customerAddress: d.customerAddress ?? null,
+            customerIdNumber: d.customerIdNumber ?? null,
             currency:        d.currency        ?? sale.currency,
             notes:           d.notes           ?? null,
             totalPrice:      totalPrice > 0 ? String(totalPrice) : null,

@@ -34,6 +34,10 @@
           <span class="meta-label">Phone</span>
           <span>{{ sale.customerPhone }}</span>
         </div>
+        <div v-if="sale.customerIdNumber" class="meta-row">
+          <span class="meta-label">ID / ח.פ.</span>
+          <span>{{ sale.customerIdNumber }}</span>
+        </div>
         <div v-if="sale.customerAddress" class="meta-row">
           <span class="meta-label">Address</span>
           <span>{{ sale.customerAddress }}</span>

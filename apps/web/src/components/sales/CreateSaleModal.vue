@@ -72,6 +72,10 @@
           <label>Currency</label>
           <InputText v-model="form.currency" placeholder="ILS" fluid />
         </div>
+        <div class="field">
+          <label>ID / ח.פ.</label>
+          <InputText v-model="form.customerIdNumber" placeholder="Optional" fluid />
+        </div>
         <div class="field field-full">
           <label>Customer Address</label>
           <InputText v-model="form.customerAddress" placeholder="Optional — street, city, zip…" fluid />
@@ -307,6 +311,10 @@
           <span class="confirm-label">Phone</span>
           <strong>{{ form.customerPhone }}</strong>
         </div>
+        <div v-if="form.customerIdNumber" class="confirm-warehouse-row">
+          <span class="confirm-label">ID / ח.פ.</span>
+          <strong>{{ form.customerIdNumber }}</strong>
+        </div>
       </div>
 
       <div class="confirm-stats">
@@ -417,6 +425,7 @@ const defaultForm = () => ({
   customerEmail:    '',
   customerPhone:    '',
   customerAddress:  '',
+  customerIdNumber: '',
   currency:         'ILS',
   notes:            '',
   targetId:         null as string | null,
@@ -502,18 +511,20 @@ const showCreateCustomerToggle = computed(() =>
 
 function applyCustomer(c: Customer) {
   customerSelectedFromLookup.value = true
-  form.value.customerName    = c.name    ?? ''
-  form.value.customerEmail   = c.email   ?? ''
-  form.value.customerPhone   = c.phone   ?? ''
-  form.value.customerAddress = c.address ?? ''
+  form.value.customerName     = c.name     ?? ''
+  form.value.customerEmail    = c.email    ?? ''
+  form.value.customerPhone    = c.phone    ?? ''
+  form.value.customerAddress  = c.address  ?? ''
+  form.value.customerIdNumber = c.idNumber ?? ''
 }
 
 function clearCustomer() {
   customerSelectedFromLookup.value = false
-  form.value.customerName    = ''
-  form.value.customerEmail   = ''
-  form.value.customerPhone   = ''
-  form.value.customerAddress = ''
+  form.value.customerName     = ''
+  form.value.customerEmail    = ''
+  form.value.customerPhone    = ''
+  form.value.customerAddress  = ''
+  form.value.customerIdNumber = ''
 }
 
 function resetForm() {
@@ -557,6 +568,7 @@ async function submit() {
       customerEmail:    form.value.customerEmail.trim()    || undefined,
       customerPhone:    form.value.customerPhone.trim()    || undefined,
       customerAddress:  form.value.customerAddress.trim()  || undefined,
+      customerIdNumber: form.value.customerIdNumber.trim() || undefined,
       currency:         form.value.currency.trim()         || 'ILS',
       notes:            form.value.notes.trim()            || undefined,
       targetId:         form.value.targetId        ?? undefined,

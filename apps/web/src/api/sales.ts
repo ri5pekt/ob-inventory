@@ -16,6 +16,7 @@ export interface Sale {
   customerEmail:   string | null
   customerPhone:   string | null
   customerAddress: string | null
+  customerIdNumber: string | null
   totalPrice:    string | null
   currency:      string
   notes:         string | null
@@ -61,6 +62,7 @@ export interface CreateSaleRequest {
   customerEmail?:    string
   customerPhone?:    string
   customerAddress?:  string
+  customerIdNumber?: string
   currency?:         string
   notes?:            string
   targetId?:         string
@@ -107,6 +109,7 @@ export interface UpdateSaleRequest {
   customerEmail?:    string
   customerPhone?:    string
   customerAddress?:  string
+  customerIdNumber?: string
   currency?:         string
   notes?:            string
   targetId?:         string | null

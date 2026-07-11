@@ -59,6 +59,10 @@
           <label>Currency</label>
           <InputText v-model="form.currency" placeholder="ILS" fluid />
         </div>
+        <div class="field">
+          <label>ID / ח.פ.</label>
+          <InputText v-model="form.customerIdNumber" placeholder="Optional" fluid />
+        </div>
         <div class="field field-full">
           <label>Customer Address</label>
           <InputText v-model="form.customerAddress" placeholder="Optional — street, city, zip…" fluid />
@@ -277,6 +281,7 @@ const defaultForm = () => ({
   customerEmail:   '',
   customerPhone:   '',
   customerAddress: '',
+  customerIdNumber: '',
   currency:        'ILS',
   notes:           '',
   targetId:        null as string | null,
@@ -318,11 +323,12 @@ watch(() => props.modelValue, async (open) => {
 watch(() => props.sale, (sale) => {
   if (!sale) return
   form.value.warehouseId     = sale.warehouseId     ?? null
-  form.value.customerName    = sale.customerName    ?? ''
-  form.value.customerEmail   = sale.customerEmail   ?? ''
-  form.value.customerPhone   = sale.customerPhone   ?? ''
-  form.value.customerAddress = sale.customerAddress ?? ''
-  form.value.currency        = sale.currency        ?? 'ILS'
+  form.value.customerName     = sale.customerName     ?? ''
+  form.value.customerEmail    = sale.customerEmail    ?? ''
+  form.value.customerPhone    = sale.customerPhone    ?? ''
+  form.value.customerAddress  = sale.customerAddress  ?? ''
+  form.value.customerIdNumber = sale.customerIdNumber ?? ''
+  form.value.currency         = sale.currency         ?? 'ILS'
   form.value.notes           = sale.notes           ?? ''
   form.value.targetId        = sale.targetId        ?? null
   form.value.invoiceStatusId = sale.invoiceStatusId ?? null
@@ -380,17 +386,19 @@ function clampQty(idx: number) {
 const customerSearchRef = ref<InstanceType<typeof CustomerSearchInput> | null>(null)
 
 function applyCustomer(c: Customer) {
-  form.value.customerName    = c.name    ?? ''
-  form.value.customerEmail   = c.email   ?? ''
-  form.value.customerPhone   = c.phone   ?? ''
-  form.value.customerAddress = c.address ?? ''
+  form.value.customerName     = c.name     ?? ''
+  form.value.customerEmail    = c.email    ?? ''
+  form.value.customerPhone    = c.phone    ?? ''
+  form.value.customerAddress  = c.address  ?? ''
+  form.value.customerIdNumber = c.idNumber ?? ''
 }
 
 function clearCustomer() {
-  form.value.customerName    = ''
-  form.value.customerEmail   = ''
-  form.value.customerPhone   = ''
-  form.value.customerAddress = ''
+  form.value.customerName     = ''
+  form.value.customerEmail    = ''
+  form.value.customerPhone    = ''
+  form.value.customerAddress  = ''
+  form.value.customerIdNumber = ''
 }
 
 function resetForm() {
@@ -415,6 +423,7 @@ async function submit() {
       customerEmail:   form.value.customerEmail.trim()   || undefined,
       customerPhone:   form.value.customerPhone.trim()   || undefined,
       customerAddress: form.value.customerAddress.trim() || undefined,
+      customerIdNumber: form.value.customerIdNumber.trim() || undefined,
       currency:        form.value.currency.trim()        || 'ILS',
       notes:           form.value.notes.trim()           || undefined,
       targetId:        form.value.targetId,
