@@ -127,6 +127,13 @@
       "when": 1749999999000,
       "tag": "0017_warehouse_admin_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1750420000000,
+      "tag": "0018_customers",
+      "breakpoints": true
     }
   ]
 }

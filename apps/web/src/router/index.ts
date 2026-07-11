@@ -18,10 +18,12 @@ const routes = [
       { path: 'inventory/:id', name: 'warehouse-stock', component: () => import('@/views/WarehouseStockView.vue') },
       { path: 'transfers', name: 'transfers', component: () => import('@/views/TransfersView.vue') },
       { path: 'sales', name: 'sales', component: () => import('@/views/SalesView.vue') },
+      { path: 'customers', name: 'customers', component: () => import('@/views/CustomersView.vue') },
       { path: 'settings', redirect: '/settings/parameters', meta: { adminOnly: true } },
       { path: 'settings/parameters',   name: 'settings-parameters',   component: () => import('@/views/settings/ParametersView.vue'),  meta: { adminOnly: true } },
       { path: 'settings/woocommerce',  name: 'settings-woocommerce',  component: () => import('@/views/settings/WooCommerceView.vue'), meta: { adminOnly: true } },
       { path: 'settings/users',        name: 'settings-users',        component: () => import('@/views/settings/UsersView.vue'),       meta: { adminOnly: true } },
+      { path: 'settings/tools',        name: 'settings-tools',        component: () => import('@/views/settings/ToolsView.vue'),        meta: { adminOnly: true } },
     ],
   },
 ]

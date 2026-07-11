@@ -26,6 +26,8 @@ import { productSearchRoutes } from './routes/product-search.js'
 import { userRoutes } from './routes/users.js'
 import { importRoutes } from './routes/import.js'
 import { invoicesRoutes } from './routes/invoices.js'
+import { customerRoutes } from './routes/customers.js'
+import { toolsRoutes } from './routes/tools.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname  = dirname(__filename)
@@ -86,6 +88,8 @@ await fastify.register(productSearchRoutes)
 await fastify.register(userRoutes)
 await fastify.register(importRoutes)
 await fastify.register(invoicesRoutes)
+await fastify.register(customerRoutes)
+await fastify.register(toolsRoutes)
 
 async function startWithRetry(retries = 5, delayMs = 1000) {
   for (let i = 0; i < retries; i++) {

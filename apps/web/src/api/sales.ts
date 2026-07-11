@@ -67,6 +67,7 @@ export interface CreateSaleRequest {
   invoiceStatusId?:  string
   paymentMethodIds?: string[]
   saleDate?:         string
+  createCustomer?:   boolean
   items:             CreateSaleItemInput[]
 }
 

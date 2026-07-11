@@ -84,7 +84,7 @@
               <span v-if="data.referenceType" class="ref-badge" :class="`ref-${data.referenceType}`">
                 {{ data.referenceType }}
               </span>
-              <span class="notes-text">{{ data.notes ?? '—' }}</span>
+              <span class="notes-text">{{ decodeNotes(data.notes) }}</span>
             </div>
           </template>
         </Column>
@@ -150,6 +150,12 @@ const { data: warehousesData } = useQuery({ queryKey: ['warehouses'], queryFn: g
 const warehouseOptions = computed(() => warehousesData.value ?? [])
 const logs             = computed(() => logsData.value ?? [])
 const filteredLogs     = computed(() => logs.value)
+
+function decodeNotes(notes: string | null): string {
+  if (!notes) return '—'
+  // Decode JSON unicode escapes (e.g. \u05e6 → ציוד) stored by the worker
+  try { return JSON.parse(`"${notes.replace(/"/g, '\\"')}"`) } catch { return notes }
+}
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })

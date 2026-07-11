@@ -12,6 +12,7 @@ import {
   sales,
   saleItems,
 } from '@ob-inventory/db'
+import { upsertCustomerFromSale } from './sales.js'
 
 // ── Payload schema from the WooCommerce plugin ────────────────────────────────
 
@@ -185,6 +186,14 @@ export const webhookRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       return { sale, unresolvedSkus: unresolved }
+    })
+
+    // Auto-create customer from WooCommerce order if email present
+    await upsertCustomerFromSale({
+      customerName:    order.customer.name    || null,
+      customerEmail:   order.customer.email   || null,
+      customerPhone:   order.customer.phone   || null,
+      customerAddress: order.customer.address || null,
     })
 
     for (const p of foundProducts) {

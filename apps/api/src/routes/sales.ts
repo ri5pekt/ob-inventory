@@ -16,7 +16,34 @@ import {
   salePaymentMethods,
   salePaymentMethodLinks,
   users,
+  customers,
 } from '@ob-inventory/db'
+
+// ── Shared helper: upsert customer from sale data ─────────────────────────────
+// Only creates if email is present and no customer with that email already exists.
+export async function upsertCustomerFromSale(data: {
+  customerName?:    string | null
+  customerEmail?:   string | null
+  customerPhone?:   string | null
+  customerAddress?: string | null
+}) {
+  if (!data.customerEmail) return
+  const email = data.customerEmail.toLowerCase().trim()
+
+  const [existing] = await db
+    .select({ id: customers.id })
+    .from(customers)
+    .where(eq(sql`lower(${customers.email})`, email))
+
+  if (!existing) {
+    await db.insert(customers).values({
+      name:    data.customerName || data.customerEmail,
+      email:   data.customerEmail.trim(),
+      phone:   data.customerPhone   ?? null,
+      address: data.customerAddress ?? null,
+    })
+  }
+}
 
 export const salesRoutes: FastifyPluginAsync = async (fastify) => {
   const auth = { onRequest: [fastify.authenticate] }
@@ -185,6 +212,7 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
       invoiceStatusId:   z.string().uuid().optional(),
       paymentMethodIds:  z.array(z.string().uuid()).optional(),
       saleDate:          z.string().optional(),
+      createCustomer:    z.boolean().default(true),
       items: z.array(z.object({
         sku:       z.string().min(1),
         name:      z.string().min(1),
@@ -350,6 +378,16 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
           }
         }
       }
+    }
+
+    // Auto-create customer if requested and email is present
+    if (d.createCustomer) {
+      await upsertCustomerFromSale({
+        customerName:    d.customerName,
+        customerEmail:   d.customerEmail,
+        customerPhone:   d.customerPhone,
+        customerAddress: d.customerAddress,
+      })
     }
 
     return reply.status(201).send(result)

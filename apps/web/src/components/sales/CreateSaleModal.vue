@@ -47,6 +47,13 @@
         />
       </div>
 
+      <!-- Customer lookup -->
+      <CustomerSearchInput
+        ref="customerSearchRef"
+        @select="applyCustomer"
+        @clear="clearCustomer"
+      />
+
       <!-- Customer row -->
       <div class="form-row form-row-customer">
         <div class="field">
@@ -69,6 +76,15 @@
           <label>Customer Address</label>
           <InputText v-model="form.customerAddress" placeholder="Optional — street, city, zip…" fluid />
         </div>
+      </div>
+
+      <!-- Auto-create customer checkbox (only when typing manually, not when picked from lookup) -->
+      <div v-if="showCreateCustomerToggle" class="create-customer-row">
+        <Checkbox v-model="form.createCustomer" :binary="true" input-id="createCustomerChk" />
+        <label for="createCustomerChk" class="create-customer-label">
+          Save as new customer
+          <span class="create-customer-hint">(email will be used as unique identifier)</span>
+        </label>
       </div>
 
       <!-- Sale Date -->
@@ -326,9 +342,12 @@ import { createSale, type CreateSaleItemInput } from '@/api/sales'
 import { getSaleTargets, getSaleInvoiceStatuses, getSalePaymentMethods, createSaleTarget, createSaleInvoiceStatus, createSalePaymentMethod, type SaleMetaItem } from '@/api/saleMeta'
 import { type ProductSearchResult } from '@/api/transfers'
 import type { WarehouseDTO } from '@ob-inventory/types'
-import ProductSearchInput from '@/components/transfers/ProductSearchInput.vue'
-import SaleMetaSelect      from './SaleMetaSelect.vue'
-import SaleMetaMultiSelect from './SaleMetaMultiSelect.vue'
+import type { Customer } from '@/api/customers'
+import Checkbox             from 'primevue/checkbox'
+import ProductSearchInput   from '@/components/transfers/ProductSearchInput.vue'
+import SaleMetaSelect       from './SaleMetaSelect.vue'
+import SaleMetaMultiSelect  from './SaleMetaMultiSelect.vue'
+import CustomerSearchInput  from './CustomerSearchInput.vue'
 
 const props = defineProps<{ modelValue: boolean }>()
 const emit  = defineEmits<{
@@ -404,6 +423,7 @@ const defaultForm = () => ({
   invoiceStatusId:  null as string | null,
   paymentMethodIds: [] as string[],
   saleDate:         new Date() as Date,
+  createCustomer:   true,
   items:            [] as SaleItemRow[],
 })
 
@@ -468,11 +488,41 @@ function clampQty(idx: number) {
   if (item.quantity > item.availableQty) item.quantity = item.availableQty
 }
 
+// ── Customer lookup ───────────────────────────────────────────────────────────
+
+const customerSearchRef = ref<InstanceType<typeof CustomerSearchInput> | null>(null)
+const customerSelectedFromLookup = ref(false)
+
+// Show the "save as new customer" toggle only when:
+// - The user typed customer info manually (not via lookup)
+// - There is an email to deduplicate by
+const showCreateCustomerToggle = computed(() =>
+  !customerSelectedFromLookup.value && !!form.value.customerEmail.trim(),
+)
+
+function applyCustomer(c: Customer) {
+  customerSelectedFromLookup.value = true
+  form.value.customerName    = c.name    ?? ''
+  form.value.customerEmail   = c.email   ?? ''
+  form.value.customerPhone   = c.phone   ?? ''
+  form.value.customerAddress = c.address ?? ''
+}
+
+function clearCustomer() {
+  customerSelectedFromLookup.value = false
+  form.value.customerName    = ''
+  form.value.customerEmail   = ''
+  form.value.customerPhone   = ''
+  form.value.customerAddress = ''
+}
+
 function resetForm() {
   form.value = defaultForm()
   error.value = null
   insufficientItems.value = []
   submitting.value = false
+  customerSelectedFromLookup.value = false
+  customerSearchRef.value?.reset()
 }
 
 // ── Submit ────────────────────────────────────────────────────────────────────
@@ -513,6 +563,7 @@ async function submit() {
       invoiceStatusId:  form.value.invoiceStatusId ?? undefined,
       paymentMethodIds: form.value.paymentMethodIds.length ? form.value.paymentMethodIds : undefined,
       saleDate:         form.value.saleDate.toISOString(),
+      createCustomer:   showCreateCustomerToggle.value ? form.value.createCustomer : false,
       items,
     })
 
@@ -534,6 +585,27 @@ async function submit() {
 </script>
 
 <style scoped>
+.create-customer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--p-surface-50, #f8fafc);
+  border: 1px solid var(--p-surface-200, #e2e8f0);
+  border-radius: 6px;
+}
+
+.create-customer-label {
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.create-customer-hint {
+  font-size: 0.75rem;
+  color: var(--p-text-muted-color, #94a3b8);
+  margin-left: 4px;
+}
+
 .create-sale-form {
   display: flex;
   flex-direction: column;

@@ -34,6 +34,13 @@
         </div>
       </div>
 
+      <!-- Customer lookup -->
+      <CustomerSearchInput
+        ref="customerSearchRef"
+        @select="applyCustomer"
+        @clear="clearCustomer"
+      />
+
       <!-- Customer row -->
       <div class="form-row form-row-customer">
         <div class="field">
@@ -229,9 +236,11 @@ import { getSaleTargets, getSaleInvoiceStatuses, getSalePaymentMethods, createSa
 import { getWarehouses } from '@/api/warehouses'
 import { type ProductSearchResult } from '@/api/transfers'
 import type { WarehouseDTO } from '@ob-inventory/types'
+import type { Customer } from '@/api/customers'
 import ProductSearchInput    from '@/components/transfers/ProductSearchInput.vue'
 import SaleMetaSelect        from './SaleMetaSelect.vue'
 import SaleMetaMultiSelect   from './SaleMetaMultiSelect.vue'
+import CustomerSearchInput   from './CustomerSearchInput.vue'
 
 const props = defineProps<{ modelValue: boolean; sale: SaleDetail | null }>()
 const emit  = defineEmits<{
@@ -366,11 +375,30 @@ function clampQty(idx: number) {
   if (item.quantity < 1) item.quantity = 1
 }
 
+// ── Customer lookup ───────────────────────────────────────────────────────────
+
+const customerSearchRef = ref<InstanceType<typeof CustomerSearchInput> | null>(null)
+
+function applyCustomer(c: Customer) {
+  form.value.customerName    = c.name    ?? ''
+  form.value.customerEmail   = c.email   ?? ''
+  form.value.customerPhone   = c.phone   ?? ''
+  form.value.customerAddress = c.address ?? ''
+}
+
+function clearCustomer() {
+  form.value.customerName    = ''
+  form.value.customerEmail   = ''
+  form.value.customerPhone   = ''
+  form.value.customerAddress = ''
+}
+
 function resetForm() {
   form.value = defaultForm()
   error.value = null
   insufficientItems.value = []
   submitting.value = false
+  customerSearchRef.value?.reset()
 }
 
 // ── Submit ────────────────────────────────────────────────────────────────────

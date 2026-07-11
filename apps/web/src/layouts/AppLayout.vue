@@ -160,6 +160,7 @@ const navItems = computed((): NavItem[] => {
     },
     { to: '/transfers', label: 'Stock Transfers', icon: 'pi-arrow-right-arrow-left' },
     { to: '/sales',     label: 'Sales',           icon: 'pi-shopping-cart' },
+    { to: '/customers', label: 'Customers',       icon: 'pi-id-card' },
   ]
   if (auth.isAdmin) {
     items.push({
@@ -168,6 +169,7 @@ const navItems = computed((): NavItem[] => {
         { to: '/settings/parameters',  label: 'Parameters',  icon: 'pi-sliders-h' },
         { to: '/settings/woocommerce', label: 'WooCommerce', icon: 'pi-shop'       },
         { to: '/settings/users',       label: 'Users',       icon: 'pi-users'      },
+        { to: '/settings/tools',       label: 'Tools',       icon: 'pi-wrench'     },
       ],
     })
   }
@@ -179,9 +181,11 @@ const pageTitles: Record<string, string> = {
   '/inventory':            'Inventory',
   '/transfers':            'Stock Transfers',
   '/sales':                'Sales',
+  '/customers':            'Customers',
   '/settings/parameters':  'Settings · Parameters',
   '/settings/woocommerce': 'Settings · WooCommerce',
   '/settings/users':       'Settings · Users',
+  '/settings/tools':       'Settings · Tools',
 }
 
 const pageTitle = computed(() => {

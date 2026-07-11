@@ -60,7 +60,12 @@ async function pushStockToStore(
     }
 
     if (!res.ok) {
-      error = `HTTP ${res.status}: ${text}`
+      // Use parsed responseBody so unicode chars (e.g. Hebrew) are decoded, not left as \uXXXX escapes
+      const body = responseBody as { message?: unknown; error?: unknown; code?: unknown } | null
+      const errMsg = body?.message ?? body?.error ?? body?.code
+      error = errMsg
+        ? `HTTP ${res.status}: ${typeof errMsg === 'string' ? errMsg : JSON.stringify(errMsg)}`
+        : `HTTP ${res.status}: ${text}`
       console.log(`[sync-woo-stock] Woo failure: store=${store.id} sku=${sku} status=${res.status} error=${error.slice(0, 80)}`)
     } else {
       console.log(`[sync-woo-stock] Woo success: store=${store.id} sku=${sku} qty=${quantity}`)
