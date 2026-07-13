@@ -16,7 +16,7 @@
         </div>
         <div class="meta-row">
           <span class="meta-label">Status</span>
-          <Tag :value="sale.status" :severity="statusSeverity(sale.status)" />
+          <Tag :value="statusLabel(sale.status)" :severity="statusSeverity(sale.status)" />
         </div>
         <div v-if="sale.warehouseName" class="meta-row">
           <span class="meta-label">Warehouse</span>
@@ -64,9 +64,9 @@
             <span v-for="m in sale.paymentMethods" :key="m.id" class="meta-tag meta-tag-payment">{{ m.name }}</span>
           </div>
         </div>
-        <div v-if="sale.notes" class="meta-row">
+        <div v-if="sale.notes" class="meta-row meta-row-notes">
           <span class="meta-label">Notes</span>
-          <span>{{ sale.notes }}</span>
+          <span class="notes-text">{{ sale.notes }}</span>
         </div>
       </div>
 
@@ -121,6 +121,18 @@
         />
         <div class="footer-right">
           <Button
+            class="btn-pdf"
+            label="PDF"
+            icon="pi pi-file-pdf"
+            severity="danger"
+            outlined
+            size="small"
+            :disabled="!sale"
+            :loading="pdfLoading"
+            v-tooltip.top="'Download sale PDF'"
+            @click="downloadPdf"
+          />
+          <Button
             label="Cardcom"
             icon="pi pi-file"
             severity="secondary"
@@ -140,10 +152,12 @@
             @click="showTerminal = true"
           />
           <Button
+            class="btn-edit"
             label="Edit"
             icon="pi pi-pencil"
             size="small"
-            :disabled="!sale"
+            :disabled="!sale || sale.status === 'superseded'"
+            v-tooltip.top="sale?.status === 'superseded' ? 'This sale was merged and cannot be edited' : undefined"
             @click="$emit('edit', sale!)"
           />
         </div>
@@ -200,6 +214,7 @@
 import { ref, computed } from 'vue'
 import type { SaleDetail, SaleType } from '@/api/sales'
 import { deleteSale } from '@/api/sales'
+import { downloadSalePdf } from '@/utils/salePdf'
 import CardcomDocumentsModal  from './CardcomDocumentsModal.vue'
 import CardcomTerminalModal   from './CardcomTerminalModal.vue'
 import type { ChargeCardResult } from '@/api/invoices'
@@ -220,13 +235,25 @@ const showConfirm  = ref(false)
 const showCardcom  = ref(false)
 const showTerminal = ref(false)
 const deleting     = ref(false)
+const deleteError  = ref<string | null>(null)
+const deleteReason = ref('')
+const pdfLoading   = ref(false)
+
+async function downloadPdf() {
+  if (!props.sale || pdfLoading.value) return
+  pdfLoading.value = true
+  try {
+    await downloadSalePdf(props.sale)
+  } catch (err) {
+    console.error(err)
+  } finally {
+    pdfLoading.value = false
+  }
+}
 
 function onCharged(_result: ChargeCardResult) {
-  // Refresh the sale list so the new payment method chip appears
   emit('refreshed')
 }
-const deleteError = ref<string | null>(null)
-const deleteReason = ref('')
 
 async function confirmDelete() {
   if (!props.sale) return
@@ -253,18 +280,28 @@ const dialogHeader = computed<string>(() => {
 })
 
 function typeLabel(type: SaleType) {
-  return type === 'woocommerce' ? 'WooCommerce' : type === 'partner' ? 'Partner' : 'Direct'
+  if (type === 'woocommerce') return 'WooCommerce'
+  if (type === 'partner')     return 'Partner'
+  if (type === 'merged')      return 'Merged'
+  return 'Direct'
 }
 
 function typeSeverity(type: SaleType) {
   if (type === 'woocommerce') return 'info'
   if (type === 'partner')     return 'warn'
+  if (type === 'merged')      return 'contrast'
   return 'success'
+}
+
+function statusLabel(status: string) {
+  if (status === 'superseded') return 'Merged'
+  return status
 }
 
 function statusSeverity(status: string) {
   if (status === 'completed') return 'success'
   if (status === 'cancelled') return 'danger'
+  if (status === 'superseded') return 'secondary'
   return 'secondary'
 }
 
@@ -294,6 +331,16 @@ function formatDate(iso: string) {
   align-items: center;
   gap: 12px;
   font-size: 14px;
+}
+
+.meta-row-notes {
+  align-items: flex-start;
+}
+
+.notes-text {
+  white-space: pre-wrap;
+  line-height: 1.45;
+  word-break: break-word;
 }
 
 .meta-label {
@@ -371,27 +418,60 @@ function formatDate(iso: string) {
 
 .detail-footer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   width: 100%;
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
-.footer-right { display: flex; gap: 8px; align-items: center; }
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
 
-/* Uniform padding for all footer buttons regardless of severity */
-.detail-footer :deep(.p-button) { padding: 0.35rem 0.75rem; }
+/* Uniform size for all footer buttons */
+.detail-footer :deep(.p-button) {
+  height: 2.25rem;
+  min-height: 2.25rem;
+  padding: 0 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
 
 @media (max-width: 768px) {
   .detail-footer {
-    flex-direction: row;
-    align-items: center;
+    flex-wrap: nowrap;
+    gap: 6px;
   }
 
-  .footer-right { flex-direction: row; flex-wrap: wrap; }
+  .footer-right {
+    margin-left: 0;
+    flex: 1;
+    min-width: 0;
+    justify-content: flex-end;
+    gap: 6px;
+  }
 
-  .footer-right .p-button { flex: 1; justify-content: center; }
+  :deep(.btn-pdf .p-button-label),
+  :deep(.btn-edit .p-button-label) {
+    display: none;
+  }
+
+  .detail-footer :deep(.p-button) {
+    height: 2.25rem;
+    min-height: 2.25rem;
+    padding: 0 0.6rem;
+  }
+
+  .detail-footer :deep(.btn-pdf),
+  .detail-footer :deep(.btn-edit),
+  .detail-footer > :deep(.p-button) {
+    width: 2.25rem;
+    padding: 0;
+  }
 
   .detail-meta { padding: 12px; }
   .meta-row { font-size: 13px; }

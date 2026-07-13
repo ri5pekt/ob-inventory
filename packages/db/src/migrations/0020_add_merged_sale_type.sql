@@ -1,0 +1,1 @@
+ALTER TYPE sale_type ADD VALUE IF NOT EXISTS 'merged';

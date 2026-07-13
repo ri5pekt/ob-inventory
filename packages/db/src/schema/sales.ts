@@ -22,8 +22,8 @@ export const salePaymentMethods = pgTable('sale_payment_methods', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
-export const saleTypeEnum = pgEnum('sale_type', ['direct', 'partner', 'woocommerce'])
-export const saleStatusEnum = pgEnum('sale_status', ['completed', 'cancelled', 'refunded'])
+export const saleTypeEnum = pgEnum('sale_type', ['direct', 'partner', 'woocommerce', 'merged'])
+export const saleStatusEnum = pgEnum('sale_status', ['completed', 'cancelled', 'refunded', 'superseded'])
 
 export const sales = pgTable('sales', {
   id: uuid('id').primaryKey().defaultRandom(),

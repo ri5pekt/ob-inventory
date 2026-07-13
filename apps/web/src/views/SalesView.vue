@@ -22,7 +22,7 @@
       <div class="collapsible-inner">
         <SalePeriodStats @date-range-change="onDateRangeChange" />
 
-        <!-- Filter chips + search -->
+        <!-- Filter chips + merge controls + search -->
         <div class="filter-bar">
           <div class="filter-chips">
             <button
@@ -36,6 +36,30 @@
               {{ f.label }}
               <span class="chip-count">{{ f.count }}</span>
             </button>
+
+            <div class="merge-controls">
+              <template v-if="mergeMode">
+                <span class="merge-indicator">
+                  {{ selectedSaleIds.length }} sale{{ selectedSaleIds.length !== 1 ? 's' : '' }} selected
+                </span>
+                <Button label="Cancel" severity="secondary" outlined size="small" @click="exitMergeMode" />
+                <Button
+                  label="Create Merged Sale"
+                  icon="pi pi-share-alt"
+                  size="small"
+                  :disabled="selectedSaleIds.length < 2"
+                  @click="openMergeModal"
+                />
+              </template>
+              <button
+                v-else
+                class="chip chip-merge"
+                @click="enterMergeMode"
+              >
+                <i class="pi pi-share-alt chip-icon" />
+                Create Merged Sale
+              </button>
+            </div>
           </div>
           <div class="filter-selects-row">
             <Select
@@ -116,8 +140,27 @@
         scrollable
         scroll-height="flex"
         row-hover
-        @row-click="openDetail($event.data)"
+        data-key="id"
+        @row-click="onRowClick"
       >
+        <Column
+          v-if="mergeMode"
+          :frozen="true"
+          header=""
+          class="col-select"
+        >
+          <template #body="{ data }">
+            <Checkbox
+              :model-value="isSelected(data.id)"
+              :binary="true"
+              :disabled="!isSelectable(data) && !isSelected(data.id)"
+              :title="selectableTitle(data)"
+              @click.stop
+              @update:model-value="(v) => toggleSale(data, !!v)"
+            />
+          </template>
+        </Column>
+
         <Column field="saleDate" header="Date" sortable class="col-date">
           <template #body="{ data }">
             <span class="date-text">{{ formatDate(data.saleDate) }}</span>
@@ -200,7 +243,7 @@
 
         <Column field="status" header="Status" class="col-status" sortable>
           <template #body="{ data }">
-            <Tag :value="data.status" :severity="statusSeverity(data.status)" />
+            <Tag :value="statusLabel(data.status)" :severity="statusSeverity(data.status)" />
           </template>
         </Column>
 
@@ -223,6 +266,11 @@
     />
     <CreateSaleModal v-model="showCreate" @created="onSaleCreated" />
     <EditSaleModal v-model="showEdit" :sale="editingSale" @updated="onSaleUpdated" />
+    <MergeSalesModal
+      v-model="showMerge"
+      :sale-ids="selectedSaleIds"
+      @created="onMergedCreated"
+    />
   </div>
 </template>
 
@@ -232,10 +280,12 @@ import { useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import { getSales, getSale, type Sale, type SaleDetail, type SaleType } from '@/api/sales'
 import { getSaleTargets, getSaleInvoiceStatuses, getSalePaymentMethods, type SaleMetaItem } from '@/api/saleMeta'
+import Checkbox from 'primevue/checkbox'
 import SalePeriodStats from '@/components/sales/SalePeriodStats.vue'
 import SaleDetailDialog from '@/components/sales/SaleDetailDialog.vue'
 import CreateSaleModal from '@/components/sales/CreateSaleModal.vue'
 import EditSaleModal from '@/components/sales/EditSaleModal.vue'
+import MergeSalesModal from '@/components/sales/MergeSalesModal.vue'
 
 // ── Collapsible panels toggle (mobile) ───────────────────────────────────────
 const panelsOpen = ref(true)
@@ -269,9 +319,80 @@ onMounted(async () => {
 const showCreate   = ref(false)
 const showDetail   = ref(false)
 const showEdit     = ref(false)
+const showMerge    = ref(false)
 const selectedSale = ref<SaleDetail | null>(null)
 const editingSale  = ref<SaleDetail | null>(null)
 const refreshKey   = ref(0)
+
+// ── Merge selection mode ──────────────────────────────────────────────────────
+const mergeMode        = ref(false)
+const selectedSales    = ref<Sale[]>([])
+const selectedSaleIds  = ref<string[]>([])
+
+function enterMergeMode() {
+  mergeMode.value = true
+  selectedSales.value = []
+  selectedSaleIds.value = []
+  panelsOpen.value = true
+}
+
+function exitMergeMode() {
+  mergeMode.value = false
+  selectedSales.value = []
+  selectedSaleIds.value = []
+  showMerge.value = false
+}
+
+function openMergeModal() {
+  if (selectedSaleIds.value.length < 2) return
+  showMerge.value = true
+}
+
+function isSelected(id: string) {
+  return selectedSaleIds.value.includes(id)
+}
+
+function isSelectable(sale: Sale) {
+  if (sale.status === 'superseded') return false
+  if (selectedSaleIds.value.length === 0) return true
+  const first = selectedSales.value[0] ?? sales.value.find(s => s.id === selectedSaleIds.value[0])
+  if (!first) return true
+  return sale.warehouseId === first.warehouseId && sale.currency === first.currency
+}
+
+function selectableTitle(sale: Sale) {
+  if (sale.status === 'superseded') return 'Already merged into another sale'
+  if (isSelectable(sale)) return undefined
+  return 'Must match warehouse and currency of the first selected sale'
+}
+
+function toggleSale(sale: Sale, checked: boolean) {
+  if (checked) {
+    if (!isSelectable(sale)) return
+    if (!selectedSaleIds.value.includes(sale.id)) {
+      selectedSaleIds.value = [...selectedSaleIds.value, sale.id]
+      selectedSales.value = [...selectedSales.value, sale]
+    }
+  } else {
+    selectedSaleIds.value = selectedSaleIds.value.filter(id => id !== sale.id)
+    selectedSales.value = selectedSales.value.filter(s => s.id !== sale.id)
+  }
+}
+
+function onRowClick(e: { data: Sale }) {
+  if (mergeMode.value) {
+    const sale = e.data
+    if (!isSelectable(sale) && !isSelected(sale.id)) return
+    toggleSale(sale, !isSelected(sale.id))
+    return
+  }
+  openDetail(e.data)
+}
+
+function onMergedCreated() {
+  exitMergeMode()
+  onSaleCreated()
+}
 
 const { data: salesData, isLoading } = useQuery({
   queryKey: computed(() => ['sales', dateRange.value?.from, dateRange.value?.to, refreshKey.value]),
@@ -311,6 +432,7 @@ const typeFilters = computed(() => [
   { value: 'woocommerce' as SaleType,  label: 'WooCommerce', icon: 'pi pi-globe',     count: sales.value.filter(s => s.saleType === 'woocommerce').length },
   { value: 'direct' as SaleType,       label: 'Direct',      icon: 'pi pi-user',      count: sales.value.filter(s => s.saleType === 'direct').length },
   { value: 'partner' as SaleType,      label: 'Partner',     icon: 'pi pi-building',  count: sales.value.filter(s => s.saleType === 'partner').length },
+  { value: 'merged' as SaleType,       label: 'Merged',      icon: 'pi pi-share-alt', count: sales.value.filter(s => s.saleType === 'merged').length },
 ])
 
 const filteredSales = computed(() => {
@@ -362,18 +484,28 @@ function formatDate(iso: string) {
 }
 
 function typeLabel(type: SaleType) {
-  return type === 'woocommerce' ? 'WooCommerce' : type === 'partner' ? 'Partner' : 'Direct'
+  if (type === 'woocommerce') return 'WooCommerce'
+  if (type === 'partner')     return 'Partner'
+  if (type === 'merged')      return 'Merged'
+  return 'Direct'
 }
 
 function typeSeverity(type: SaleType) {
   if (type === 'woocommerce') return 'info'
   if (type === 'partner')     return 'warn'
+  if (type === 'merged')      return 'contrast'
   return 'success'
+}
+
+function statusLabel(status: string) {
+  if (status === 'superseded') return 'Merged'
+  return status
 }
 
 function statusSeverity(status: string) {
   if (status === 'completed') return 'success'
   if (status === 'cancelled') return 'danger'
+  if (status === 'superseded') return 'secondary'
   return 'secondary'
 }
 </script>
@@ -513,6 +645,37 @@ function statusSeverity(status: string) {
 
 .summary-zero { color: #94a3b8; }
 
+.merge-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.chip-merge {
+  border-style: dashed;
+  color: var(--p-primary-color);
+  border-color: var(--p-primary-200, #bfdbfe);
+  background: var(--p-primary-50, #eff6ff);
+}
+
+.chip-merge:hover {
+  border-color: var(--p-primary-color);
+  color: var(--p-primary-color);
+  background: var(--p-primary-50, #eff6ff);
+}
+
+.merge-indicator {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--p-primary-color);
+  padding: 4px 10px;
+  background: var(--p-primary-50, #eff6ff);
+  border: 1px solid var(--p-primary-200, #bfdbfe);
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
 .table-card {
   flex: 1;
   background: var(--p-surface-card);
@@ -524,6 +687,7 @@ function statusSeverity(status: string) {
 }
 
 /* ── Column widths ── */
+:deep(.col-select)    { width: 48px; min-width: 48px; text-align: center; }
 :deep(.col-date)      { width: 150px; min-width: 150px; }
 :deep(.col-customer)  { min-width: 160px; }
 :deep(.col-warehouse) { width: 140px; min-width: 110px; }

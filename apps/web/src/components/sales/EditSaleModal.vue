@@ -701,18 +701,41 @@ label {
   .items-list-head { display: none; }
 
   .item-row {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: auto minmax(72px, 1fr) auto auto;
+    gap: 8px 6px;
     padding: 10px 12px;
-    align-items: stretch;
+    align-items: center;
   }
 
-  .item-row .col-product  { order: 1; }
-  .item-row .col-qty-wrap { order: 2; display: flex; align-items: center; gap: 8px; }
-  .item-row .col-price    { order: 3; }
-  .item-row .col-total    { order: 4; text-align: left; }
-  .item-row .col-remove   { order: 5; justify-self: start; }
+  .item-row .col-product {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  .item-row .col-qty-wrap {
+    display: flex;
+    align-items: center;
+  }
+
+  .item-row .col-price {
+    min-width: 0;
+  }
+
+  .item-row .col-price :deep(.p-inputnumber),
+  .item-row .col-price :deep(.p-inputtext) {
+    width: 100%;
+  }
+
+  .item-row .col-total {
+    text-align: right;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .item-row .col-remove {
+    justify-self: end;
+  }
 
   .item-name { white-space: normal; word-break: break-word; font-size: 12px; }
   .item-sku  { font-size: 11px; }
