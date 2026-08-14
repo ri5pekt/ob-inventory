@@ -28,6 +28,16 @@ export async function getSaleDocuments(saleId: string): Promise<CardcomDocument[
   return data
 }
 
+export interface PullDocumentsResult {
+  pulledCount: number
+  documents:   CardcomDocument[]
+}
+
+export async function pullSaleDocuments(saleId: string): Promise<PullDocumentsResult> {
+  const { data } = await apiClient.post<PullDocumentsResult>(`/sales/${saleId}/documents/pull`)
+  return data
+}
+
 export type CardcomPaymentType = 'Cash' | 'BankTransfer' | 'CreditCard' | 'Bit' | 'Cheque'
 
 export interface DocumentOverride {

@@ -118,11 +118,13 @@ export const salesRoutes: FastifyPluginAsync = async (fastify) => {
         invoiceStatusName:  saleInvoiceStatuses.name,
         createdByName:      users.name,
         itemCount:          sql<number>`coalesce(sum(${saleItems.quantity}), 0)`,
+        costOfGoods:        sql<string>`coalesce(sum(${saleItems.quantity}::numeric * coalesce(${products.costPrice}, 0)), 0)`,
       })
       .from(sales)
       .leftJoin(warehouses, eq(sales.warehouseId, warehouses.id))
       .leftJoin(stores, eq(sales.storeId, stores.id))
       .leftJoin(saleItems, eq(sales.id, saleItems.saleId))
+      .leftJoin(products, eq(saleItems.productId, products.id))
       .leftJoin(saleTargets, eq(sales.targetId, saleTargets.id))
       .leftJoin(saleInvoiceStatuses, eq(sales.invoiceStatusId, saleInvoiceStatuses.id))
       .leftJoin(users, eq(sales.createdBy, users.id))

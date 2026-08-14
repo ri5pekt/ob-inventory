@@ -31,6 +31,23 @@
       </div>
     </div>
 
+    <div class="doc-pull-section">
+      <p class="doc-create-label">Pull from Cardcom</p>
+      <p class="doc-pull-hint">
+        After the customer pays a Cardcom payment link, a receipt (קבלה לחשבונית) is created on Cardcom.
+        Check here to import it into this sale.
+      </p>
+      <Button
+        label="Check Cardcom"
+        icon="pi pi-refresh"
+        size="small"
+        outlined
+        :loading="pulling"
+        :disabled="!sale"
+        @click="pullFromCardcom"
+      />
+    </div>
+
     <div class="doc-create-section">
       <p class="doc-create-label">Create New Document</p>
       <div class="doc-create-buttons">
@@ -257,6 +274,7 @@ import type { SaleDetail } from '@/api/sales'
 import {
   getSaleDocuments,
   createSaleDocument,
+  pullSaleDocuments,
   ALL_DOCUMENT_TYPES,
   DOCUMENT_TYPE_LABELS,
   type CardcomPaymentType,
@@ -288,6 +306,7 @@ defineEmits<{
 
 const toast     = useToast()
 const loading   = ref(false)
+const pulling   = ref(false)
 const documents = ref<CardcomDocument[]>([])
 
 // Confirm dialog state
@@ -358,6 +377,50 @@ async function fetchDocuments() {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load documents', life: 4000 })
   } finally {
     loading.value = false
+  }
+}
+
+function apiErrorMessage(err: unknown, fallback: string): string {
+  if (err && typeof err === 'object' && 'response' in err) {
+    const data = (err as { response?: { data?: { error?: string } } }).response?.data
+    if (data?.error) return data.error
+  }
+  if (err instanceof Error && err.message) return err.message
+  return fallback
+}
+
+async function pullFromCardcom() {
+  if (!props.sale) return
+  pulling.value = true
+  try {
+    const result = await pullSaleDocuments(props.sale.id)
+    documents.value = result.documents
+    if (result.pulledCount > 0) {
+      toast.add({
+        severity: 'success',
+        summary:  'Documents pulled',
+        detail:   result.pulledCount === 1
+          ? '1 new document imported from Cardcom'
+          : `${result.pulledCount} new documents imported from Cardcom`,
+        life: 5000,
+      })
+    } else {
+      toast.add({
+        severity: 'info',
+        summary:  'No new documents',
+        detail:   'Cardcom has no new documents for this sale',
+        life: 4000,
+      })
+    }
+  } catch (err: unknown) {
+    toast.add({
+      severity: 'error',
+      summary:  'Check failed',
+      detail:   apiErrorMessage(err, 'Failed to check Cardcom'),
+      life: 5000,
+    })
+  } finally {
+    pulling.value = false
   }
 }
 
@@ -526,6 +589,18 @@ function formatDate(iso: string) {
 }
 .doc-download:hover { background: var(--p-primary-50, #eff6ff); }
 .doc-no-url { font-size: 12px; color: var(--p-text-muted-color); flex-shrink: 0; }
+
+.doc-pull-section {
+  margin-top: 20px;
+  border-top: 1px solid var(--p-content-border-color);
+  padding-top: 16px;
+}
+.doc-pull-hint {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--p-text-muted-color);
+}
 
 .doc-create-section { margin-top: 20px; border-top: 1px solid var(--p-content-border-color); padding-top: 16px; }
 .doc-create-label {

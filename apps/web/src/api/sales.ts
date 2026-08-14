@@ -23,6 +23,7 @@ export interface Sale {
   saleDate:      string
   createdAt:     string
   itemCount:     number
+  costOfGoods?:  string | null
   targetId:          string | null
   targetName:        string | null
   invoiceStatusId:   string | null

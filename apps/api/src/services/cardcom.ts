@@ -8,6 +8,22 @@ const API_NAME     = (USE_TEST ? env.CARDCOM_TEST_API_NAME     : env.CARDCOM_API
 const API_PASSWORD = (USE_TEST ? env.CARDCOM_TEST_API_PASSWORD : env.CARDCOM_API_PASSWORD)!
 const TERMINAL_NUM = (USE_TEST ? env.CARDCOM_TEST_TERMINAL     : env.CARDCOM_TERMINAL)!
 
+export interface CardcomAuth {
+  apiName:     string
+  apiPassword: string
+  terminal:    number
+}
+
+/** Default terminal (honors CARDCOM_USE_TEST). Woo store docs live on production. */
+export function cardcomAuth(forceProduction = false): CardcomAuth {
+  const useTest = !forceProduction && env.CARDCOM_USE_TEST === 'true'
+  return {
+    apiName:     (useTest ? env.CARDCOM_TEST_API_NAME     : env.CARDCOM_API_NAME)!,
+    apiPassword: (useTest ? env.CARDCOM_TEST_API_PASSWORD : env.CARDCOM_API_PASSWORD)!,
+    terminal:    Number(useTest ? env.CARDCOM_TEST_TERMINAL : env.CARDCOM_TERMINAL),
+  }
+}
+
 export type CardcomDocumentType =
   | 'TaxInvoiceAndReceipt'
   | 'TaxInvoice'
@@ -286,11 +302,13 @@ export async function chargeCard(params: ChargeCardParams): Promise<ChargeCardRe
 export async function getDocumentUrl(
   documentType:   CardcomDocumentType | string,
   documentNumber: number,
+  auth?:          CardcomAuth,
 ): Promise<string> {
+  const a = auth ?? cardcomAuth()
   const data = await post<CardcomUrlResponse>('/Documents/CreateDocumentUrl', {
-    TerminalNumber: TERMINAL_NUM,
-    ApiName:        API_NAME,
-    ApiPassword:    API_PASSWORD,
+    TerminalNumber: a.terminal,
+    ApiName:        a.apiName,
+    ApiPassword:    a.apiPassword,
     DocumentType:   documentType,
     DocumentNumber: documentNumber,
   })
@@ -300,4 +318,136 @@ export async function getDocumentUrl(
   }
 
   return data.DocUrl
+}
+
+/** Cardcom InvoiceType integers → stored document_type values */
+export const DOCUMENT_TYPE_BY_INVOICE_TYPE: Record<number, string> = {
+  1:   'TaxInvoiceAndReceipt',
+  305: 'TaxInvoice',
+  400: 'ReceiptForTaxInvoice',
+  330: 'TaxInvoiceRefund',
+  2:   'TaxInvoiceAndReceiptRefund',
+}
+
+const RECEIPT_INVOICE_TYPES = new Set([400])
+
+export function isReceiptInvoiceType(invoiceType: number): boolean {
+  return RECEIPT_INVOICE_TYPES.has(invoiceType)
+}
+
+export function normalizeDocumentTypeKey(documentType: string): string {
+  if (documentType === 'Receipt' || documentType === 'ReceiptForTaxInvoice') {
+    return 'ReceiptForTaxInvoice'
+  }
+  return documentType
+}
+
+export interface CardcomReportDocument {
+  invoiceNumber:      number
+  invoiceType:        number
+  documentType:       string | null
+  externalId:         string | null
+  asmachta:           string | null
+  userComments:       string | null
+  customerNumber:     number | null
+  groupNumber:        number | null
+  customerName:       string | null
+  email:              string | null
+  totalIncludeVatNis: number | null
+  invoiceDate:        Date | null
+}
+
+interface CardcomGetReportResponse {
+  ResponseCode: number
+  Description:  string | null
+  Documents?:   CardcomReportRaw[] | null
+  Invoices?:    CardcomReportRaw[] | null
+  Page?:        number
+  Count?:       number
+}
+
+interface CardcomReportRaw {
+  Invoice_Number?:        number
+  InvoiceType?:           number
+  ExternalId?:            string | null
+  Asmachta?:              string | null
+  UserComments?:          string | null
+  Customer_Number?:       number | null
+  group_number?:          number | null
+  Cust_Name?:             string | null
+  Email?:                 string | null
+  TotalIncludeVATNIS?:    number | null
+  InvoiceDate?:           string | null
+  InvoiceDateOnly?:       string | null
+}
+
+function yyyymmdd(d: Date): string {
+  const y = d.getUTCFullYear()
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(d.getUTCDate()).padStart(2, '0')
+  return `${y}${m}${day}`
+}
+
+function parseCardcomDate(value: string | null | undefined): Date | null {
+  if (!value) return null
+  const parsed = new Date(value)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+function mapReportRow(raw: CardcomReportRaw): CardcomReportDocument | null {
+  const invoiceNumber = raw.Invoice_Number
+  const invoiceType   = raw.InvoiceType
+  if (invoiceNumber == null || invoiceType == null) return null
+  return {
+    invoiceNumber,
+    invoiceType,
+    documentType:       DOCUMENT_TYPE_BY_INVOICE_TYPE[invoiceType] ?? null,
+    externalId:         raw.ExternalId?.trim() || null,
+    asmachta:           raw.Asmachta?.trim() || null,
+    userComments:       raw.UserComments?.trim() || null,
+    customerNumber:     raw.Customer_Number ?? null,
+    groupNumber:        raw.group_number ?? null,
+    customerName:       raw.Cust_Name?.trim() || null,
+    email:              raw.Email?.trim() || null,
+    totalIncludeVatNis: raw.TotalIncludeVATNIS ?? null,
+    invoiceDate:        parseCardcomDate(raw.InvoiceDate) ?? parseCardcomDate(raw.InvoiceDateOnly),
+  }
+}
+
+export async function getDocumentsReport(
+  from: Date,
+  to: Date,
+  auth?: CardcomAuth,
+): Promise<CardcomReportDocument[]> {
+  const a = auth ?? cardcomAuth()
+  const fromStr = yyyymmdd(from)
+  const toStr   = yyyymmdd(to)
+  const collected: CardcomReportDocument[] = []
+  const maxPages = 25
+
+  for (let page = 1; page <= maxPages; page++) {
+    const data = await post<CardcomGetReportResponse>('/Documents/GetReport', {
+      TerminalNumber:   a.terminal,
+      ApiName:          a.apiName,
+      ApiPassword:      a.apiPassword,
+      FromDateYYYYMMDD: fromStr,
+      ToDateYYYYMMDD:   toStr,
+      DocType:          -2,
+      PageNumber:       page,
+      ItemsPerPage:     200,
+    })
+
+    if (data.ResponseCode !== 0) {
+      throw new Error(data.Description ?? `Cardcom GetReport error ${data.ResponseCode}`)
+    }
+
+    const rows = data.Documents ?? data.Invoices ?? []
+    for (const row of rows) {
+      const mapped = mapReportRow(row)
+      if (mapped) collected.push(mapped)
+    }
+    if (rows.length < 200) break
+  }
+
+  return collected
 }

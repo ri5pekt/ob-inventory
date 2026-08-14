@@ -1,5 +1,5 @@
 """
-Production deploy script — v1.8.0
+Production deploy script — v1.9.0,
 Run from project root: python scripts/deploy-production.py
 """
 
@@ -86,7 +86,7 @@ client.close()
 
 print(f"""
 {'='*60}
-  DEPLOY COMPLETE — v1.8.0
+  DEPLOY COMPLETE — v1.9.0,
 
   URL: https://activebrands.cloud
 {'='*60}

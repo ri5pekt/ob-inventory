@@ -112,15 +112,52 @@
           </span>
           <span class="summary-sep">·</span>
           <span class="summary-totals">
-            <template v-if="filteredTotals.length">
-              <span v-for="(t, i) in filteredTotals" :key="t.currency" class="summary-total">
+            <span class="summary-metric-label">Revenue</span>
+            <template v-if="filteredPeriodSums.length">
+              <span v-for="(t, i) in filteredPeriodSums" :key="'r-' + t.currency" class="summary-total">
                 <span v-if="i > 0" class="summary-currency-sep">+</span>
-                <span class="summary-amount">{{ t.amount }}</span>
+                <span class="summary-amount">{{ t.revenue }}</span>
                 <span class="summary-currency">{{ t.currency }}</span>
               </span>
             </template>
             <span v-else class="summary-zero">—</span>
           </span>
+          <button
+            v-if="auth.isAdmin"
+            type="button"
+            class="summary-expand"
+            :aria-expanded="financeOpen"
+            :aria-label="financeOpen ? 'Hide cost and profit' : 'Show cost and profit'"
+            @click="financeOpen = !financeOpen"
+          >
+            <i :class="financeOpen ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
+          </button>
+          <template v-if="auth.isAdmin && financeOpen">
+            <span class="summary-sep">·</span>
+            <span class="summary-totals summary-cogs">
+              <span class="summary-metric-label">Cost of goods</span>
+              <template v-if="filteredPeriodSums.length">
+                <span v-for="(t, i) in filteredPeriodSums" :key="'c-' + t.currency" class="summary-total">
+                  <span v-if="i > 0" class="summary-currency-sep">+</span>
+                  <span class="summary-amount">{{ t.cost }}</span>
+                  <span class="summary-currency">{{ t.currency }}</span>
+                </span>
+              </template>
+              <span v-else class="summary-zero">—</span>
+            </span>
+            <span class="summary-sep">·</span>
+            <span class="summary-totals summary-profit">
+              <span class="summary-metric-label">Profit</span>
+              <template v-if="filteredPeriodSums.length">
+                <span v-for="(t, i) in filteredPeriodSums" :key="'p-' + t.currency" class="summary-total">
+                  <span v-if="i > 0" class="summary-currency-sep">+</span>
+                  <span class="summary-amount" :class="{ negative: t.profitNegative }">{{ t.profit }}</span>
+                  <span class="summary-currency">{{ t.currency }}</span>
+                </span>
+              </template>
+              <span v-else class="summary-zero">—</span>
+            </span>
+          </template>
         </div>
       </div>
     </div>
@@ -286,6 +323,10 @@ import SaleDetailDialog from '@/components/sales/SaleDetailDialog.vue'
 import CreateSaleModal from '@/components/sales/CreateSaleModal.vue'
 import EditSaleModal from '@/components/sales/EditSaleModal.vue'
 import MergeSalesModal from '@/components/sales/MergeSalesModal.vue'
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore()
+const financeOpen = ref(false)
 
 // ── Collapsible panels toggle (mobile) ───────────────────────────────────────
 const panelsOpen = ref(true)
@@ -454,19 +495,33 @@ const filteredSales = computed(() => {
   return list
 })
 
-const filteredTotals = computed(() => {
-  const totals: Record<string, number> = {}
+function formatMoney(n: number) {
+  return n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+const filteredPeriodSums = computed(() => {
+  const byCurrency: Record<string, { total: number; cost: number }> = {}
   for (const s of filteredSales.value) {
-    if (!s.totalPrice) continue
-    const cur = s.currency ?? '₪'
-    totals[cur] = (totals[cur] ?? 0) + parseFloat(s.totalPrice)
+    const total = s.totalPrice ? parseFloat(s.totalPrice) : 0
+    const cost  = s.costOfGoods != null ? parseFloat(String(s.costOfGoods)) : 0
+    if (!total && !cost) continue
+    const cur = s.currency ?? 'ILS'
+    if (!byCurrency[cur]) byCurrency[cur] = { total: 0, cost: 0 }
+    byCurrency[cur].total += Number.isNaN(total) ? 0 : total
+    byCurrency[cur].cost  += Number.isNaN(cost)  ? 0 : cost
   }
-  return Object.entries(totals)
+  return Object.entries(byCurrency)
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([currency, amount]) => ({
-      currency,
-      amount: amount.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-    }))
+    .map(([currency, v]) => {
+      const profit = v.total - v.cost
+      return {
+        currency,
+        revenue: formatMoney(v.total),
+        cost:    formatMoney(v.cost),
+        profit:  formatMoney(profit),
+        profitNegative: profit < 0,
+      }
+    })
 })
 
 async function openDetail(sale: Sale) {
@@ -629,6 +684,43 @@ function statusSeverity(status: string) {
 .summary-sep { color: #cbd5e1; }
 
 .summary-totals { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+.summary-metric-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 2px;
+}
+
+.summary-cogs .summary-amount { color: #475569; }
+
+.summary-profit .summary-amount { color: #047857; }
+.summary-profit .summary-amount.negative { color: #b91c1c; }
+
+.summary-expand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-left: 2px;
+  padding: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #fff;
+  color: #64748b;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.summary-expand:hover {
+  border-color: #0891b2;
+  color: #0891b2;
+}
+
+.summary-expand .pi { font-size: 10px; }
 
 .summary-total { display: inline-flex; align-items: baseline; gap: 3px; }
 

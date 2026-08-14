@@ -79,28 +79,8 @@
       </div>
     </div>
 
-    <!-- Footer with Clear All (out of the way to avoid accidental taps) -->
-    <footer class="inventory-footer">
-      <button type="button" class="clear-all-link" @click="showClearConfirm = true">
-        <i class="pi pi-trash" /> Clear all products
-      </button>
-    </footer>
-
     <!-- Import Products Modal -->
     <ImportProductsModal v-model="showImport" @done="queryClient.invalidateQueries({ queryKey: ['warehouses'] })" />
-
-    <!-- Clear All Confirmation -->
-    <Dialog v-model:visible="showClearConfirm" header="Clear All Products" modal :draggable="false" style="width: 420px">
-      <div class="clear-confirm-body">
-        <i class="pi pi-exclamation-triangle clear-warn-icon" />
-        <p>This will permanently delete <strong>all products, stock, transfers, sales, brands and categories</strong>.</p>
-        <p class="clear-sub">Warehouses and users will not be affected.</p>
-      </div>
-      <template #footer>
-        <Button label="Cancel" severity="secondary" text @click="showClearConfirm = false" />
-        <Button label="Yes, clear everything" severity="danger" icon="pi pi-trash" :loading="clearing" @click="clearAll" />
-      </template>
-    </Dialog>
 
     <!-- Add Warehouse Dialog -->
     <Dialog v-model:visible="showDialog" header="Add Warehouse" modal style="width: 420px" :draggable="false">
@@ -146,7 +126,6 @@ import Select from 'primevue/select'
 import Textarea from 'primevue/textarea'
 import { useToast } from 'primevue/usetoast'
 import { getWarehouses, createWarehouse } from '@/api/warehouses'
-import { useAuthStore } from '@/stores/auth'
 import type { WarehouseType } from '@ob-inventory/types'
 
 const router = useRouter()
@@ -161,28 +140,8 @@ const { data: warehouses, isLoading } = useQuery({
 const mainWarehouses = computed(() => warehouses.value?.filter(w => w.type === 'main') ?? [])
 const partnerWarehouses = computed(() => warehouses.value?.filter(w => w.type !== 'main') ?? [])
 
-const showDialog       = ref(false)
-const showImport       = ref(false)
-const showClearConfirm = ref(false)
-const clearing         = ref(false)
-
-async function clearAll() {
-  clearing.value = true
-  try {
-    const res = await fetch('/api/import/clear-all', {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${useAuthStore().accessToken}` },
-    })
-    if (!res.ok) throw new Error('Failed')
-    await queryClient.invalidateQueries({ queryKey: ['warehouses'] })
-    showClearConfirm.value = false
-    toast.add({ severity: 'success', summary: 'All products cleared', life: 3000 })
-  } catch {
-    toast.add({ severity: 'error', summary: 'Clear failed', life: 4000 })
-  } finally {
-    clearing.value = false
-  }
-}
+const showDialog = ref(false)
+const showImport = ref(false)
 const form = ref({ name: '', type: 'main' as WarehouseType, notes: '' })
 
 const typeOptions = [
@@ -222,33 +181,6 @@ function typeSeverity(type: string) {
   flex-direction: column;
   gap: 24px;
   min-height: 0;
-}
-
-.inventory-footer {
-  margin-top: auto;
-  padding-top: 24px;
-  border-top: 1px solid #e2e8f0;
-}
-
-.clear-all-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  font-size: 12px;
-  color: #94a3b8;
-  cursor: pointer;
-  padding: 4px 0;
-  transition: color 0.15s;
-}
-
-.clear-all-link:hover {
-  color: #dc2626;
-}
-
-.clear-all-link .pi {
-  font-size: 11px;
 }
 
 .view-header {
@@ -435,27 +367,6 @@ function typeSeverity(type: string) {
   margin: 0 0 20px;
 }
 
-/* Clear confirm */
-.clear-confirm-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 0 4px;
-  text-align: center;
-}
-.clear-warn-icon {
-  font-size: 38px;
-  color: #f59e0b;
-}
-.clear-confirm-body p {
-  margin: 0;
-  font-size: 14px;
-  color: #374151;
-  line-height: 1.5;
-}
-.clear-sub { font-size: 13px; color: #94a3b8 !important; }
-
 /* Dialog */
 .dialog-form {
   display: flex;
@@ -526,10 +437,6 @@ function typeSeverity(type: string) {
   .wh-header-name { font-size: 13px; }
 
   .wh-meta { font-size: 12px; }
-
-  .inventory-footer {
-    padding-top: 18px;
-  }
 
   .empty-state { padding: 40px 16px; }
 
