@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify'
-import { eq, ilike, inArray } from 'drizzle-orm'
+import { eq, and, ilike, inArray } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../db.js'
 import { sales, saleItems, cardcomDocuments, salePaymentMethods, salePaymentMethodLinks } from '@ob-inventory/db'
@@ -151,6 +151,26 @@ export const invoicesRoutes: FastifyPluginAsync = async (fastify) => {
       ? cardcomAuth(true)
       : undefined
     return documentsWithUrls(id, cardcom)
+  })
+
+  // ── DELETE /api/sales/:id/documents/:docId ─────────────────────────────────
+  // Removes the local link only — the Cardcom document is not cancelled.
+  fastify.delete('/api/sales/:id/documents/:docId', auth, async (request, reply) => {
+    const { id, docId } = z.object({
+      id:    z.string().uuid(),
+      docId: z.string().uuid(),
+    }).parse(request.params)
+
+    const [doc] = await db
+      .select({ id: cardcomDocuments.id })
+      .from(cardcomDocuments)
+      .where(and(eq(cardcomDocuments.id, docId), eq(cardcomDocuments.saleId, id)))
+      .limit(1)
+
+    if (!doc) return reply.status(404).send({ error: 'Document not found on this sale' })
+
+    await db.delete(cardcomDocuments).where(eq(cardcomDocuments.id, docId))
+    return reply.status(204).send()
   })
 
   // ── POST /api/sales/:id/documents/pull ─────────────────────────────────────

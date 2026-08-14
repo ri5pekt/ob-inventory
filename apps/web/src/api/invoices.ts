@@ -38,6 +38,10 @@ export async function pullSaleDocuments(saleId: string): Promise<PullDocumentsRe
   return data
 }
 
+export async function deleteSaleDocument(saleId: string, docId: string): Promise<void> {
+  await apiClient.delete(`/sales/${saleId}/documents/${docId}`)
+}
+
 export type CardcomPaymentType = 'Cash' | 'BankTransfer' | 'CreditCard' | 'Bit' | 'Cheque'
 
 export interface DocumentOverride {

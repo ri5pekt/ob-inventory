@@ -312,8 +312,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import { getSales, getSale, type Sale, type SaleDetail, type SaleType } from '@/api/sales'
 import { getSaleTargets, getSaleInvoiceStatuses, getSalePaymentMethods, type SaleMetaItem } from '@/api/saleMeta'
@@ -468,6 +468,21 @@ async function onSaleUpdated() {
 const sales = computed(() => salesData.value ?? [])
 
 const router = useRouter()
+const route = useRoute()
+
+watch(
+  () => route.query.open,
+  async (id) => {
+    if (typeof id !== 'string') return
+    try {
+      selectedSale.value = await getSale(id)
+      showDetail.value = true
+    } catch { /* sale may not exist */ }
+    router.replace({ path: '/sales' })
+  },
+  { immediate: true },
+)
+
 const typeFilters = computed(() => [
   { value: undefined,                  label: 'All',         icon: 'pi pi-list',      count: sales.value.length },
   { value: 'woocommerce' as SaleType,  label: 'WooCommerce', icon: 'pi pi-globe',     count: sales.value.filter(s => s.saleType === 'woocommerce').length },

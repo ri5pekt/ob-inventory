@@ -160,6 +160,7 @@ const navItems = computed((): NavItem[] => {
     },
     { to: '/transfers', label: 'Stock Transfers', icon: 'pi-arrow-right-arrow-left' },
     { to: '/sales',     label: 'Sales',           icon: 'pi-shopping-cart' },
+    { to: '/quotes',    label: 'Price Quotes',    icon: 'pi-file-edit' },
     { to: '/customers', label: 'Customers',       icon: 'pi-id-card' },
   ]
   if (auth.isAdmin) {
@@ -181,6 +182,7 @@ const pageTitles: Record<string, string> = {
   '/inventory':            'Inventory',
   '/transfers':            'Stock Transfers',
   '/sales':                'Sales',
+  '/quotes':               'Price Quotes',
   '/customers':            'Customers',
   '/settings/parameters':  'Settings · Parameters',
   '/settings/woocommerce': 'Settings · WooCommerce',

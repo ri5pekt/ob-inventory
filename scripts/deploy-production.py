@@ -1,5 +1,5 @@
 """
-Production deploy script — v1.9.0,
+Production deploy script — v2.0.0
 Run from project root: python scripts/deploy-production.py
 """
 
@@ -75,8 +75,27 @@ run(
 run(
     f"cd {APP_DIR} && docker compose exec -T api node apps/api/dist/migrate.js 2>&1",
     timeout=60,
-    allow_fail=True,  # warn but don't abort — migration may already be applied
+    allow_fail=True,  # warn but don't abort — Drizzle may skip files after 0000
 )
+
+# Drizzle often skips later SQL files because 0000 has a future timestamp.
+# Apply 0022 (quotes) via psql if the table is not there yet.
+exists_out, _ = run(
+    f"cd {APP_DIR} && docker compose exec -T postgres "
+    "psql -U ob_user -d ob_inventory -tAc \"SELECT to_regclass('public.quotes')\"",
+    timeout=30,
+    allow_fail=True,
+)
+if "quotes" not in exists_out:
+    print("Applying 0022_add_quotes.sql via psql...")
+    run(
+        f"cd {APP_DIR} && docker compose exec -T postgres "
+        "psql -U ob_user -d ob_inventory -v ON_ERROR_STOP=1 "
+        f"< {APP_DIR}/packages/db/src/migrations/0022_add_quotes.sql",
+        timeout=60,
+    )
+else:
+    print("quotes table already exists — skipping 0022.")
 
 # ── 5. Status check ───────────────────────────────────────────────────────────
 step("5 / 5  Container status")
@@ -86,7 +105,7 @@ client.close()
 
 print(f"""
 {'='*60}
-  DEPLOY COMPLETE — v1.9.0,
+  DEPLOY COMPLETE — v2.0.0
 
   URL: https://activebrands.cloud
 {'='*60}

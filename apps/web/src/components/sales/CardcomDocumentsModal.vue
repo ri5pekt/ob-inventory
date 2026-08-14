@@ -24,10 +24,22 @@
           <span class="doc-number">#{{ doc.documentNumber }}</span>
           <span class="doc-date">{{ formatDate(doc.createdAt) }}</span>
         </div>
-        <a v-if="doc.docUrl" :href="doc.docUrl" target="_blank" rel="noopener" class="doc-download">
-          <i class="pi pi-file-pdf" /> PDF
-        </a>
-        <span v-else class="doc-no-url">—</span>
+        <div class="doc-row-actions">
+          <a v-if="doc.docUrl" :href="doc.docUrl" target="_blank" rel="noopener" class="doc-download">
+            <i class="pi pi-file-pdf" /> PDF
+          </a>
+          <span v-else class="doc-no-url">—</span>
+          <Button
+            icon="pi pi-trash"
+            severity="danger"
+            outlined
+            size="small"
+            rounded
+            :disabled="deleting"
+            v-tooltip.top="'Remove from this sale'"
+            @click="openDelete(doc)"
+          />
+        </div>
       </div>
     </div>
 
@@ -66,6 +78,25 @@
 
     <template #footer>
       <Button label="Close" severity="secondary" outlined size="small" @click="$emit('update:visible', false)" />
+    </template>
+  </Dialog>
+
+  <Dialog
+    v-model:visible="showDelete"
+    modal
+    header="Remove Document"
+    :style="{ width: '420px', maxWidth: '96vw' }"
+    :closable="!deleting"
+  >
+    <p class="delete-copy">
+      Remove {{ pendingDelete ? typeLabel(pendingDelete.documentType) : 'this document' }}
+      <strong v-if="pendingDelete"> #{{ pendingDelete.documentNumber }}</strong>
+      from this sale?
+    </p>
+    <p class="delete-sub">The document stays on Cardcom. Only the link in OB is removed.</p>
+    <template #footer>
+      <Button label="Keep" severity="secondary" outlined :disabled="deleting" @click="showDelete = false" />
+      <Button label="Remove from OB" icon="pi pi-trash" severity="danger" :loading="deleting" @click="confirmDelete" />
     </template>
   </Dialog>
 
@@ -275,6 +306,7 @@ import {
   getSaleDocuments,
   createSaleDocument,
   pullSaleDocuments,
+  deleteSaleDocument,
   ALL_DOCUMENT_TYPES,
   DOCUMENT_TYPE_LABELS,
   type CardcomPaymentType,
@@ -307,7 +339,10 @@ defineEmits<{
 const toast     = useToast()
 const loading   = ref(false)
 const pulling   = ref(false)
+const deleting  = ref(false)
 const documents = ref<CardcomDocument[]>([])
+const showDelete = ref(false)
+const pendingDelete = ref<CardcomDocument | null>(null)
 
 // Confirm dialog state
 const showConfirm = ref(false)
@@ -387,6 +422,37 @@ function apiErrorMessage(err: unknown, fallback: string): string {
   }
   if (err instanceof Error && err.message) return err.message
   return fallback
+}
+
+function openDelete(doc: CardcomDocument) {
+  pendingDelete.value = doc
+  showDelete.value = true
+}
+
+async function confirmDelete() {
+  if (!props.sale || !pendingDelete.value) return
+  deleting.value = true
+  try {
+    await deleteSaleDocument(props.sale.id, pendingDelete.value.id)
+    documents.value = documents.value.filter(d => d.id !== pendingDelete.value!.id)
+    showDelete.value = false
+    pendingDelete.value = null
+    toast.add({
+      severity: 'success',
+      summary:  'Removed',
+      detail:   'Document removed from this sale. It is still on Cardcom.',
+      life: 4000,
+    })
+  } catch (err: unknown) {
+    toast.add({
+      severity: 'error',
+      summary:  'Remove failed',
+      detail:   apiErrorMessage(err, 'Failed to remove document'),
+      life: 5000,
+    })
+  } finally {
+    deleting.value = false
+  }
 }
 
 async function pullFromCardcom() {
@@ -589,6 +655,9 @@ function formatDate(iso: string) {
 }
 .doc-download:hover { background: var(--p-primary-50, #eff6ff); }
 .doc-no-url { font-size: 12px; color: var(--p-text-muted-color); flex-shrink: 0; }
+.doc-row-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.delete-copy { margin: 0 0 8px; font-size: 14px; line-height: 1.45; }
+.delete-sub { margin: 0; font-size: 13px; color: var(--p-text-muted-color); line-height: 1.45; }
 
 .doc-pull-section {
   margin-top: 20px;
