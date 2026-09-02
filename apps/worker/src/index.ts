@@ -4,6 +4,7 @@ import { env } from './env.js'
 import IORedis from 'ioredis'
 import { db } from './db.js'
 import { products, inventoryStock, warehouses, stores, wooSyncLog } from '@ob-inventory/db'
+import { startReconciliationSchedule } from './reconcile.js'
 
 const QUEUE_NAME = 'sync-woo-stock'
 
@@ -185,6 +186,13 @@ setTimeout(async () => {
     console.warn('[worker] Could not check stores:', (err as Error).message)
   }
 }, 2000)
+
+// Self-healing reconciliation: periodically re-pushes any Main-warehouse
+// product whose stock changed since its last successful Woo sync, in case a
+// sync-woo-stock job was silently dropped (e.g. a Redis blip during enqueue).
+startReconciliationSchedule().catch((err) => {
+  console.error('[worker] Failed to start reconciliation schedule:', err)
+})
 
 // Graceful shutdown (Docker/K8s send SIGTERM)
 async function shutdown(signal: string) {
