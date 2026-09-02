@@ -127,7 +127,7 @@
             size="small"
             :disabled="!sale"
             v-tooltip.top="'More actions'"
-            @click="showMoreActions = true"
+            @click="toggleMoreActions"
           />
           <Button
             class="btn-edit"
@@ -143,8 +143,8 @@
     </template>
   </Dialog>
 
-  <SaleMoreActionsModal
-    v-model:visible="showMoreActions"
+  <SaleActionsMenu
+    ref="actionsMenu"
     :sale="sale"
     @pick="onPickAction"
   />
@@ -208,7 +208,7 @@ import { downloadSalePdf } from '@/utils/salePdf'
 import CardcomDocumentsModal  from './CardcomDocumentsModal.vue'
 import CardcomTerminalModal   from './CardcomTerminalModal.vue'
 import ConvertToTransferModal from './ConvertToTransferModal.vue'
-import SaleMoreActionsModal   from './SaleMoreActionsModal.vue'
+import SaleActionsMenu        from './SaleActionsMenu.vue'
 import type { ChargeCardResult } from '@/api/invoices'
 
 const props = defineProps<{
@@ -227,7 +227,7 @@ const showConfirm     = ref(false)
 const showCardcom     = ref(false)
 const showTerminal    = ref(false)
 const showConvert     = ref(false)
-const showMoreActions = ref(false)
+const actionsMenu     = ref<InstanceType<typeof SaleActionsMenu> | null>(null)
 const deleting     = ref(false)
 const deleteError  = ref<string | null>(null)
 const deleteReason = ref('')
@@ -252,6 +252,10 @@ function onCharged(_result: ChargeCardResult) {
 function onConverted() {
   emit('update:visible', false)
   emit('deleted') // sale no longer exists — reuse the same "refresh list" signal as delete
+}
+
+function toggleMoreActions(event: Event) {
+  actionsMenu.value?.toggle(event)
 }
 
 function onPickAction(action: 'pdf' | 'cardcom' | 'charge' | 'convert') {

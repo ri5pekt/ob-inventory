@@ -1,28 +1,19 @@
 <template>
-  <Dialog
-    v-model:visible="visible"
-    modal
-    header="More Actions"
-    :style="{ width: '360px', maxWidth: '96vw' }"
-    :breakpoints="{ '480px': 'calc(100vw - 16px)' }"
-  >
+  <Popover ref="popover" append-to="body" class="sale-actions-popover">
     <div class="actions-list">
       <button class="action-row" :disabled="!sale" @click="pick('pdf')">
         <i class="pi pi-file-pdf action-icon" />
         <span class="action-label">Download PDF</span>
-        <i class="pi pi-chevron-right action-chevron" />
       </button>
 
       <button class="action-row" :disabled="!sale" @click="pick('cardcom')">
         <i class="pi pi-file action-icon" />
         <span class="action-label">Cardcom Documents</span>
-        <i class="pi pi-chevron-right action-chevron" />
       </button>
 
       <button class="action-row" :disabled="!sale || !sale.totalPrice" @click="pick('charge')">
         <i class="pi pi-credit-card action-icon" />
         <span class="action-label">Charge Card</span>
-        <i class="pi pi-chevron-right action-chevron" />
       </button>
 
       <div class="action-divider" />
@@ -34,54 +25,57 @@
       >
         <i class="pi pi-truck action-icon" />
         <span class="action-label">Convert to Stock Transfer</span>
-        <i class="pi pi-chevron-right action-chevron" />
       </button>
     </div>
-  </Dialog>
+  </Popover>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref } from 'vue'
+import Popover from 'primevue/popover'
 import type { SaleDetail } from '@/api/sales'
 
-const props = defineProps<{
-  visible: boolean
-  sale:    SaleDetail | null
+defineProps<{
+  sale: SaleDetail | null
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:visible', v: boolean): void
   (e: 'pick', action: 'pdf' | 'cardcom' | 'charge' | 'convert'): void
 }>()
 
-const visible = computed({
-  get: () => props.visible,
-  set: (v: boolean) => emit('update:visible', v),
-})
+const popover = ref<InstanceType<typeof Popover> | null>(null)
+
+function toggle(event: Event) {
+  popover.value?.toggle(event)
+}
 
 function pick(action: 'pdf' | 'cardcom' | 'charge' | 'convert') {
-  visible.value = false
+  popover.value?.hide()
   emit('pick', action)
 }
+
+defineExpose({ toggle })
 </script>
 
 <style scoped>
 .actions-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
+  min-width: 220px;
+  padding: 4px;
 }
 
 .action-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
-  padding: 12px 10px;
+  padding: 9px 10px;
   border: none;
   background: transparent;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--p-text-color);
   cursor: pointer;
@@ -99,8 +93,8 @@ function pick(action: 'pdf' | 'cardcom' | 'charge' | 'convert') {
 }
 
 .action-icon {
-  font-size: 16px;
-  width: 20px;
+  font-size: 14px;
+  width: 18px;
   text-align: center;
   color: var(--p-primary-color);
   flex-shrink: 0;
@@ -112,14 +106,9 @@ function pick(action: 'pdf' | 'cardcom' | 'charge' | 'convert') {
 
 .action-label { flex: 1; }
 
-.action-chevron {
-  font-size: 12px;
-  color: var(--p-text-muted-color);
-}
-
 .action-divider {
   height: 1px;
   background: var(--p-content-border-color);
-  margin: 4px 0;
+  margin: 4px 6px;
 }
 </style>

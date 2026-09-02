@@ -42,6 +42,7 @@ import Password      from 'primevue/password'
 import Checkbox      from 'primevue/checkbox'
 import TabView       from 'primevue/tabview'
 import MultiSelect   from 'primevue/multiselect'
+import Popover       from 'primevue/popover'
 
 const app = createApp(App)
 
@@ -90,6 +91,7 @@ app.component('Password',      Password)
 app.component('Checkbox',      Checkbox)
 app.component('TabView',       TabView)
 app.component('MultiSelect',   MultiSelect)
+app.component('Popover',       Popover)
 
 app.directive('tooltip', Tooltip)
 
