@@ -49,7 +49,7 @@ def step(label):
 
 # ── 1. Pull latest code ────────────────────────────────────────────────────────
 step("1 / 5  Pull latest code")
-run(f"cd {APP_DIR} && git fetch && git reset --hard origin/main", timeout=60)
+run(f"cd {APP_DIR} && GIT_TERMINAL_PROMPT=0 git fetch && git reset --hard origin/main", timeout=60)
 
 # ── 2. Build all containers (api + worker + web) ───────────────────────────────
 step("2 / 5  Build containers — api, worker, web  (may take a few minutes)")
