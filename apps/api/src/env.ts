@@ -9,6 +9,7 @@ const envSchema = z.object({
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('365d'),
   API_PORT: z.coerce.number().default(3000),
+  API_V1_RATE_LIMIT: z.coerce.number().default(300), // requests/minute per token on /api/v1/*
   WOO_STORE_URL: z.string().optional(),
   WOO_API_KEY: z.string().optional(),
   WOO_API_SECRET: z.string().optional(),

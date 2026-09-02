@@ -12,5 +12,9 @@ declare module 'fastify' {
       role: 'admin' | 'warehouse_admin'
       warehouseIds: string[]
     }
+    apiToken?: {
+      id: string
+      name: string
+    }
   }
 }

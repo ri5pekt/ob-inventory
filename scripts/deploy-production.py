@@ -1,5 +1,5 @@
 """
-Production deploy script — v2.0.0
+Production deploy script — v2.1.0
 Run from project root: python scripts/deploy-production.py
 """
 
@@ -79,23 +79,28 @@ run(
 )
 
 # Drizzle often skips later SQL files because 0000 has a future timestamp.
-# Apply 0022 (quotes) via psql if the table is not there yet.
-exists_out, _ = run(
-    f"cd {APP_DIR} && docker compose exec -T postgres "
-    "psql -U ob_user -d ob_inventory -tAc \"SELECT to_regclass('public.quotes')\"",
-    timeout=30,
-    allow_fail=True,
-)
-if "quotes" not in exists_out:
-    print("Applying 0022_add_quotes.sql via psql...")
-    run(
+# Apply any migration whose marker table isn't there yet, directly via psql.
+PENDING_MIGRATIONS = [
+    ("quotes",      "0022_add_quotes.sql"),
+    ("api_tokens",  "0023_add_api_tokens.sql"),
+]
+for marker_table, sql_file in PENDING_MIGRATIONS:
+    exists_out, _ = run(
         f"cd {APP_DIR} && docker compose exec -T postgres "
-        "psql -U ob_user -d ob_inventory -v ON_ERROR_STOP=1 "
-        f"< {APP_DIR}/packages/db/src/migrations/0022_add_quotes.sql",
-        timeout=60,
+        f"psql -U ob_user -d ob_inventory -tAc \"SELECT to_regclass('public.{marker_table}')\"",
+        timeout=30,
+        allow_fail=True,
     )
-else:
-    print("quotes table already exists — skipping 0022.")
+    if marker_table not in exists_out:
+        print(f"Applying {sql_file} via psql...")
+        run(
+            f"cd {APP_DIR} && docker compose exec -T postgres "
+            "psql -U ob_user -d ob_inventory -v ON_ERROR_STOP=1 "
+            f"< {APP_DIR}/packages/db/src/migrations/{sql_file}",
+            timeout=60,
+        )
+    else:
+        print(f"{marker_table} table already exists — skipping {sql_file}.")
 
 # ── 5. Status check ───────────────────────────────────────────────────────────
 step("5 / 5  Container status")
@@ -105,7 +110,7 @@ client.close()
 
 print(f"""
 {'='*60}
-  DEPLOY COMPLETE — v2.0.0
+  DEPLOY COMPLETE — v2.1.0
 
   URL: https://activebrands.cloud
 {'='*60}

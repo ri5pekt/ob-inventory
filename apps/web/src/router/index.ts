@@ -25,6 +25,7 @@ const routes = [
       { path: 'settings/woocommerce',  name: 'settings-woocommerce',  component: () => import('@/views/settings/WooCommerceView.vue'), meta: { adminOnly: true } },
       { path: 'settings/users',        name: 'settings-users',        component: () => import('@/views/settings/UsersView.vue'),       meta: { adminOnly: true } },
       { path: 'settings/tools',        name: 'settings-tools',        component: () => import('@/views/settings/ToolsView.vue'),        meta: { adminOnly: true } },
+      { path: 'settings/api-tokens',   name: 'settings-api-tokens',   component: () => import('@/views/settings/ApiTokensView.vue'),   meta: { adminOnly: true } },
     ],
   },
 ]

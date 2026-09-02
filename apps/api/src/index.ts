@@ -29,6 +29,8 @@ import { invoicesRoutes } from './routes/invoices.js'
 import { customerRoutes } from './routes/customers.js'
 import { toolsRoutes } from './routes/tools.js'
 import { quotesRoutes } from './routes/quotes.js'
+import { apiTokensRoutes } from './routes/api-tokens.js'
+import { apiV1Routes } from './routes/v1/index.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname  = dirname(__filename)
@@ -92,6 +94,8 @@ await fastify.register(invoicesRoutes)
 await fastify.register(customerRoutes)
 await fastify.register(toolsRoutes)
 await fastify.register(quotesRoutes)
+await fastify.register(apiTokensRoutes)
+await fastify.register(apiV1Routes)
 
 async function startWithRetry(retries = 5, delayMs = 1000) {
   for (let i = 0; i < retries; i++) {

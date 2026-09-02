@@ -171,6 +171,7 @@ const navItems = computed((): NavItem[] => {
         { to: '/settings/woocommerce', label: 'WooCommerce', icon: 'pi-shop'       },
         { to: '/settings/users',       label: 'Users',       icon: 'pi-users'      },
         { to: '/settings/tools',       label: 'Tools',       icon: 'pi-wrench'     },
+        { to: '/settings/api-tokens',  label: 'API Tokens',  icon: 'pi-key'        },
       ],
     })
   }
@@ -188,6 +189,7 @@ const pageTitles: Record<string, string> = {
   '/settings/woocommerce': 'Settings · WooCommerce',
   '/settings/users':       'Settings · Users',
   '/settings/tools':       'Settings · Tools',
+  '/settings/api-tokens':  'Settings · API Tokens',
 }
 
 const pageTitle = computed(() => {
