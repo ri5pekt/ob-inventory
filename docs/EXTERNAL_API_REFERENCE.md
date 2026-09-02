@@ -6,6 +6,13 @@ instead of a user login, and is meant to stay stable.
 
 Base URL: `https://activebrands.cloud/api/v1`
 
+> **Machine-readable version.** `GET /api/v1` (same auth as everything else) returns this same
+> reference as structured JSON — endpoints, params, response shapes, conventions. It's the same
+> idea as an MCP server's `tools/list`: point an agent at the API and let it call `GET /api/v1`
+> first to learn what's available, instead of pasting this file into its prompt. This markdown
+> file stays as the human-readable version; keep both in sync when an endpoint changes
+> (`apps/api/src/routes/v1/meta.ts` is the source for the JSON one).
+
 ## Authentication
 
 Every request needs an `Authorization` header with a Bearer token issued from
