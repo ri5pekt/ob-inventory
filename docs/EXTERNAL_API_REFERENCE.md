@@ -84,6 +84,26 @@ GET /api/v1/attributes
 ```
 Reference data — attribute definitions come with their `options`.
 
+**Discovering valid SKUs / product IDs.** The `productId`/`sku` filters used throughout this API
+(sales, inventory, transfers, quotes, stats) aren't guessable — an agent needs to look them up
+first. The whole catalog (currently ~1,000 products) fits in a single page, so the standard
+pattern is: pull it once, cache a `sku → { id, name, brand, category }` lookup table locally, and
+reuse it for every filtered call afterwards.
+
+```bash
+curl -H "Authorization: Bearer $OB_API_TOKEN" \
+  "https://activebrands.cloud/api/v1/products?limit=1000"
+```
+Check `pagination.total` — if it ever exceeds `1000`, page with `offset` until you've fetched all
+of it (or narrow with `search=`/`brandId=`/`categoryId=`). For refreshing an existing cache, use
+`updatedSince` instead of re-pulling everything (see [Incremental sync](#incremental-sync)).
+
+Free-text lookup also works without pulling the whole catalog:
+```
+GET /api/v1/products?search=handwraps      → matches sku or name, case-insensitive
+GET /api/v1/products?sku=HWR-BK             → exact SKU match
+```
+
 ### Warehouses
 
 ```
