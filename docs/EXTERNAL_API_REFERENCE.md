@@ -180,6 +180,49 @@ period, or a single product. Response shape:
 When `productId`/`sku` is set, `revenue` and `quantity` reflect only that product's line items
 (not the whole sale total) — e.g. "revenue from SKU X, per day, in August".
 
+```
+GET /api/v1/stats/top-products
+    ?dateFrom=&dateTo=&warehouseId=&saleType=&storeId=&brandId=&categoryId=
+    &groupBy=product|brand|category&sortBy=quantity|revenue&order=desc|asc&limit=&offset=
+```
+Best (or, with `order=asc`, worst) sellers — the direct answer to "what should we reorder from
+the manufacturer" or "what's dead stock we should stop buying". Only counts `completed` sales.
+`groupBy=product` (default) ranks individual SKUs; `groupBy=brand`/`category` rolls sales up to
+that level instead (e.g. "which brand sells best"). Response:
+```json
+{
+  "groupBy": "product", "sortBy": "quantity", "order": "desc",
+  "data": [ { "sku": "HWR-BK", "name": "...", "brandName": "TKB", "categoryName": "ELASTICS",
+              "quantitySold": 91, "revenue": "5560.00", "orderCount": 46 } ],
+  "limit": 50, "offset": 0
+}
+```
+
+```
+GET /api/v1/stats/low-stock
+    ?warehouseId=&brandId=&categoryId=&velocityDays=30&thresholdDays=14&limit=&offset=
+```
+Reorder alert list: for every product with recent sales, projects `daysOfStockRemaining` from
+current on-hand stock divided by its average daily sale rate over the last `velocityDays` days,
+then returns only products projected to run out within `thresholdDays` — sorted most-urgent
+first (stock already at 0 with active sales shows up with `daysOfStockRemaining: 0`). Products
+with no sales in the window are excluded (no basis to project urgency). Response:
+```json
+{
+  "data": [ { "sku": "HWR-BK", "name": "...", "currentStock": 4, "qtySoldRecent": 24,
+              "avgDailyQty": 0.8, "daysOfStockRemaining": 5 } ],
+  "pagination": { "limit": 100, "offset": 0, "total": 12 },
+  "meta": { "velocityDays": 30, "thresholdDays": 14 }
+}
+```
+
+```
+GET /api/v1/stats/inventory-value
+    ?warehouseId=&brandId=&categoryId=&groupBy=none|warehouse|brand|category
+```
+Stock-on-hand valued at both `costValue` (cost price × qty) and `retailValue` (retail price × qty)
+— useful for "how much money is sitting in this warehouse" or per-brand/category exposure.
+
 ### Price Quotes
 
 ```
