@@ -6,6 +6,7 @@ import {
   sales, saleItems, warehouses, stores, saleTargets, saleInvoiceStatuses,
   salePaymentMethods, salePaymentMethodLinks, cardcomDocuments,
 } from '@ob-inventory/db'
+import { isValidUuid } from './_util.js'
 
 const saleListColumns = {
   id:               sales.id,
@@ -78,6 +79,8 @@ export const salesV1Routes: FastifyPluginAsync = async (fastify) => {
   })
 
   fastify.get<{ Params: { id: string } }>('/api/v1/sales/:id', async (request, reply) => {
+    if (!isValidUuid(request.params.id)) return reply.status(400).send({ error: 'Invalid id', code: 'VALIDATION_ERROR' })
+
     const [sale] = await db
       .select(saleListColumns)
       .from(sales)

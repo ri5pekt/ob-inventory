@@ -3,6 +3,7 @@ import { eq, and, gte, lte, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../../db.js'
 import { quotes, quoteItems, warehouses } from '@ob-inventory/db'
+import { isValidUuid } from './_util.js'
 
 export const quotesV1Routes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/api/v1/quotes', async (request, reply) => {
@@ -58,6 +59,8 @@ export const quotesV1Routes: FastifyPluginAsync = async (fastify) => {
   })
 
   fastify.get<{ Params: { id: string } }>('/api/v1/quotes/:id', async (request, reply) => {
+    if (!isValidUuid(request.params.id)) return reply.status(400).send({ error: 'Invalid id', code: 'VALIDATION_ERROR' })
+
     const [quote] = await db.select().from(quotes).where(eq(quotes.id, request.params.id))
     if (!quote) return reply.status(404).send({ error: 'Quote not found', code: 'NOT_FOUND' })
 

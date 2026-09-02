@@ -7,6 +7,7 @@ import {
   productAttributes, attributeDefinitions, attributeOptions,
   inventoryStock,
 } from '@ob-inventory/db'
+import { isValidUuid } from './_util.js'
 
 const listQuerySchema = z.object({
   sku:          z.string().optional(),
@@ -101,6 +102,8 @@ export const productsV1Routes: FastifyPluginAsync = async (fastify) => {
 
   // ── Single product, with per-warehouse stock ────────────────────────────────
   fastify.get<{ Params: { id: string } }>('/api/v1/products/:id', async (request, reply) => {
+    if (!isValidUuid(request.params.id)) return reply.status(400).send({ error: 'Invalid id', code: 'VALIDATION_ERROR' })
+
     const [product] = await db
       .select({
         id:           products.id,

@@ -3,6 +3,7 @@ import { eq, or, ilike, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../../db.js'
 import { customers } from '@ob-inventory/db'
+import { isValidUuid } from './_util.js'
 
 export const customersV1Routes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/api/v1/customers', async (request, reply) => {
@@ -28,6 +29,8 @@ export const customersV1Routes: FastifyPluginAsync = async (fastify) => {
   })
 
   fastify.get<{ Params: { id: string } }>('/api/v1/customers/:id', async (request, reply) => {
+    if (!isValidUuid(request.params.id)) return reply.status(400).send({ error: 'Invalid id', code: 'VALIDATION_ERROR' })
+
     const [customer] = await db.select().from(customers).where(eq(customers.id, request.params.id))
     if (!customer) return reply.status(404).send({ error: 'Customer not found', code: 'NOT_FOUND' })
     return { data: customer }

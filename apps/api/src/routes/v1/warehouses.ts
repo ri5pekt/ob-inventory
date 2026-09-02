@@ -2,6 +2,7 @@ import type { FastifyPluginAsync } from 'fastify'
 import { eq, sql } from 'drizzle-orm'
 import { db } from '../../db.js'
 import { warehouses, inventoryStock } from '@ob-inventory/db'
+import { isValidUuid } from './_util.js'
 
 export const warehousesV1Routes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/api/v1/warehouses', async () => {
@@ -25,6 +26,8 @@ export const warehousesV1Routes: FastifyPluginAsync = async (fastify) => {
   })
 
   fastify.get<{ Params: { id: string } }>('/api/v1/warehouses/:id', async (request, reply) => {
+    if (!isValidUuid(request.params.id)) return reply.status(400).send({ error: 'Invalid id', code: 'VALIDATION_ERROR' })
+
     const [warehouse] = await db.select().from(warehouses).where(eq(warehouses.id, request.params.id))
     if (!warehouse) return reply.status(404).send({ error: 'Warehouse not found', code: 'NOT_FOUND' })
     return { data: warehouse }

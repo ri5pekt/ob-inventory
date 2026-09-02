@@ -3,6 +3,7 @@ import { eq, and, gte, lte, inArray, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../../db.js'
 import { transfers, transferItems, warehouses } from '@ob-inventory/db'
+import { isValidUuid } from './_util.js'
 
 export const transfersV1Routes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/api/v1/transfers', async (request, reply) => {
@@ -67,6 +68,8 @@ export const transfersV1Routes: FastifyPluginAsync = async (fastify) => {
   })
 
   fastify.get<{ Params: { id: string } }>('/api/v1/transfers/:id', async (request, reply) => {
+    if (!isValidUuid(request.params.id)) return reply.status(400).send({ error: 'Invalid id', code: 'VALIDATION_ERROR' })
+
     const [transfer] = await db.select().from(transfers).where(eq(transfers.id, request.params.id))
     if (!transfer) return reply.status(404).send({ error: 'Transfer not found', code: 'NOT_FOUND' })
 
