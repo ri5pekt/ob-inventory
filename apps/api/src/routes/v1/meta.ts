@@ -226,8 +226,13 @@ function buildDescriptor(baseUrl: string) {
 
 export const metaV1Routes: FastifyPluginAsync = async (fastify) => {
   const handler = async (request: FastifyRequest) => {
+    // Caddy terminates TLS and proxies internally over plain HTTP, so request.protocol would
+    // report "http" even in production — read the forwarded header instead of flipping Fastify's
+    // global trustProxy (which would also change request.ip, used elsewhere for rate-limit
+    // keying and token usage logging).
+    const proto   = (request.headers['x-forwarded-proto'] as string | undefined)?.split(',')[0]?.trim() ?? request.protocol
     const host    = request.headers.host ?? request.hostname
-    const baseUrl = `${request.protocol}://${host}/api/v1`
+    const baseUrl = `${proto}://${host}/api/v1`
     return buildDescriptor(baseUrl)
   }
 
