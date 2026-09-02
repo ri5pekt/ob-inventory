@@ -2,6 +2,7 @@ import { pgTable, uuid, text, integer, timestamp, pgEnum } from 'drizzle-orm/pg-
 import { warehouses } from './inventory.js'
 import { products } from './catalog.js'
 import { users } from './auth.js'
+import { sales } from './sales.js'
 
 export const transferStatusEnum = pgEnum('transfer_status', ['completed', 'cancelled'])
 
@@ -13,6 +14,8 @@ export const transfers = pgTable('transfers', {
   reference: text('reference'),
   notes: text('notes'),
   createdBy:    uuid('created_by').references(() => users.id),
+  /** Set when this transfer was created via "Convert to Stock Transfer" on a sale. */
+  convertedFromSaleId: uuid('converted_from_sale_id').references(() => sales.id, { onDelete: 'set null' }),
   transferDate: timestamp('transfer_date', { withTimezone: true }).defaultNow().notNull(),
   createdAt:    timestamp('created_at',    { withTimezone: true }).defaultNow().notNull(),
 })

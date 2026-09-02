@@ -128,6 +128,29 @@ export async function deleteSale(id: string, reason?: string): Promise<void> {
   await apiClient.delete(`/sales/${id}`, { data: { reason } })
 }
 
+// ── Convert to stock transfer ─────────────────────────────────────────────────
+
+export interface ConvertToTransferRequest {
+  toWarehouseId: string
+  reference?:    string
+  notes?:        string
+}
+
+export interface ConvertToTransferResponse {
+  transferId:         string
+  saleDeleted:        boolean
+  wooOrderCancelled:  boolean | null
+  wooCancelWarning?:  string
+}
+
+export async function convertSaleToTransfer(
+  id: string,
+  payload: ConvertToTransferRequest,
+): Promise<ConvertToTransferResponse> {
+  const { data } = await apiClient.post<ConvertToTransferResponse>(`/sales/${id}/convert-to-transfer`, payload)
+  return data
+}
+
 // ── Merge sales ──────────────────────────────────────────────────────────────
 
 export interface MergePreviewItem {

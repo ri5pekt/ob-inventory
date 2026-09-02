@@ -121,35 +121,13 @@
         />
         <div class="footer-right">
           <Button
-            class="btn-pdf"
-            label="PDF"
-            icon="pi pi-file-pdf"
-            severity="danger"
-            outlined
-            size="small"
-            :disabled="!sale"
-            :loading="pdfLoading"
-            v-tooltip.top="'Download sale PDF'"
-            @click="downloadPdf"
-          />
-          <Button
-            label="Cardcom"
-            icon="pi pi-file"
+            icon="pi pi-ellipsis-h"
             severity="secondary"
             outlined
             size="small"
             :disabled="!sale"
-            @click="showCardcom = true"
-          />
-          <Button
-            label="Charge"
-            icon="pi pi-credit-card"
-            severity="success"
-            outlined
-            size="small"
-            :disabled="!sale || !sale.totalPrice"
-            v-tooltip.top="!sale?.totalPrice ? 'No total price on this sale' : undefined"
-            @click="showTerminal = true"
+            v-tooltip.top="'More actions'"
+            @click="showMoreActions = true"
           />
           <Button
             class="btn-edit"
@@ -165,6 +143,12 @@
     </template>
   </Dialog>
 
+  <SaleMoreActionsModal
+    v-model:visible="showMoreActions"
+    :sale="sale"
+    @pick="onPickAction"
+  />
+
   <CardcomDocumentsModal
     v-model:visible="showCardcom"
     :sale="sale"
@@ -174,6 +158,12 @@
     v-model:visible="showTerminal"
     :sale="sale"
     @charged="onCharged"
+  />
+
+  <ConvertToTransferModal
+    v-model:visible="showConvert"
+    :sale="sale"
+    @converted="onConverted"
   />
 
   <!-- Delete confirmation -->
@@ -217,6 +207,8 @@ import { deleteSale } from '@/api/sales'
 import { downloadSalePdf } from '@/utils/salePdf'
 import CardcomDocumentsModal  from './CardcomDocumentsModal.vue'
 import CardcomTerminalModal   from './CardcomTerminalModal.vue'
+import ConvertToTransferModal from './ConvertToTransferModal.vue'
+import SaleMoreActionsModal   from './SaleMoreActionsModal.vue'
 import type { ChargeCardResult } from '@/api/invoices'
 
 const props = defineProps<{
@@ -231,9 +223,11 @@ const emit = defineEmits<{
   (e: 'refreshed'): void
 }>()
 
-const showConfirm  = ref(false)
-const showCardcom  = ref(false)
-const showTerminal = ref(false)
+const showConfirm     = ref(false)
+const showCardcom     = ref(false)
+const showTerminal    = ref(false)
+const showConvert     = ref(false)
+const showMoreActions = ref(false)
 const deleting     = ref(false)
 const deleteError  = ref<string | null>(null)
 const deleteReason = ref('')
@@ -253,6 +247,18 @@ async function downloadPdf() {
 
 function onCharged(_result: ChargeCardResult) {
   emit('refreshed')
+}
+
+function onConverted() {
+  emit('update:visible', false)
+  emit('deleted') // sale no longer exists — reuse the same "refresh list" signal as delete
+}
+
+function onPickAction(action: 'pdf' | 'cardcom' | 'charge' | 'convert') {
+  if (action === 'pdf')     downloadPdf()
+  if (action === 'cardcom') showCardcom.value  = true
+  if (action === 'charge')  showTerminal.value = true
+  if (action === 'convert') showConvert.value  = true
 }
 
 async function confirmDelete() {
@@ -455,22 +461,10 @@ function formatDate(iso: string) {
     gap: 6px;
   }
 
-  :deep(.btn-pdf .p-button-label),
-  :deep(.btn-edit .p-button-label) {
-    display: none;
-  }
-
   .detail-footer :deep(.p-button) {
     height: 2.25rem;
     min-height: 2.25rem;
     padding: 0 0.6rem;
-  }
-
-  .detail-footer :deep(.btn-pdf),
-  .detail-footer :deep(.btn-edit),
-  .detail-footer > :deep(.p-button) {
-    width: 2.25rem;
-    padding: 0;
   }
 
   .detail-meta { padding: 12px; }

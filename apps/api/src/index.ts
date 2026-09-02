@@ -17,6 +17,7 @@ import { warehouseProductRoutes } from './routes/warehouse-products.js'
 import { storeRoutes } from './routes/stores.js'
 import { catalogRoutes } from './routes/catalog.js'
 import { salesRoutes } from './routes/sales.js'
+import { saleConvertRoutes } from './routes/sale-convert.js'
 import { saleMetaRoutes } from './routes/sale-meta.js'
 import { webhookRoutes } from './routes/webhooks.js'
 import { transferRoutes } from './routes/transfers.js'
@@ -82,6 +83,7 @@ await fastify.register(warehouseProductRoutes)
 await fastify.register(storeRoutes)
 await fastify.register(catalogRoutes)
 await fastify.register(salesRoutes)
+await fastify.register(saleConvertRoutes)
 await fastify.register(saleMetaRoutes)
 await fastify.register(webhookRoutes)
 await fastify.register(transferRoutes)

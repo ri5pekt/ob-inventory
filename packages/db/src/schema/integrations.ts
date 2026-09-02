@@ -15,7 +15,7 @@ export const stores = pgTable('stores', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
-export const wooSyncActionEnum = pgEnum('woo_sync_action', ['push_stock', 'pull_order'])
+export const wooSyncActionEnum = pgEnum('woo_sync_action', ['push_stock', 'pull_order', 'cancel_order'])
 export const wooSyncStatusEnum = pgEnum('woo_sync_status', ['pending', 'success', 'failed'])
 
 export const wooSyncLog = pgTable('woo_sync_log', {
