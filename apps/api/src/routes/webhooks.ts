@@ -87,15 +87,18 @@ export const webhookRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(500).send({ error: 'No main warehouse configured' })
     }
 
-    // ── Resolve products by SKU (bulk) ────────────────────────────────────────
+    // ── Resolve products by SKU (bulk, case-insensitive) ──────────────────────
+    // WooCommerce SKUs are free-text and can differ in casing from what's stored
+    // here (e.g. "SHORTSGeisha-Graphic-XL" vs "SHORTSGEISHA-GRAPHIC-XL") — match
+    // on upper(sku) so casing differences don't silently drop items unresolved.
     const skus = [...new Set(order.items.map(i => i.sku).filter(Boolean))]
     const foundProducts = skus.length > 0
       ? await db.select({ id: products.id, sku: products.sku, name: products.name })
           .from(products)
-          .where(sql`${products.sku} = ANY(ARRAY[${sql.join(skus.map(s => sql`${s}`), sql`, `)}])`)
+          .where(sql`upper(${products.sku}) = ANY(ARRAY[${sql.join(skus.map(s => sql`upper(${s})`), sql`, `)}])`)
       : []
 
-    const productBySku = new Map(foundProducts.map(p => [p.sku, p]))
+    const productBySku = new Map(foundProducts.map(p => [p.sku.toUpperCase(), p]))
 
     // ── Pre-check stock for items that exist in OB Inventory ─────────────────
     const stockChecks = foundProducts.length > 0
@@ -134,7 +137,7 @@ export const webhookRoutes: FastifyPluginAsync = async (fastify) => {
 
       for (const item of order.items) {
         if (!item.sku) continue
-        const product = productBySku.get(item.sku)
+        const product = productBySku.get(item.sku.toUpperCase())
 
         itemsToInsert.push({
           saleId:    sale.id,
