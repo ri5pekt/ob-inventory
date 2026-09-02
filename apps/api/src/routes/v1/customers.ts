@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify'
-import { eq, or, ilike, sql } from 'drizzle-orm'
+import { eq, and, or, ilike, gte, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../../db.js'
 import { customers } from '@ob-inventory/db'
@@ -8,18 +8,20 @@ import { isValidUuid } from './_util.js'
 export const customersV1Routes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/api/v1/customers', async (request, reply) => {
     const qSchema = z.object({
-      search: z.string().optional(),
-      limit:  z.coerce.number().int().min(1).max(1000).default(100),
-      offset: z.coerce.number().int().min(0).default(0),
+      search:       z.string().optional(),
+      createdSince: z.string().datetime().optional(),
+      limit:        z.coerce.number().int().min(1).max(1000).default(100),
+      offset:       z.coerce.number().int().min(0).default(0),
     })
     const q = qSchema.safeParse((request as { query: unknown }).query)
     if (!q.success) return reply.status(400).send({ error: 'Invalid query', code: 'VALIDATION_ERROR', details: q.error.flatten() })
     const f = q.data
 
     const term = f.search?.trim()
-    const where = term
-      ? or(ilike(customers.name, `%${term}%`), ilike(customers.email, `%${term}%`), ilike(customers.phone, `%${term}%`))
-      : undefined
+    const filters: ReturnType<typeof eq>[] = []
+    if (term) filters.push(or(ilike(customers.name, `%${term}%`), ilike(customers.email, `%${term}%`), ilike(customers.phone, `%${term}%`)) as ReturnType<typeof eq>)
+    if (f.createdSince) filters.push(gte(customers.createdAt, new Date(f.createdSince)) as ReturnType<typeof eq>)
+    const where = filters.length > 0 ? and(...filters) : undefined
 
     const [{ total }] = await db.select({ total: sql<number>`count(*)` }).from(customers).where(where)
 

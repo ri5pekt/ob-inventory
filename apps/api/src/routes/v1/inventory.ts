@@ -57,6 +57,7 @@ export const inventoryV1Routes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/api/v1/inventory/movements', async (request, reply) => {
     const qSchema = z.object({
       productId:   z.string().uuid().optional(),
+      sku:         z.string().optional(),
       warehouseId: z.string().uuid().optional(),
       actionType:  z.enum(['receive', 'transfer_in', 'transfer_out', 'sale', 'return', 'adjustment']).optional(),
       dateFrom:    z.string().optional(),
@@ -70,13 +71,18 @@ export const inventoryV1Routes: FastifyPluginAsync = async (fastify) => {
 
     const filters: ReturnType<typeof eq>[] = []
     if (f.productId)   filters.push(eq(inventoryLedger.productId, f.productId))
+    if (f.sku)         filters.push(eq(products.sku, f.sku))
     if (f.warehouseId) filters.push(eq(inventoryLedger.warehouseId, f.warehouseId))
     if (f.actionType)  filters.push(eq(inventoryLedger.actionType, f.actionType))
     if (f.dateFrom)    filters.push(gte(inventoryLedger.createdAt, new Date(f.dateFrom)) as ReturnType<typeof eq>)
     if (f.dateTo)      filters.push(lte(inventoryLedger.createdAt, new Date(f.dateTo)) as ReturnType<typeof eq>)
     const where = filters.length > 0 ? and(...filters) : undefined
 
-    const [{ total }] = await db.select({ total: sql<number>`count(*)` }).from(inventoryLedger).where(where)
+    const [{ total }] = await db
+      .select({ total: sql<number>`count(*)` })
+      .from(inventoryLedger)
+      .leftJoin(products, eq(inventoryLedger.productId, products.id))
+      .where(where)
 
     const rows = await db
       .select({

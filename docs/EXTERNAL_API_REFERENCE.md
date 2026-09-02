@@ -105,28 +105,34 @@ Current on-hand quantity per product per warehouse.
 
 ```
 GET /api/v1/inventory/movements
-    ?productId=&warehouseId=&actionType=&dateFrom=&dateTo=&limit=&offset=
+    ?productId=&sku=&warehouseId=&actionType=&dateFrom=&dateTo=&limit=&offset=
 ```
 The append-only inventory ledger — every receive / transfer / sale / return / adjustment that
 ever touched stock. `actionType` is one of `receive | transfer_in | transfer_out | sale | return
 | adjustment`. `quantityDelta` is signed (positive = stock in, negative = stock out).
+`productId`/`sku` scope the ledger to a single product — e.g. "every stock movement for SKU X
+in March".
 
 ### Transfers
 
 ```
 GET /api/v1/transfers
-    ?fromWarehouseId=&toWarehouseId=&status=&dateFrom=&dateTo=&limit=&offset=
+    ?fromWarehouseId=&toWarehouseId=&status=&productId=&sku=&dateFrom=&dateTo=&limit=&offset=
 GET /api/v1/transfers/:id     → includes items[]
 ```
+`productId`/`sku` return only transfers that contain that product (via a line-item match).
 
 ### Sales
 
 ```
 GET /api/v1/sales
-    ?saleType=&status=&warehouseId=&storeId=&dateFrom=&dateTo=&updatedSince=&limit=&offset=
+    ?saleType=&status=&warehouseId=&storeId=&productId=&sku=&dateFrom=&dateTo=&updatedSince=&limit=&offset=
 ```
-`saleType`: `direct | partner | woocommerce | merged`.
+`saleType`: `direct | partner | woocommerce | merged` — this is the closest concept to a "channel".
 `status`: `completed | cancelled | refunded | superseded`.
+`dateFrom`/`dateTo` filter on `saleDate`, so you can pull "sales in period X".
+`productId`/`sku` return only sales that included that product — combine with `dateFrom`/`dateTo`
+and `saleType`/`storeId` to answer "sales of SKU X via WooCommerce in Q2", etc.
 
 ```
 GET /api/v1/sales/:id
@@ -134,13 +140,34 @@ GET /api/v1/sales/:id
 Includes `items[]`, `paymentMethods[]`, and `cardcomDocuments[]` (invoices/receipts issued for
 this sale).
 
+### Statistics
+
+```
+GET /api/v1/stats/sales-summary
+    ?dateFrom=&dateTo=&warehouseId=&saleType=&storeId=&productId=&sku=&groupBy=day|warehouse|saleType|store
+```
+Pre-aggregated revenue/count/quantity so an agent doesn't have to page through raw sales and sum
+them client-side. Only counts `completed` sales. `groupBy` (default `day`) buckets the results;
+combine with any of the filters above to scope by warehouse, channel (`saleType`/`storeId`),
+period, or a single product. Response shape:
+```json
+{
+  "groupBy": "day",
+  "data": [ { "group": "2026-09-01", "count": 12, "revenue": "4500.00", "quantity": 34 } ],
+  "totals": { "count": 120, "revenue": "45000.00", "quantity": 340 }
+}
+```
+When `productId`/`sku` is set, `revenue` and `quantity` reflect only that product's line items
+(not the whole sale total) — e.g. "revenue from SKU X, per day, in August".
+
 ### Price Quotes
 
 ```
 GET /api/v1/quotes
-    ?status=&warehouseId=&dateFrom=&dateTo=&limit=&offset=
+    ?status=&warehouseId=&productId=&sku=&customerEmail=&dateFrom=&dateTo=&limit=&offset=
 ```
 `status`: `open | converted | cancelled`.
+`productId`/`sku` return only quotes that contain that product.
 
 ```
 GET /api/v1/quotes/:id     → includes items[]
@@ -149,7 +176,7 @@ GET /api/v1/quotes/:id     → includes items[]
 ### Customers
 
 ```
-GET /api/v1/customers?search=&limit=&offset=
+GET /api/v1/customers?search=&createdSince=&limit=&offset=
 GET /api/v1/customers/:id
 ```
 
@@ -180,6 +207,11 @@ curl -H "Authorization: Bearer $OB_API_TOKEN" \
 ```bash
 curl -H "Authorization: Bearer $OB_API_TOKEN" \
   "https://activebrands.cloud/api/v1/sales?updatedSince=2026-09-01T00:00:00Z"
+```
+
+```bash
+curl -H "Authorization: Bearer $OB_API_TOKEN" \
+  "https://activebrands.cloud/api/v1/stats/sales-summary?dateFrom=2026-08-01&dateTo=2026-08-31&groupBy=saleType"
 ```
 
 ---

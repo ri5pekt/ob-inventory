@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify'
-import { eq, and, gte, lte, sql } from 'drizzle-orm'
+import { eq, and, gte, lte, exists, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../../db.js'
 import {
@@ -41,6 +41,8 @@ export const salesV1Routes: FastifyPluginAsync = async (fastify) => {
       status:       z.enum(['completed', 'cancelled', 'refunded', 'superseded']).optional(),
       warehouseId:  z.string().uuid().optional(),
       storeId:      z.string().uuid().optional(),
+      productId:    z.string().uuid().optional(),
+      sku:          z.string().optional(),
       dateFrom:     z.string().optional(),
       dateTo:       z.string().optional(),
       updatedSince: z.string().datetime().optional(),
@@ -59,6 +61,12 @@ export const salesV1Routes: FastifyPluginAsync = async (fastify) => {
     if (f.dateFrom)      filters.push(gte(sales.saleDate, new Date(f.dateFrom)) as ReturnType<typeof eq>)
     if (f.dateTo)        filters.push(lte(sales.saleDate, new Date(f.dateTo)) as ReturnType<typeof eq>)
     if (f.updatedSince)  filters.push(gte(sales.updatedAt, new Date(f.updatedSince)) as ReturnType<typeof eq>)
+    if (f.productId || f.sku) {
+      const itemConds = [eq(saleItems.saleId, sales.id)]
+      if (f.productId) itemConds.push(eq(saleItems.productId, f.productId))
+      if (f.sku)        itemConds.push(eq(saleItems.sku, f.sku))
+      filters.push(exists(db.select({ one: sql`1` }).from(saleItems).where(and(...itemConds))) as ReturnType<typeof eq>)
+    }
     const where = filters.length > 0 ? and(...filters) : undefined
 
     const [{ total }] = await db.select({ total: sql<number>`count(*)` }).from(sales).where(where)

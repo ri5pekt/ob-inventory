@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify'
-import { eq, and, gte, lte, inArray, sql } from 'drizzle-orm'
+import { eq, and, gte, lte, inArray, exists, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../../db.js'
 import { transfers, transferItems, warehouses } from '@ob-inventory/db'
@@ -11,6 +11,8 @@ export const transfersV1Routes: FastifyPluginAsync = async (fastify) => {
       fromWarehouseId: z.string().uuid().optional(),
       toWarehouseId:   z.string().uuid().optional(),
       status:          z.enum(['completed', 'cancelled']).optional(),
+      productId:       z.string().uuid().optional(),
+      sku:             z.string().optional(),
       dateFrom:        z.string().optional(),
       dateTo:          z.string().optional(),
       limit:           z.coerce.number().int().min(1).max(1000).default(100),
@@ -26,6 +28,12 @@ export const transfersV1Routes: FastifyPluginAsync = async (fastify) => {
     if (f.status)          filters.push(eq(transfers.status, f.status))
     if (f.dateFrom)         filters.push(gte(transfers.transferDate, new Date(f.dateFrom)) as ReturnType<typeof eq>)
     if (f.dateTo)           filters.push(lte(transfers.transferDate, new Date(f.dateTo)) as ReturnType<typeof eq>)
+    if (f.productId || f.sku) {
+      const itemConds = [eq(transferItems.transferId, transfers.id)]
+      if (f.productId) itemConds.push(eq(transferItems.productId, f.productId))
+      if (f.sku)        itemConds.push(eq(transferItems.sku, f.sku))
+      filters.push(exists(db.select({ one: sql`1` }).from(transferItems).where(and(...itemConds))) as ReturnType<typeof eq>)
+    }
     const where = filters.length > 0 ? and(...filters) : undefined
 
     const [{ total }] = await db.select({ total: sql<number>`count(*)` }).from(transfers).where(where)

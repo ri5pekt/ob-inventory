@@ -14,6 +14,7 @@ import { quotesV1Routes } from './quotes.js'
 import { customersV1Routes } from './customers.js'
 import { usersV1Routes } from './users.js'
 import { storesV1Routes } from './stores.js'
+import { statsV1Routes } from './stats.js'
 
 /**
  * External, read-only API for agents/scripts — token-based auth, separate
@@ -79,4 +80,5 @@ export const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(customersV1Routes)
   await fastify.register(usersV1Routes)
   await fastify.register(storesV1Routes)
+  await fastify.register(statsV1Routes)
 }
