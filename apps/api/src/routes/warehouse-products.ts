@@ -47,7 +47,7 @@ const updateProductSchema = z.object({
   retailPrice:   z.number().nonnegative().nullable().optional(),
 })
 
-async function upsertAttributes(
+export async function upsertAttributes(
   productId: string,
   d: { model?: string | null; sizeOptionId?: string | null; colorOptionId?: string | null; unitOptionId?: string | null },
 ) {

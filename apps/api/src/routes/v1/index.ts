@@ -18,8 +18,10 @@ import { statsV1Routes } from './stats.js'
 import { metaV1Routes } from './meta.js'
 
 /**
- * External, read-only API for agents/scripts — token-based auth, separate
- * from the JWT session used by the SPA. See docs/EXTERNAL_API_REFERENCE.md.
+ * External API for agents/scripts — token-based auth, separate from the JWT
+ * session used by the SPA. Mostly read-only, with a small write surface for
+ * product creation/updates (see routes/v1/products.ts). See
+ * docs/EXTERNAL_API_REFERENCE.md.
  */
 export const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   // ── Token auth — runs first so rate limiting can be keyed per token ─────────
@@ -39,7 +41,7 @@ export const apiV1Routes: FastifyPluginAsync = async (fastify) => {
       return reply.status(401).send({ error: 'Token expired', code: 'TOKEN_EXPIRED' })
     }
 
-    request.apiToken = { id: token.id, name: token.name }
+    request.apiToken = { id: token.id, name: token.name, createdBy: token.createdBy }
     // Fire-and-forget — never block the response on this.
     void db.update(apiTokens).set({ lastUsedAt: new Date() }).where(eq(apiTokens.id, token.id))
   })

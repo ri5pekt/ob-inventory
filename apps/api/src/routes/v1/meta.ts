@@ -14,10 +14,12 @@ import type { FastifyPluginAsync, FastifyRequest } from 'fastify'
 function buildDescriptor(baseUrl: string) {
   return {
     name:        'OB Inventory External API',
-    version:     '2.1.0',
-    description: 'Read-only HTTP API for external agents/scripts to query sales, inventory, '
-      + 'products, warehouses, and pre-aggregated statistics. Separate from the internal /api/* '
-      + 'used by the web app — authenticated with a long-lived API token instead of a user login.',
+    version:     '2.4.0',
+    description: 'HTTP API for external agents/scripts to query sales, inventory, products, '
+      + 'warehouses, and pre-aggregated statistics — and to create/update products. Separate from '
+      + 'the internal /api/* used by the web app — authenticated with a long-lived API token instead '
+      + 'of a user login. Almost entirely read-only; the one write surface is product catalog '
+      + 'management (see POST/PUT /products below).',
     baseUrl,
 
     authentication: {
@@ -70,9 +72,46 @@ function buildDescriptor(baseUrl: string) {
         method: 'GET', path: '/products/:id',
         summary: "Single product, same shape as list, plus stock: [{ warehouseId, quantity, boxNumber }] for every warehouse holding it.",
       },
-      { method: 'GET', path: '/brands',     summary: 'Reference data — all brands.' },
-      { method: 'GET', path: '/categories', summary: 'Reference data — all categories.' },
-      { method: 'GET', path: '/attributes', summary: 'Reference data — attribute definitions, each with its options[].' },
+      {
+        method: 'POST', path: '/products',
+        summary: 'Create a product. brand/category/size/color/unit are matched by name/label against existing '
+          + 'reference data (GET /brands, /categories, /attributes) case-insensitively, and auto-created if they '
+          + "don't exist yet — you don't need to look up IDs first, but you can call those GETs to see what "
+          + 'already exists and avoid near-duplicate spellings. imageUrl is fetched server-side (resized to a '
+          + 'full-size + thumbnail JPEG) — no file upload needed. initialStock is optional; omit it to create a '
+          + 'catalog-only product with no stock yet.',
+        body: {
+          sku: 'required, must be unique', name: 'required',
+          wooTitle: 'optional', brand: 'optional, e.g. "Nike"', category: 'optional, e.g. "Gloves"',
+          model: 'optional free text', size: 'optional, e.g. "L"', color: 'optional, e.g. "Black"', unit: 'optional, e.g. "Pair"',
+          costPrice: 'optional number', retailPrice: 'optional number', notes: 'optional',
+          imageUrl: 'optional — a fetchable image URL',
+          initialStock: 'optional { warehouseId (uuid, required), quantity (int, default 0), boxNumber (optional) }',
+        },
+        responses: {
+          201: 'Created — { data: <product, same shape as GET /products/:id> }',
+          400: 'VALIDATION_ERROR (bad input) or IMAGE_FETCH_FAILED (imageUrl unreachable or not an image)',
+          404: 'initialStock.warehouseId does not exist',
+          409: 'DUPLICATE_SKU — sku already exists',
+        },
+        example: '{ "sku": "HWR-BK", "name": "Hand Wraps Black", "brand": "TKB", "category": "Handwraps", '
+          + '"size": "L", "costPrice": 12.5, "retailPrice": 29.9, "imageUrl": "https://.../hwr-bk.jpg", '
+          + '"initialStock": { "warehouseId": "...", "quantity": 50 } }',
+      },
+      {
+        method: 'PUT', path: '/products/:id',
+        summary: 'Update a product\'s catalog fields (not stock — stock is managed elsewhere). Every field is '
+          + 'optional and only supplied fields are changed; send null on a field to clear it (e.g. "imageUrl": null '
+          + 'removes the picture). Same brand/category/size/color/unit resolve-or-auto-create behavior as create.',
+        body: 'Same fields as POST /products, all optional, minus initialStock.',
+        responses: {
+          200: '{ data: <product, same shape as GET /products/:id> }',
+          400: 'VALIDATION_ERROR or IMAGE_FETCH_FAILED', 404: 'Product not found', 409: 'DUPLICATE_SKU',
+        },
+      },
+      { method: 'GET', path: '/brands',     summary: 'Reference data — all brands. Check here before POST /products to avoid near-duplicate spellings.' },
+      { method: 'GET', path: '/categories', summary: 'Reference data — all categories. Check here before POST /products to avoid near-duplicate spellings.' },
+      { method: 'GET', path: '/attributes', summary: 'Reference data — attribute definitions (Model, Size, Color, Unit, ...), each with its options[] (existing size/color/unit labels).' },
 
       {
         method: 'GET', path: '/warehouses',
@@ -218,7 +257,9 @@ function buildDescriptor(baseUrl: string) {
     ],
 
     notAvailable: [
-      'Write access — creating/editing sales, adjusting stock, etc. This entire surface is read-only.',
+      'Write access to anything other than products — sales, transfers, quotes, warehouses, stock levels, etc. '
+        + 'are all still read-only. The only mutating endpoints are POST /products and PUT /products/:id.',
+      'Adjusting stock on an existing product, or deleting a product — not available via this API yet.',
       'Cardcom/Woo credentials, password hashes, refresh/API token secrets — never exposed.',
     ],
   }

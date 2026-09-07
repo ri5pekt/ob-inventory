@@ -15,6 +15,7 @@ declare module 'fastify' {
     apiToken?: {
       id: string
       name: string
+      createdBy: string | null
     }
   }
 }

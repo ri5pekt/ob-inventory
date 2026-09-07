@@ -1,8 +1,10 @@
 # OB Inventory — External API Reference (`/api/v1`)
 
-Read-only HTTP API for external agents and scripts. Separate from the internal `/api/*`
-endpoints used by the web app — this surface is authenticated with a long-lived **API token**
-instead of a user login, and is meant to stay stable.
+HTTP API for external agents and scripts. Separate from the internal `/api/*` endpoints used by
+the web app — this surface is authenticated with a long-lived **API token** instead of a user
+login, and is meant to stay stable. Almost entirely read-only; the one write surface is product
+catalog management (`POST`/`PUT /products`, below) — every token can use it, there's no separate
+read/write scope.
 
 Base URL: `https://activebrands.cloud/api/v1`
 
@@ -89,7 +91,55 @@ GET /api/v1/brands
 GET /api/v1/categories
 GET /api/v1/attributes
 ```
-Reference data — attribute definitions come with their `options`.
+Reference data — attribute definitions come with their `options`. Check these before creating a
+product to see what brand/category/size/color/unit values already exist and avoid near-duplicate
+spellings (e.g. "Nike" vs "nike " creating two brands) — though as noted below, exact lookups
+aren't required since create/update auto-create by name.
+
+```
+POST /api/v1/products
+```
+Creates a product. Body:
+```jsonc
+{
+  "sku": "HWR-BK",              // required, must be unique
+  "name": "Hand Wraps Black",   // required
+  "wooTitle": null,             // optional
+  "brand": "TKB",               // optional — matched case-insensitively by name; auto-created if new
+  "category": "Handwraps",      // optional — same resolve-or-create behavior
+  "model": null,                // optional free text attribute
+  "size": "L",                  // optional — matched by label against existing options; auto-created if new
+  "color": "Black",             // optional — same
+  "unit": null,                 // optional — same
+  "costPrice": 12.5,            // optional
+  "retailPrice": 29.9,          // optional
+  "notes": null,                // optional
+  "imageUrl": "https://...",    // optional — fetched server-side, resized to full + thumbnail JPEG, stored.
+                                 //   No file upload needed; just point at a reachable image URL.
+  "initialStock": {              // optional — omit entirely for a catalog-only product with no stock yet
+    "warehouseId": "<uuid>",     // required if initialStock is present — see GET /warehouses
+    "quantity": 50,              // optional, default 0
+    "boxNumber": null            // optional
+  }
+}
+```
+Response `201 { "data": <product, same shape as GET /products/:id> }`. Errors:
+`400 VALIDATION_ERROR` (bad input) or `400 IMAGE_FETCH_FAILED` (imageUrl unreachable/not an
+image), `404` (`initialStock.warehouseId` doesn't exist), `409 DUPLICATE_SKU` (sku taken).
+
+If `initialStock` targets the **main** warehouse, stock is auto-synced to WooCommerce the same
+way a manual stock entry in the app would be (fire-and-forget — check
+`GET /api/v1/inventory/movements?sku=...` afterwards if you need to confirm it landed).
+
+```
+PUT /api/v1/products/:id
+```
+Updates a product's catalog fields — **not stock**, which isn't adjustable via this API yet. Same
+body shape as `POST` minus `initialStock`, but every field is optional: only the fields you
+include are changed. Send `null` on a field to explicitly clear it, e.g. `{"imageUrl": null}`
+removes the picture. Same brand/category/size/color/unit resolve-or-auto-create behavior as
+create. Response `200 { "data": <product> }`. Errors: `400`, `404` (product not found),
+`409 DUPLICATE_SKU` (if changing `sku` to one already in use).
 
 **Discovering valid SKUs / product IDs.** The `productId`/`sku` filters used throughout this API
 (sales, inventory, transfers, quotes, stats) aren't guessable — an agent needs to look them up
@@ -288,7 +338,9 @@ curl -H "Authorization: Bearer $OB_API_TOKEN" \
 
 ## Not available via this API (v1)
 
-- **Write access** — creating/editing sales, adjusting stock, etc. This API is read-only.
+- **Write access to anything other than products** — sales, transfers, quotes, warehouses, stock
+  levels, etc. are all still read-only. The only mutating endpoints are `POST`/`PUT /products`.
+- Adjusting stock on an *existing* product, or deleting a product — not available yet.
 - Cardcom/Woo credentials, password hashes, refresh/API token secrets — never exposed.
 
 ## Managing tokens
