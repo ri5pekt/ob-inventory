@@ -14,7 +14,7 @@ import type { FastifyPluginAsync, FastifyRequest } from 'fastify'
 function buildDescriptor(baseUrl: string) {
   return {
     name:        'OB Inventory External API',
-    version:     '2.4.0',
+    version:     '2.4.1',
     description: 'HTTP API for external agents/scripts to query sales, inventory, products, '
       + 'warehouses, and pre-aggregated statistics — and to create/update products. Separate from '
       + 'the internal /api/* used by the web app — authenticated with a long-lived API token instead '

@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify'
-import { eq } from 'drizzle-orm'
+import { eq, and, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../db.js'
 import { stores, products, inventoryStock, warehouses } from '@ob-inventory/db'
@@ -197,13 +197,29 @@ export const storeRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(502).send({ error: msg })
     }
 
-    // ── Load main warehouse stock from DB ───────────────────────────────────
+    // ── Load the whole OB catalog, left-joined to main warehouse stock ──────
+    // Deliberately a LEFT JOIN from products (not an INNER JOIN from inventory_stock):
+    // a product with no stock row yet in Main (e.g. just created via the external API,
+    // or added to a partner warehouse only) is still a real catalog entry that should
+    // be matched against WooCommerce by SKU — it just has 0 quantity, not "doesn't exist".
+    // Using an INNER JOIN here previously made any zero-stock OB product invisible to
+    // this comparison, so it always showed up as "Woo Only" even after being created
+    // with the right SKU.
+    const [mainWarehouse] = await db.select({ id: warehouses.id }).from(warehouses).where(eq(warehouses.type, 'main'))
+    if (!mainWarehouse) return reply.status(400).send({ error: 'No main warehouse configured', code: 'NO_MAIN_WAREHOUSE' })
+
     const obStock = await db
-      .select({ productId: products.id, sku: products.sku, name: products.name, quantity: inventoryStock.quantity })
-      .from(inventoryStock)
-      .innerJoin(products,   eq(inventoryStock.productId,   products.id))
-      .innerJoin(warehouses, eq(inventoryStock.warehouseId, warehouses.id))
-      .where(eq(warehouses.type, 'main'))
+      .select({
+        productId: products.id,
+        sku:       products.sku,
+        name:      products.name,
+        quantity:  sql<number>`coalesce(${inventoryStock.quantity}, 0)`,
+      })
+      .from(products)
+      .leftJoin(inventoryStock, and(
+        eq(inventoryStock.productId,   products.id),
+        eq(inventoryStock.warehouseId, mainWarehouse.id),
+      ))
 
     // ── Match by SKU (case-insensitive, trimmed) ─────────────────────────────
     // WooCommerce SKUs sometimes differ in casing or have extra whitespace
