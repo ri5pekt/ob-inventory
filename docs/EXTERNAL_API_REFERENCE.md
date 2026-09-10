@@ -2,9 +2,9 @@
 
 HTTP API for external agents and scripts. Separate from the internal `/api/*` endpoints used by
 the web app — this surface is authenticated with a long-lived **API token** instead of a user
-login, and is meant to stay stable. Almost entirely read-only; the one write surface is product
-catalog management (`POST`/`PUT /products`, below) — every token can use it, there's no separate
-read/write scope.
+login, and is meant to stay stable. Almost entirely read-only; the write surface is product
+catalog + stock management (`POST`/`PUT /products`, `PUT /products/:id/stock`, below) — every
+token can use it, there's no separate read/write scope.
 
 Base URL: `https://activebrands.cloud/api/v1`
 
@@ -134,12 +134,30 @@ way a manual stock entry in the app would be (fire-and-forget — check
 ```
 PUT /api/v1/products/:id
 ```
-Updates a product's catalog fields — **not stock**, which isn't adjustable via this API yet. Same
-body shape as `POST` minus `initialStock`, but every field is optional: only the fields you
+Updates a product's catalog fields — **not stock**, see `PUT /products/:id/stock` below for that.
+Same body shape as `POST` minus `initialStock`, but every field is optional: only the fields you
 include are changed. Send `null` on a field to explicitly clear it, e.g. `{"imageUrl": null}`
 removes the picture. Same brand/category/size/color/unit resolve-or-auto-create behavior as
 create. Response `200 { "data": <product> }`. Errors: `400`, `404` (product not found),
 `409 DUPLICATE_SKU` (if changing `sku` to one already in use).
+
+```
+PUT /api/v1/products/:id/stock
+```
+Sets the **absolute** on-hand quantity for a product in one warehouse — not a delta, so sending
+the same call twice is safe (idempotent). Body:
+```jsonc
+{
+  "warehouseId": "<uuid>",   // required — see GET /warehouses
+  "quantity": 50,            // required, integer >= 0 — absolute quantity, not a +/- delta
+  "boxNumber": null          // optional
+}
+```
+Creates the stock row if the product isn't in that warehouse yet, otherwise adjusts it — either
+way a ledger entry (`inventory/movements`) is recorded so the change is auditable, same as a
+manual stock edit in the app. If `warehouseId` is the **Main** warehouse, a WooCommerce stock sync
+is enqueued automatically. Response `200 { "data": <product, including stock[] for every
+warehouse> }`. Errors: `400 VALIDATION_ERROR`, `404` (product or warehouse not found).
 
 **Discovering valid SKUs / product IDs.** The `productId`/`sku` filters used throughout this API
 (sales, inventory, transfers, quotes, stats) aren't guessable — an agent needs to look them up
@@ -338,9 +356,11 @@ curl -H "Authorization: Bearer $OB_API_TOKEN" \
 
 ## Not available via this API (v1)
 
-- **Write access to anything other than products** — sales, transfers, quotes, warehouses, stock
-  levels, etc. are all still read-only. The only mutating endpoints are `POST`/`PUT /products`.
-- Adjusting stock on an *existing* product, or deleting a product — not available yet.
+- **Write access to anything other than products and their stock** — sales, transfers, quotes,
+  warehouses, etc. are all still read-only. The only mutating endpoints are `POST /products`,
+  `PUT /products/:id`, and `PUT /products/:id/stock`.
+- Deleting a product, or removing it from a warehouse entirely (as opposed to setting its
+  quantity to `0`) — not available yet.
 - Cardcom/Woo credentials, password hashes, refresh/API token secrets — never exposed.
 
 ## Managing tokens

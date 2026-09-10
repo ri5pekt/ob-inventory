@@ -14,12 +14,12 @@ import type { FastifyPluginAsync, FastifyRequest } from 'fastify'
 function buildDescriptor(baseUrl: string) {
   return {
     name:        'OB Inventory External API',
-    version:     '2.4.1',
+    version:     '2.5.0',
     description: 'HTTP API for external agents/scripts to query sales, inventory, products, '
-      + 'warehouses, and pre-aggregated statistics — and to create/update products. Separate from '
-      + 'the internal /api/* used by the web app — authenticated with a long-lived API token instead '
-      + 'of a user login. Almost entirely read-only; the one write surface is product catalog '
-      + 'management (see POST/PUT /products below).',
+      + 'warehouses, and pre-aggregated statistics — and to create/update products and their stock. '
+      + 'Separate from the internal /api/* used by the web app — authenticated with a long-lived API '
+      + 'token instead of a user login. Almost entirely read-only; the write surface is product '
+      + 'catalog + stock management (see POST/PUT /products and PUT /products/:id/stock below).',
     baseUrl,
 
     authentication: {
@@ -100,14 +100,31 @@ function buildDescriptor(baseUrl: string) {
       },
       {
         method: 'PUT', path: '/products/:id',
-        summary: 'Update a product\'s catalog fields (not stock — stock is managed elsewhere). Every field is '
-          + 'optional and only supplied fields are changed; send null on a field to clear it (e.g. "imageUrl": null '
-          + 'removes the picture). Same brand/category/size/color/unit resolve-or-auto-create behavior as create.',
+        summary: 'Update a product\'s catalog fields (not stock — see PUT /products/:id/stock below). Every field '
+          + 'is optional and only supplied fields are changed; send null on a field to clear it (e.g. "imageUrl": '
+          + 'null removes the picture). Same brand/category/size/color/unit resolve-or-auto-create behavior as create.',
         body: 'Same fields as POST /products, all optional, minus initialStock.',
         responses: {
           200: '{ data: <product, same shape as GET /products/:id> }',
           400: 'VALIDATION_ERROR or IMAGE_FETCH_FAILED', 404: 'Product not found', 409: 'DUPLICATE_SKU',
         },
+      },
+      {
+        method: 'PUT', path: '/products/:id/stock',
+        summary: 'Set the absolute on-hand quantity for a product in one warehouse — not a delta, so re-sending '
+          + 'the same call twice is safe. Creates the stock row if the product isn\'t in that warehouse yet, '
+          + 'otherwise adjusts it; either way a ledger entry is recorded so the change is auditable. If the '
+          + 'warehouse is the Main warehouse, a WooCommerce stock sync is enqueued automatically — same as a '
+          + 'manual stock edit in the app.',
+        body: {
+          warehouseId: 'required, uuid — see GET /warehouses', quantity: 'required, int >= 0, absolute quantity',
+          boxNumber: 'optional',
+        },
+        responses: {
+          200: '{ data: <product, same shape as GET /products/:id, including stock[] for every warehouse> }',
+          400: 'VALIDATION_ERROR', 404: 'Product not found, or warehouseId not found',
+        },
+        example: '{ "warehouseId": "...", "quantity": 50 }',
       },
       { method: 'GET', path: '/brands',     summary: 'Reference data — all brands. Check here before POST /products to avoid near-duplicate spellings.' },
       { method: 'GET', path: '/categories', summary: 'Reference data — all categories. Check here before POST /products to avoid near-duplicate spellings.' },
@@ -257,9 +274,11 @@ function buildDescriptor(baseUrl: string) {
     ],
 
     notAvailable: [
-      'Write access to anything other than products — sales, transfers, quotes, warehouses, stock levels, etc. '
-        + 'are all still read-only. The only mutating endpoints are POST /products and PUT /products/:id.',
-      'Adjusting stock on an existing product, or deleting a product — not available via this API yet.',
+      'Write access to anything other than products and their stock — sales, transfers, quotes, warehouses, etc. '
+        + 'are all still read-only. The only mutating endpoints are POST /products, PUT /products/:id, and '
+        + 'PUT /products/:id/stock.',
+      'Deleting a product, or removing it from a warehouse entirely (as opposed to setting its quantity to 0) — '
+        + 'not available via this API yet.',
       'Cardcom/Woo credentials, password hashes, refresh/API token secrets — never exposed.',
     ],
   }

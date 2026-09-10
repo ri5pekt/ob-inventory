@@ -182,6 +182,12 @@ const updateProductSchema = z.object({
   imageUrl:    z.string().url().nullable().optional(), // null clears the image
 })
 
+const setStockSchema = z.object({
+  warehouseId: z.string().uuid(),
+  quantity:    z.number().int().min(0), // absolute on-hand quantity, not a delta
+  boxNumber:   z.string().nullable().optional(),
+})
+
 export const productsV1Routes: FastifyPluginAsync = async (fastify) => {
   // ── List products ────────────────────────────────────────────────────────────
   fastify.get('/api/v1/products', async (request, reply) => {
@@ -318,8 +324,7 @@ export const productsV1Routes: FastifyPluginAsync = async (fastify) => {
   })
 
   // ── Update product ───────────────────────────────────────────────────────────
-  // Catalog fields only — stock is not adjustable here, use the internal
-  // warehouse endpoints (or a future /api/v1/inventory write endpoint) for that.
+  // Catalog fields only — for stock, use PUT /api/v1/products/:id/stock below.
   fastify.put<{ Params: { id: string } }>('/api/v1/products/:id', async (request, reply) => {
     if (!isValidUuid(request.params.id)) return reply.status(400).send({ error: 'Invalid id', code: 'VALIDATION_ERROR' })
 
@@ -369,6 +374,74 @@ export const productsV1Routes: FastifyPluginAsync = async (fastify) => {
     if (Object.keys(attrInput).length > 0) await upsertAttributes(current.id, attrInput)
 
     const detail = await fetchProductDetail(current.id)
+    return { data: detail }
+  })
+
+  // ── Set stock for one warehouse ─────────────────────────────────────────────
+  // Sets the *absolute* on-hand quantity for a product in one warehouse (not a
+  // delta) — idempotent, so retries/re-sends are safe. Creates the stock row if
+  // the product isn't in that warehouse yet, otherwise adjusts it, recording a
+  // ledger entry either way so the change is auditable. If the warehouse is the
+  // Main warehouse, a WooCommerce stock sync is enqueued automatically.
+  fastify.put<{ Params: { id: string } }>('/api/v1/products/:id/stock', async (request, reply) => {
+    if (!isValidUuid(request.params.id)) return reply.status(400).send({ error: 'Invalid id', code: 'VALIDATION_ERROR' })
+
+    const body = setStockSchema.safeParse(request.body)
+    if (!body.success) return reply.status(400).send({ error: 'Invalid input', code: 'VALIDATION_ERROR', details: body.error.flatten() })
+    const d = body.data
+
+    const [product] = await db.select({ id: products.id }).from(products).where(eq(products.id, request.params.id))
+    if (!product) return reply.status(404).send({ error: 'Product not found', code: 'NOT_FOUND' })
+
+    const [warehouse] = await db.select({ id: warehouses.id, type: warehouses.type }).from(warehouses)
+      .where(eq(warehouses.id, d.warehouseId))
+    if (!warehouse) return reply.status(404).send({ error: 'warehouseId not found', code: 'NOT_FOUND' })
+
+    const [existingStock] = await db.select().from(inventoryStock)
+      .where(and(eq(inventoryStock.productId, product.id), eq(inventoryStock.warehouseId, warehouse.id)))
+
+    if (!existingStock) {
+      await db.insert(inventoryStock).values({
+        productId:  product.id,
+        warehouseId: warehouse.id,
+        boxNumber:  d.boxNumber ?? null,
+        quantity:   d.quantity,
+        dateAdded:  sql`CURRENT_DATE`,
+      })
+      if (d.quantity > 0) {
+        await db.insert(inventoryLedger).values({
+          productId:     product.id,
+          warehouseId:   warehouse.id,
+          actionType:    'receive',
+          quantityDelta: d.quantity,
+          notes:         `Stock set via API token "${request.apiToken?.name ?? 'unknown'}"`,
+        })
+      }
+    } else {
+      const delta = d.quantity - existingStock.quantity
+      await db.update(inventoryStock)
+        .set({ quantity: d.quantity, ...(d.boxNumber !== undefined ? { boxNumber: d.boxNumber } : {}) })
+        .where(and(eq(inventoryStock.productId, product.id), eq(inventoryStock.warehouseId, warehouse.id)))
+      if (delta !== 0) {
+        await db.insert(inventoryLedger).values({
+          productId:     product.id,
+          warehouseId:   warehouse.id,
+          actionType:    'adjustment',
+          quantityDelta: delta,
+          notes:         `Stock set via API token "${request.apiToken?.name ?? 'unknown'}" (${delta > 0 ? '+' : ''}${delta})`,
+        })
+      }
+    }
+
+    if (warehouse.type === 'main') {
+      try {
+        await enqueueSyncWooStock(product.id)
+      } catch (err) {
+        request.log.warn({ err, productId: product.id }, '[api/v1] Failed to enqueue Woo sync after stock update')
+      }
+    }
+
+    const detail = await fetchProductDetail(product.id)
     return { data: detail }
   })
 

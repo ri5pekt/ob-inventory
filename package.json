@@ -1,6 +1,6 @@
 {
   "name": "ob-inventory",
-  "version": "2.4.1",
+  "version": "2.5.0",
   "private": true,
   "packageManager": "pnpm@10.16.0",
   "engines": {
