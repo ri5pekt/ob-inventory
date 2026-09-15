@@ -346,9 +346,12 @@ function openCreateSaleFromSelection() {
   cancelSelectionMode()
 }
 
-function onSaleCreated() {
+function onSaleCreated(id: string) {
   queryClient.invalidateQueries({ queryKey: ['warehouse-stock', warehouseId.value] })
   queryClient.invalidateQueries({ queryKey: ['warehouses'] })
+
+  // Jump to the Sales screen and open the sale we just created so it can be edited/charged
+  router.push({ path: '/sales', query: { open: id } })
 }
 
 // ── Filter panel ──────────────────────────────────────────

@@ -440,12 +440,19 @@ const { data: salesData, isLoading } = useQuery({
   queryFn:  () => getSales({ dateFrom: dateRange.value?.from, dateTo: dateRange.value?.to, limit: 1000 }),
 })
 
-function onSaleCreated() {
+async function onSaleCreated(id?: string) {
   if (dateRange.value) {
     const to = new Date(Date.now() + 60_000)
     dateRange.value = { from: dateRange.value.from, to: to.toISOString() }
   }
   refreshKey.value++
+
+  // Open the newly created sale so the admin can edit it or charge right away
+  if (!id) return
+  try {
+    selectedSale.value = await getSale(id)
+    showDetail.value = true
+  } catch { /* non-critical — sale list still refreshed */ }
 }
 
 function onSaleDeleted() {

@@ -380,7 +380,7 @@ export interface SalePrefill {
 const props = defineProps<{ modelValue: boolean }>()
 const emit  = defineEmits<{
   (e: 'update:modelValue', v: boolean): void
-  (e: 'created'): void
+  (e: 'created', id: string): void
 }>()
 
 const visible = computed({
@@ -607,7 +607,7 @@ async function submit() {
       lineTotal: i.unitPrice != null ? i.unitPrice * i.quantity : undefined,
     }))
 
-    await createSale({
+    const created = await createSale({
       saleType:         form.value.saleType,
       warehouseId:      form.value.warehouseId      ?? undefined,
       customerName:     form.value.customerName.trim()     || undefined,
@@ -627,7 +627,7 @@ async function submit() {
 
     showConfirm.value = false
     visible.value = false
-    emit('created')
+    emit('created', created.id)
   } catch (err: unknown) {
     const axiosErr = err as { response?: { data?: { error?: string; code?: string; items?: typeof insufficientItems.value } } }
     showConfirm.value = false
