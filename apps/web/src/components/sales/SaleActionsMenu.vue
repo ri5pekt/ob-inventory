@@ -16,6 +16,11 @@
         <span class="action-label">Charge Card</span>
       </button>
 
+      <button class="action-row" :disabled="!sale || !sale.totalPrice" @click="pick('qr')">
+        <i class="pi pi-qrcode action-icon" />
+        <span class="action-label">Request Payment (QR)</span>
+      </button>
+
       <div class="action-divider" />
 
       <button
@@ -40,7 +45,7 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'pick', action: 'pdf' | 'cardcom' | 'charge' | 'convert'): void
+  (e: 'pick', action: 'pdf' | 'cardcom' | 'charge' | 'qr' | 'convert'): void
 }>()
 
 const popover = ref<InstanceType<typeof Popover> | null>(null)
@@ -49,7 +54,7 @@ function toggle(event: Event) {
   popover.value?.toggle(event)
 }
 
-function pick(action: 'pdf' | 'cardcom' | 'charge' | 'convert') {
+function pick(action: 'pdf' | 'cardcom' | 'charge' | 'qr' | 'convert') {
   popover.value?.hide()
   emit('pick', action)
 }

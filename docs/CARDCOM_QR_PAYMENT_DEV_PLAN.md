@@ -7,7 +7,8 @@ Cardcom's own hosted page (never on ours) → the sale's modal auto-closes and t
 exact same result data (last 4 digits, card brand, Tax Invoice & Receipt, PDF link) as if the
 details had been typed into `CardcomTerminalModal.vue` manually.
 
-Status: **Planning — not built yet.**
+Status: **Built (v2.6.0) — pending production smoke test.** See the "Post-build notes" section
+at the end of this doc for what shipped and one design change made during implementation.
 
 ---
 
@@ -237,3 +238,26 @@ Phase 4   Frontend: CardcomQrPaymentModal.vue + entry point next to "Pay with Te
 
 Straight-line build — no phase is independently shippable ahead of the others the way the API
 write-expansion plan's phases were; this is one feature, sequenced by dependency order.
+
+---
+
+## Post-build notes
+
+- **Added `last_checked_at` to the schema** (not in the original plan) — needed to actually
+  throttle the polling endpoint's poll-through to Cardcom (the plan's "more than ~3s since the
+  last check" needed something to measure from; `resolvedAt` only gets set once terminal, which
+  doesn't help while a request is still `pending`).
+- **Dropped automatic "failed" detection from `GetLpResult`.** The plan's step 4 assumed
+  `finalizeLowProfilePayment` could tell a terminal decline apart from "not paid yet" using
+  `ResponseCode`. Cardcom's spec doesn't document distinct codes for those two cases, and there's
+  no test-terminal ground truth to derive it safely without risking a live decline getting
+  mis-classified as still-pending (safe) vs. a still-pending request getting mis-classified as
+  failed (would kill a QR code the customer is actively scanning). For v1, a request just stays
+  `pending` until either paid or its own 10-minute local expiry — `failed` is left in the schema
+  for a future refinement once we've seen a real decline's `GetLpResult` payload.
+- **`recordCardcomPayment` extraction also refactored the existing manual charge-card route**
+  (`POST /api/sales/:id/charge-card`) to call the same shared helper, per the plan's Phase 2 —
+  confirmed via `pnpm --filter @ob-inventory/api build` that behavior is unchanged.
+- Not yet done: the production smoke test from the "Documentation & hardening" checklist above
+  (real small-amount charge on the test terminal, then one live low-amount run) — needs a human
+  with a phone to actually scan a QR and pay.

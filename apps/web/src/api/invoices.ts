@@ -107,3 +107,54 @@ export async function chargeCardForSale(
   const { data } = await apiClient.post<ChargeCardResult>(`/sales/${saleId}/charge-card`, payload)
   return data
 }
+
+// ── QR / LowProfile payment requests ─────────────────────────────────────────
+
+export interface QrPaymentRequestPayload {
+  customerName?:  string
+  customerEmail?: string | null
+  isVatFree?:     boolean
+  items?: Array<{ name: string; quantity: number; unitPrice: number }>
+}
+
+export interface QrPaymentRequest {
+  requestId: string
+  url:       string
+  expiresAt: string
+}
+
+export type QrPaymentStatus =
+  | 'pending' | 'paid' | 'failed' | 'expired' | 'cancelled' | 'paid_after_cancel'
+
+export interface QrPaymentStatusResult {
+  status:          QrPaymentStatus
+  documentId?:     string
+  documentNumber?: number
+  documentType?:   string
+  last4Digits?:    string
+  cardBrand?:      string
+  docUrl?:         string | null
+}
+
+export async function createQrPaymentRequest(
+  saleId:  string,
+  payload: QrPaymentRequestPayload,
+): Promise<QrPaymentRequest> {
+  const { data } = await apiClient.post<QrPaymentRequest>(`/sales/${saleId}/qr-payment-request`, payload)
+  return data
+}
+
+export async function getQrPaymentStatus(
+  saleId:    string,
+  requestId: string,
+): Promise<QrPaymentStatusResult> {
+  const { data } = await apiClient.get<QrPaymentStatusResult>(`/sales/${saleId}/qr-payment-request/${requestId}`)
+  return data
+}
+
+export async function cancelQrPaymentRequest(
+  saleId:    string,
+  requestId: string,
+): Promise<void> {
+  await apiClient.post(`/sales/${saleId}/qr-payment-request/${requestId}/cancel`)
+}

@@ -299,6 +299,160 @@ export async function chargeCard(params: ChargeCardParams): Promise<ChargeCardRe
   }
 }
 
+// ── LowProfile (QR / hosted payment page) ────────────────────────────────────
+// See docs/CARDCOM_QR_PAYMENT_DEV_PLAN.md. `createLowProfile` opens a one-time
+// Cardcom-hosted page (rendered as a QR code by the frontend); `getLowProfileResult`
+// is the authoritative "ask Cardcom directly" check used by both the webhook handler
+// and the frontend-polling status endpoint — never trust the webhook body alone.
+
+export interface CreateLowProfileParams {
+  saleId:         string
+  amount:         number
+  customerName:   string
+  customerEmail:  string | null
+  isVatFree:      boolean
+  webhookUrl:     string
+  successRedirectUrl: string
+  failedRedirectUrl:  string
+  items: Array<{ name: string; quantity: number; unitPrice: number }>
+}
+
+export interface CreateLowProfileResult {
+  lowProfileId: string
+  url:          string
+  urlToBit:     string | null
+}
+
+interface CardcomCreateLowProfileResponse {
+  ResponseCode: number
+  Description:  string | null
+  LowProfileId: string | null
+  Url:          string | null
+  UrlToPayPal:  string | null
+  UrlToBit:     string | null
+}
+
+export async function createLowProfile(params: CreateLowProfileParams): Promise<CreateLowProfileResult> {
+  const body: Record<string, unknown> = {
+    TerminalNumber:     Number(TERMINAL_NUM),
+    ApiName:            API_NAME,
+    ApiPassword:        API_PASSWORD,
+    Operation:          'ChargeOnly',
+    Amount:             params.amount,
+    ReturnValue:        params.saleId,
+    SuccessRedirectUrl: params.successRedirectUrl,
+    FailedRedirectUrl:  params.failedRedirectUrl,
+    WebHookUrl:         params.webhookUrl,
+    Language:           'he',
+    Document: {
+      DocumentTypeToCreate: 'TaxInvoiceAndReceipt',
+      Name:          params.customerName,
+      Email:         params.customerEmail ?? undefined,
+      IsSendByEmail: !!params.customerEmail,
+      IsVatFree:     params.isVatFree,
+      Language:      'he',
+      ExternalId:    params.saleId,
+      AdvancedDefinition: {
+        IsAutoCreateUpdateAccount: true,
+        AccountForeignKey:         params.saleId,
+      },
+      Products: params.items.map(item => ({
+        Description: item.name,
+        Quantity:    item.quantity,
+        UnitCost:    item.unitPrice,
+      })),
+    },
+  }
+
+  const data = await post<CardcomCreateLowProfileResponse>('/LowProfile/Create', body)
+
+  if (data.ResponseCode !== 0 || !data.LowProfileId || !data.Url) {
+    throw new Error(data.Description ?? `Cardcom LowProfile create error ${data.ResponseCode}`)
+  }
+
+  return {
+    lowProfileId: data.LowProfileId,
+    url:          data.Url,
+    urlToBit:     data.UrlToBit ?? null,
+  }
+}
+
+export interface LowProfileResultShape {
+  responseCode:   number
+  description:    string | null
+  lowProfileId:   string
+  transaction: {
+    transactionId:  number
+    last4Digits:    string
+    cardBrand:      string
+    approvalNumber: string | null
+  } | null
+  document: {
+    documentType:   string
+    documentNumber: number
+    documentUrl:    string | null
+  } | null
+  raw: unknown
+}
+
+interface CardcomTransactionInfoRaw {
+  ResponseCode?:    number
+  TranzactionId?:   number
+  Last4CardDigits?: number
+  Last4CardDigitsString?: string
+  CardName?:        string
+  Brand?:           string
+  ApprovalNumber?:  string | null
+}
+
+interface CardcomDocumentInfoRaw {
+  ResponseCode?:    number
+  DocumentType?:    string
+  DocumentNumber?:  number
+  DocumentUrl?:     string | null
+}
+
+interface CardcomLowProfileResultRaw {
+  ResponseCode:     number
+  Description:      string | null
+  LowProfileId:      string
+  TranzactionInfo?: CardcomTransactionInfoRaw | null
+  DocumentInfo?:    CardcomDocumentInfoRaw | null
+}
+
+export async function getLowProfileResult(lowProfileId: string): Promise<LowProfileResultShape> {
+  const data = await post<CardcomLowProfileResultRaw>('/LowProfile/GetLpResult', {
+    TerminalNumber: Number(TERMINAL_NUM),
+    ApiName:        API_NAME,
+    LowProfileId:   lowProfileId,
+  })
+
+  const t = data.TranzactionInfo
+  const d = data.DocumentInfo
+
+  return {
+    responseCode: data.ResponseCode,
+    description:  data.Description,
+    lowProfileId: data.LowProfileId,
+    transaction: t
+      ? {
+          transactionId:  t.TranzactionId ?? 0,
+          last4Digits:    t.Last4CardDigitsString ?? String(t.Last4CardDigits ?? ''),
+          cardBrand:      t.Brand ?? t.CardName ?? '',
+          approvalNumber: t.ApprovalNumber ?? null,
+        }
+      : null,
+    document: d
+      ? {
+          documentType:   d.DocumentType ?? 'TaxInvoiceAndReceipt',
+          documentNumber: d.DocumentNumber ?? 0,
+          documentUrl:    d.DocumentUrl ?? null,
+        }
+      : null,
+    raw: data,
+  }
+}
+
 export async function getDocumentUrl(
   documentType:   CardcomDocumentType | string,
   documentNumber: number,

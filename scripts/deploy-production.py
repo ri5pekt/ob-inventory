@@ -1,5 +1,5 @@
 """
-Production deploy script — v2.5.0
+Production deploy script — v2.6.0
 Run from project root: python scripts/deploy-production.py
 """
 
@@ -83,6 +83,7 @@ run(
 PENDING_MIGRATIONS = [
     ("quotes",      "0022_add_quotes.sql"),
     ("api_tokens",  "0023_add_api_tokens.sql"),
+    ("cardcom_lowprofile_requests", "0025_add_cardcom_lowprofile_requests.sql"),
 ]
 
 # Column-level migrations that Drizzle's migrate.js may skip (its marker table already
@@ -143,7 +144,7 @@ client.close()
 
 print(f"""
 {'='*60}
-  DEPLOY COMPLETE — v2.5.0
+  DEPLOY COMPLETE — v2.6.0
 
   URL: https://activebrands.cloud
 {'='*60}

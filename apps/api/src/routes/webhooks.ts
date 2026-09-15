@@ -13,6 +13,7 @@ import {
   saleItems,
 } from '@ob-inventory/db'
 import { upsertCustomerFromSale } from './sales.js'
+import { finalizeLowProfilePayment } from '../services/cardcom-payment.js'
 
 // ── Payload schema from the WooCommerce plugin ────────────────────────────────
 
@@ -212,5 +213,38 @@ export const webhookRoutes: FastifyPluginAsync = async (fastify) => {
       itemsCreated:  order.items.length,
       unresolvedSkus: result.unresolvedSkus,
     })
+  })
+
+  /**
+   * POST /api/webhooks/cardcom/lowprofile
+   *
+   * Called by Cardcom when a LowProfile (QR / hosted payment page) deal completes.
+   * No signature/HMAC exists on this callback (confirmed against Cardcom's own API
+   * spec) — so the body is treated only as a "go check now" trigger, never as a data
+   * source. finalizeLowProfilePayment always re-verifies against Cardcom's own
+   * GetLpResult before recording anything, so a forged callback body can't cause a
+   * false "paid" — worst case it's a wasted lookup for a request that isn't pending.
+   * See docs/CARDCOM_QR_PAYMENT_DEV_PLAN.md.
+   *
+   * Always replies 200 — that's Cardcom's callback contract for "accepted".
+   */
+  fastify.post('/api/webhooks/cardcom/lowprofile', async (request, reply) => {
+    const body = z.object({
+      LowProfileId: z.string().optional(),
+    }).safeParse(request.body)
+
+    const lowProfileId = body.success ? body.data.LowProfileId : undefined
+    if (!lowProfileId) {
+      request.log.warn({ body: request.body }, '[cardcom-webhook] Missing LowProfileId in callback body')
+      return reply.status(200).send({ ok: true })
+    }
+
+    try {
+      await finalizeLowProfilePayment(lowProfileId)
+    } catch (err) {
+      request.log.error({ err, lowProfileId }, '[cardcom-webhook] finalizeLowProfilePayment failed')
+    }
+
+    return reply.status(200).send({ ok: true })
   })
 }

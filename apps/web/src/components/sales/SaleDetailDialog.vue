@@ -160,6 +160,12 @@
     @charged="onCharged"
   />
 
+  <CardcomQrPaymentModal
+    v-model:visible="showQr"
+    :sale="sale"
+    @charged="onCharged"
+  />
+
   <ConvertToTransferModal
     v-model:visible="showConvert"
     :sale="sale"
@@ -207,9 +213,10 @@ import { deleteSale } from '@/api/sales'
 import { downloadSalePdf } from '@/utils/salePdf'
 import CardcomDocumentsModal  from './CardcomDocumentsModal.vue'
 import CardcomTerminalModal   from './CardcomTerminalModal.vue'
+import CardcomQrPaymentModal  from './CardcomQrPaymentModal.vue'
 import ConvertToTransferModal from './ConvertToTransferModal.vue'
 import SaleActionsMenu        from './SaleActionsMenu.vue'
-import type { ChargeCardResult } from '@/api/invoices'
+import type { ChargeCardResult, QrPaymentStatusResult } from '@/api/invoices'
 
 const props = defineProps<{
   visible: boolean
@@ -226,6 +233,7 @@ const emit = defineEmits<{
 const showConfirm     = ref(false)
 const showCardcom     = ref(false)
 const showTerminal    = ref(false)
+const showQr          = ref(false)
 const showConvert     = ref(false)
 const actionsMenu     = ref<InstanceType<typeof SaleActionsMenu> | null>(null)
 const deleting     = ref(false)
@@ -245,7 +253,7 @@ async function downloadPdf() {
   }
 }
 
-function onCharged(_result: ChargeCardResult) {
+function onCharged(_result: ChargeCardResult | QrPaymentStatusResult) {
   emit('refreshed')
 }
 
@@ -258,10 +266,11 @@ function toggleMoreActions(event: Event) {
   actionsMenu.value?.toggle(event)
 }
 
-function onPickAction(action: 'pdf' | 'cardcom' | 'charge' | 'convert') {
+function onPickAction(action: 'pdf' | 'cardcom' | 'charge' | 'qr' | 'convert') {
   if (action === 'pdf')     downloadPdf()
   if (action === 'cardcom') showCardcom.value  = true
   if (action === 'charge')  showTerminal.value = true
+  if (action === 'qr')      showQr.value       = true
   if (action === 'convert') showConvert.value  = true
 }
 

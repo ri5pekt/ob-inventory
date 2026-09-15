@@ -233,6 +233,67 @@ This terminal has used **only `TaxInvoiceAndReceipt`** for all real transactions
 
 ---
 
+## LowProfile (QR payment) Endpoints
+
+Used for the "Request Payment (QR)" feature — see `docs/CARDCOM_QR_PAYMENT_DEV_PLAN.md` for the
+full design. Full implementation lives in `apps/api/src/services/cardcom.ts`
+(`createLowProfile`, `getLowProfileResult`) and `apps/api/src/services/cardcom-payment.ts`
+(`finalizeLowProfilePayment`).
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /LowProfile/Create` | Creates a one-time, Cardcom-hosted payment page. Returns `LowProfileId`, `Url` (rendered as a QR code by our frontend — Cardcom itself has no QR feature), and `UrlToBit`. |
+| `POST /LowProfile/GetLpResult` | Given a `LowProfileId`, returns the current result — the authoritative check, used by both our webhook handler and our frontend-polling status endpoint. Never trust the webhook body directly (see below). |
+
+### Creating a LowProfile request
+
+```json
+POST /api/v11/LowProfile/Create
+
+{
+  "TerminalNumber": 1000,
+  "ApiName": "kzFKfohEvL6AOF8aMEJz",
+  "ApiPassword": "FIDHIh4pAadw3Slbdsjg",
+  "Operation": "ChargeOnly",
+  "Amount": 100,
+  "ReturnValue": "<our sale id>",
+  "SuccessRedirectUrl": "https://activebrands.cloud/pay/success.html",
+  "FailedRedirectUrl": "https://activebrands.cloud/pay/failed.html",
+  "WebHookUrl": "https://activebrands.cloud/api/webhooks/cardcom/lowprofile",
+  "Document": {
+    "DocumentTypeToCreate": "TaxInvoiceAndReceipt",
+    "Name": "Customer Name",
+    "Email": "customer@example.com",
+    "Products": [{ "Description": "Product name", "Quantity": 1, "UnitCost": 100 }]
+  }
+}
+```
+
+Response: `{ "ResponseCode": 0, "LowProfileId": "<guid>", "Url": "https://...", "UrlToBit": "https://..." }`
+
+### Getting the result
+
+```json
+POST /api/v11/LowProfile/GetLpResult
+
+{ "TerminalNumber": 1000, "ApiName": "kzFKfohEvL6AOF8aMEJz", "LowProfileId": "<guid>" }
+```
+
+Response is a `LowProfileResult` — `TranzactionInfo` (present once paid: `Last4CardDigits`,
+`Brand`, `TranzactionId`, `ApprovalNumber`) and `DocumentInfo` (present if a document was
+auto-created: `DocumentType`, `DocumentNumber`, `DocumentUrl`). Same field shapes as the direct
+`/Transactions/Transaction` charge flow, so a QR payment produces identical stored data to a
+manually-entered card charge.
+
+### No webhook signature
+
+Confirmed against the full API spec (`swagger.json`) — the `WebHookUrl` callback has **no
+signature/HMAC field**. Our webhook handler (`POST /api/webhooks/cardcom/lowprofile`) therefore
+never trusts the callback body for anything beyond extracting `LowProfileId` — it always calls
+`GetLpResult` itself (authenticated, server-to-server) before recording any payment.
+
+---
+
 ## Important Gotchas
 
 1. **`Languge` is a typo** in the Cardcom API — it's spelled wrong and must be passed as `Languge`, not `Language`.

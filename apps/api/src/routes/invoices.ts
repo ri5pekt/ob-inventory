@@ -1,18 +1,35 @@
-import type { FastifyPluginAsync } from 'fastify'
-import { eq, and, ilike, inArray } from 'drizzle-orm'
+import type { FastifyPluginAsync, FastifyRequest } from 'fastify'
+import { eq, and, inArray } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../db.js'
-import { sales, saleItems, cardcomDocuments, salePaymentMethods, salePaymentMethodLinks } from '@ob-inventory/db'
+import { sales, saleItems, cardcomDocuments, cardcomLowprofileRequests } from '@ob-inventory/db'
 import {
   createDocument,
   getDocumentUrl,
   chargeCard,
+  createLowProfile,
   getDocumentsReport,
   isReceiptInvoiceType,
   normalizeDocumentTypeKey,
   cardcomAuth,
 } from '../services/cardcom.js'
 import type { CardcomAuth, CardcomDocumentType, CardcomReportDocument } from '../services/cardcom.js'
+import { recordCardcomPayment, finalizeLowProfilePayment } from '../services/cardcom-payment.js'
+
+const QR_REQUEST_TTL_MS = 10 * 60 * 1000 // 10 minutes — local expiry, independent of Cardcom's own page timeout
+const QR_POLL_THROTTLE_MS = 3_000 // don't hit Cardcom's GetLpResult more than once every ~3s per request
+
+/**
+ * Public base URL for this deploy, used to build Cardcom's WebHookUrl / redirect URLs.
+ * Caddy terminates TLS and proxies internally over plain HTTP, so request.protocol would
+ * report "http" even in production — read the forwarded header instead (same approach as
+ * apps/api/src/routes/v1/meta.ts).
+ */
+function publicBaseUrl(request: FastifyRequest): string {
+  const proto = (request.headers['x-forwarded-proto'] as string | undefined)?.split(',')[0]?.trim() ?? request.protocol
+  const host  = request.headers.host ?? request.hostname
+  return `${proto}://${host}`
+}
 
 const DOCUMENT_TYPES: CardcomDocumentType[] = [
   'TaxInvoiceAndReceipt',
@@ -435,38 +452,17 @@ export const invoicesRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(422).send({ error: msg })
     }
 
-    // Save document to DB
-    const [row] = await db.insert(cardcomDocuments).values({
-      saleId:         id,
+    // Save document + auto-link the "קארדקום OB" payment method (shared with the
+    // QR/LowProfile flow further below — same downstream behavior either way).
+    const { documentId } = await recordCardcomPayment(id, {
       documentType:   result.documentType,
       documentNumber: result.documentNumber,
       transactionId:  result.transactionId,
       last4Digits:    result.last4Digits,
       cardBrand:      result.cardBrand,
-    }).returning()
+    })
 
-    // Auto-assign the "קארדקום OB" payment method
-    const [cardcomPM] = await db
-      .select()
-      .from(salePaymentMethods)
-      .where(ilike(salePaymentMethods.name, 'קארדקום OB'))
-      .limit(1)
-
-    if (cardcomPM) {
-      // Upsert — don't add duplicate link if it's already there
-      const existingLinks = await db
-        .select()
-        .from(salePaymentMethodLinks)
-        .where(eq(salePaymentMethodLinks.saleId, id))
-
-      const alreadyLinked = existingLinks.some(l => l.paymentMethodId === cardcomPM.id)
-      if (!alreadyLinked) {
-        await db.insert(salePaymentMethodLinks).values({
-          saleId:          id,
-          paymentMethodId: cardcomPM.id,
-        })
-      }
-    }
+    const [row] = await db.select().from(cardcomDocuments).where(eq(cardcomDocuments.id, documentId)).limit(1)
 
     return reply.status(201).send({
       id:             row.id,
@@ -479,4 +475,166 @@ export const invoicesRoutes: FastifyPluginAsync = async (fastify) => {
       docUrl:         result.documentUrl,
     })
   })
+
+  // ── POST /api/sales/:id/qr-payment-request ──────────────────────────────────
+  // Creates a Cardcom LowProfile (hosted payment page) request. The frontend renders
+  // the returned `url` as a QR code — see docs/CARDCOM_QR_PAYMENT_DEV_PLAN.md.
+  fastify.post('/api/sales/:id/qr-payment-request', auth, async (request, reply) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(request.params)
+
+    const body = z.object({
+      customerName:  z.string().min(1).optional(),
+      customerEmail: z.string().nullable().optional(),
+      isVatFree:     z.boolean().default(false),
+      items: z.array(z.object({
+        name:      z.string(),
+        quantity:  z.number().min(1),
+        unitPrice: z.number().min(0),
+      })).optional(),
+    }).parse(request.body)
+
+    const [sale] = await db.select().from(sales).where(eq(sales.id, id)).limit(1)
+    if (!sale) return reply.status(404).send({ error: 'Sale not found' })
+
+    const dbItems = body.items == null
+      ? await db.select().from(saleItems).where(eq(saleItems.saleId, id))
+      : []
+
+    const resolvedItems = body.items ?? dbItems.map(i => ({
+      name:      i.name,
+      quantity:  i.quantity,
+      unitPrice: parseFloat(i.unitPrice ?? '0'),
+    }))
+
+    if (resolvedItems.length === 0) {
+      return reply.status(400).send({ error: 'No items — cannot request payment for an empty sale' })
+    }
+
+    // Amount always derived from current sale items server-side — never client-supplied.
+    const amount = resolvedItems.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0)
+
+    const resolvedName  = body.customerName  ?? sale.customerName  ?? 'לקוח'
+    const resolvedEmail = body.customerEmail !== undefined ? body.customerEmail : sale.customerEmail
+
+    // Only one live QR per sale at a time — expire any earlier pending request first.
+    await db
+      .update(cardcomLowprofileRequests)
+      .set({ status: 'expired', resolvedAt: new Date() })
+      .where(and(eq(cardcomLowprofileRequests.saleId, id), eq(cardcomLowprofileRequests.status, 'pending')))
+
+    const base = publicBaseUrl(request)
+
+    let created: Awaited<ReturnType<typeof createLowProfile>>
+    try {
+      created = await createLowProfile({
+        saleId:             id,
+        amount,
+        customerName:       resolvedName,
+        customerEmail:      resolvedEmail,
+        isVatFree:          body.isVatFree,
+        webhookUrl:         `${base}/api/webhooks/cardcom/lowprofile`,
+        successRedirectUrl: `${base}/pay/success.html`,
+        failedRedirectUrl:  `${base}/pay/failed.html`,
+        items:              resolvedItems,
+      })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Cardcom LowProfile create failed'
+      return reply.status(422).send({ error: msg })
+    }
+
+    const [row] = await db.insert(cardcomLowprofileRequests).values({
+      saleId:       id,
+      lowProfileId: created.lowProfileId,
+      amount:       amount.toFixed(2),
+      url:          created.url,
+    }).returning()
+
+    return reply.status(201).send({
+      requestId: row.id,
+      url:       row.url,
+      expiresAt: new Date(row.createdAt.getTime() + QR_REQUEST_TTL_MS).toISOString(),
+    })
+  })
+
+  // ── GET /api/sales/:id/qr-payment-request/:reqId ────────────────────────────
+  // Polled by the frontend modal while it's open. Advances state itself (no separate
+  // cron) — if still pending and enough time passed since the last check, re-verifies
+  // against Cardcom's own GetLpResult before responding.
+  fastify.get<{ Params: { id: string; reqId: string } }>(
+    '/api/sales/:id/qr-payment-request/:reqId',
+    auth,
+    async (request, reply) => {
+      const { id, reqId } = z.object({
+        id:    z.string().uuid(),
+        reqId: z.string().uuid(),
+      }).parse(request.params)
+
+      const [row] = await db
+        .select()
+        .from(cardcomLowprofileRequests)
+        .where(and(eq(cardcomLowprofileRequests.id, reqId), eq(cardcomLowprofileRequests.saleId, id)))
+        .limit(1)
+
+      if (!row) return reply.status(404).send({ error: 'QR payment request not found' })
+
+      // Local expiry — independent of whatever timeout Cardcom's own hosted page uses.
+      if (row.status === 'pending' && Date.now() - row.createdAt.getTime() > QR_REQUEST_TTL_MS) {
+        const [expired] = await db
+          .update(cardcomLowprofileRequests)
+          .set({ status: 'expired', resolvedAt: new Date() })
+          .where(eq(cardcomLowprofileRequests.id, row.id))
+          .returning()
+        return { status: expired.status }
+      }
+
+      if (row.status !== 'pending') {
+        return { status: row.status }
+      }
+
+      const sinceLastCheck = Date.now() - (row.lastCheckedAt?.getTime() ?? 0)
+      if (sinceLastCheck < QR_POLL_THROTTLE_MS) {
+        return { status: 'pending' }
+      }
+
+      await db
+        .update(cardcomLowprofileRequests)
+        .set({ lastCheckedAt: new Date() })
+        .where(eq(cardcomLowprofileRequests.id, row.id))
+
+      const finalized = await finalizeLowProfilePayment(row.lowProfileId)
+      if (!finalized) return { status: row.status }
+
+      return finalized
+    },
+  )
+
+  // ── POST /api/sales/:id/qr-payment-request/:reqId/cancel ────────────────────
+  fastify.post<{ Params: { id: string; reqId: string } }>(
+    '/api/sales/:id/qr-payment-request/:reqId/cancel',
+    auth,
+    async (request, reply) => {
+      const { id, reqId } = z.object({
+        id:    z.string().uuid(),
+        reqId: z.string().uuid(),
+      }).parse(request.params)
+
+      const [row] = await db
+        .select()
+        .from(cardcomLowprofileRequests)
+        .where(and(eq(cardcomLowprofileRequests.id, reqId), eq(cardcomLowprofileRequests.saleId, id)))
+        .limit(1)
+
+      if (!row) return reply.status(404).send({ error: 'QR payment request not found' })
+      if (row.status !== 'pending') {
+        return reply.status(409).send({ error: `Request is already ${row.status}` })
+      }
+
+      await db
+        .update(cardcomLowprofileRequests)
+        .set({ status: 'cancelled', resolvedAt: new Date() })
+        .where(eq(cardcomLowprofileRequests.id, row.id))
+
+      return reply.status(204).send()
+    },
+  )
 }
