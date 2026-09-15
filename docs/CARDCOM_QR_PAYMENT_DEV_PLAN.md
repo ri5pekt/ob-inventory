@@ -50,6 +50,9 @@ information, no compromise on the final data our app stores.
 | Amount source | Always derived from the sale's current items server-side (same rule `chargeCard` already follows: "Cardcom requires payment total == sum(Price × Quantity), always derive from lines") — never trust a client-supplied amount. |
 | Bit-specific QR | Not in scope for v1. `UrlToBit` is captured in the response for a possible later "Pay with Bit" quick-action, but the default QR encodes the generic `Url` (works for any card, scanned by any camera app) — narrower, well-understood first cut. |
 | Concurrent requests per sale | Creating a new QR request for a sale that already has a `'pending'` row auto-expires the old row first (mirrors the existing `enqueueSyncWooStock` "remove obsolete jobs" pattern) — only one live QR per sale at a time. |
+| Success/fail redirect pages | Build small branded static pages (e.g. "Payment received — you can close this tab" / "Payment failed — please ask staff for a new QR code") under `apps/web/public/`, referenced by `SuccessRedirectUrl`/`FailedRedirectUrl`. Customer's own phone browser lands here after paying on Cardcom's hosted page — never seen by staff. |
+| Local/dev webhook testing | Not required. The webhook is a pure optimization/fallback (per the "webhook vs. polling" decision above) — local dev relies on the polling path alone, no ngrok/tunnel setup needed. |
+| "Request Payment (QR)" placement | Lives right next to "Pay with Terminal" in the same action area on the sale detail screen (same reachability as today's terminal button, including the mobile "More actions" pattern if that's where "Pay with Terminal" itself currently sits). |
 
 ---
 
@@ -205,19 +208,8 @@ already establishes.
 
 ## Open questions before starting to build
 
-1. **Static redirect pages.** `SuccessRedirectUrl`/`FailedRedirectUrl` are required fields on
-   `LowProfile/Create` even though the customer's *own* phone browser is the one that lands on
-   them, not our app. Do we want a branded "Payment received, you can close this tab" page (small
-   static HTML under `apps/web/public/`), or is a generic placeholder acceptable for v1?
-2. **Local/dev testing without a public webhook.** Production (`activebrands.cloud`) can receive
-   the Cardcom webhook directly; local dev cannot. Confirm relying on the polling path alone for
-   local testing is acceptable (recommended — the webhook is a pure optimization/fallback, not
-   required for correctness).
-3. **Where "Request Payment (QR)" lives in the UI.** Same button group as "Pay with Terminal" on
-   the sale detail screen (desktop + the "More actions" mobile pattern used for other sale
-   actions), or somewhere else? Screenshot in this conversation shows "Pay with Terminal" as its
-   own modal reachable from the sale's action area — assuming QR sits right next to it unless told
-   otherwise.
+**None — all resolved.** See the three added rows in the Decisions Log above (redirect pages,
+local webhook testing, button placement).
 
 ---
 
