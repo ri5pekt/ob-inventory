@@ -114,7 +114,7 @@
       <!-- ── Pricing ──────────────────────────────────────────────── -->
       <section-label>Pricing</section-label>
       <div class="form-grid">
-        <div class="field">
+        <div v-if="!auth.isWarehouseAdmin" class="field">
           <label class="field-label">Cost Price</label>
           <InputNumber
             v-model="form.costPrice"
@@ -170,8 +170,12 @@
             show-buttons
             button-layout="horizontal"
             :step="1"
+            :disabled="auth.isWarehouseAdmin"
             class="w-full"
           />
+          <p v-if="auth.isWarehouseAdmin" class="field-hint quantity-locked-hint">
+            <i class="pi pi-lock" /> Only main admins can set an initial quantity. The product will be added with 0 — receive stock with a transfer.
+          </p>
         </div>
       </div>
 
@@ -207,6 +211,9 @@ import { catalogApi } from '@/api/catalog'
 import { addProductToWarehouse } from '@/api/warehouses'
 import { type CatalogSearchResult } from '@/api/transfers'
 import SkuAutocompleteInput from '@/components/warehouse/SkuAutocompleteInput.vue'
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore()
 
 // ── Tiny helper component ─────────────────────────────────────────────────────
 import { defineComponent, h } from 'vue'
@@ -322,12 +329,12 @@ async function submit() {
       categoryId:   form.value.categoryId   || null,
       boxNumber:    form.value.boxNumber    || null,
       dateAdded:    form.value.dateAdded ? toISODate(form.value.dateAdded) : null,
-      quantity:     form.value.quantity,
+      quantity:     auth.isWarehouseAdmin ? 0 : form.value.quantity,
       model:        form.value.model        || null,
       sizeOptionId: form.value.sizeOptionId  || null,
       colorOptionId:form.value.colorOptionId || null,
       unitOptionId: form.value.unitOptionId  || null,
-      costPrice:    form.value.costPrice    ?? null,
+      costPrice:    auth.isWarehouseAdmin ? null : (form.value.costPrice ?? null),
       retailPrice:  form.value.retailPrice  ?? null,
     })
 
@@ -419,6 +426,16 @@ function handleClose() {
   font-size: 13px;
   margin-top: 16px;
 }
+
+.quantity-locked-hint {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #b45309;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.quantity-locked-hint .pi { font-size: 14px; flex-shrink: 0; }
 
 .w-full {
   width: 100%;

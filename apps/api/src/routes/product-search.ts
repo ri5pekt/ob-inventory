@@ -28,6 +28,9 @@ export const productSearchRoutes: FastifyPluginAsync = async (fastify) => {
     })
     const { q, limit } = qSchema.parse((request as { query: unknown }).query)
 
+    // Cost price reveals margins — hide it from warehouse-scoped (partner) users.
+    const hideCost = (request.user as { role?: string })?.role === 'warehouse_admin'
+
     const term = q.trim()
     const textFilter = term
       ? or(
@@ -107,6 +110,7 @@ export const productSearchRoutes: FastifyPluginAsync = async (fastify) => {
 
     return rows.map(r => ({
       ...r,
+      costPrice:     hideCost ? null : r.costPrice,
       model:         attrMap.get(r.productId)?.model         ?? null,
       sizeOptionId:  attrMap.get(r.productId)?.sizeOptionId  ?? null,
       sizeLabel:     attrMap.get(r.productId)?.sizeLabel      ?? null,

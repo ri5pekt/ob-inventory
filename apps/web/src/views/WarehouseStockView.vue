@@ -20,12 +20,35 @@
           </template>
         </div>
       </div>
-      <div class="header-right-actions">
+      <div v-if="!selectionMode" class="header-right-actions">
         <Button
-          label="Add Product"
+          :label="isMobile ? 'Product' : 'Add Product'"
           icon="pi pi-plus"
           size="small"
           @click="showAddProduct = true"
+        />
+        <Button
+          :label="isMobile ? 'Sale' : 'New Sale'"
+          icon="pi pi-shopping-cart"
+          size="small"
+          severity="secondary"
+          outlined
+          @click="enterSelectionMode"
+        />
+      </div>
+    </div>
+
+    <!-- Selection mode bar (own row, doesn't crowd the warehouse title) -->
+    <div v-if="selectionMode" class="selection-bar">
+      <span v-if="selectedCount > 0" class="selection-count">{{ selectedCount }} selected</span>
+      <div class="selection-bar-actions">
+        <Button label="Cancel" icon="pi pi-times" size="small" severity="secondary" outlined @click="cancelSelectionMode" />
+        <Button
+          label="Create Sale"
+          icon="pi pi-check"
+          size="small"
+          :disabled="selectedCount === 0"
+          @click="openCreateSaleFromSelection"
         />
       </div>
     </div>
@@ -34,7 +57,7 @@
     <Tabs v-model:value="activeTab" class="stock-tabs">
       <TabList>
         <Tab value="stock">Stock</Tab>
-        <Tab value="cost-summary">Cost Summary</Tab>
+        <Tab v-if="!auth.isWarehouseAdmin" value="cost-summary">Cost Summary</Tab>
         <Tab value="movements">Movements</Tab>
       </TabList>
 
@@ -157,13 +180,21 @@
                 <Skeleton width="32px"  height="16px" border-radius="4px" style="margin-left:auto" />
               </div>
             </div>
-            <StockTable v-else :items="filteredStock" @edit="openEdit" />
+            <StockTable
+              v-else
+              :items="filteredStock"
+              :selection-mode="selectionMode"
+              :selected-qty="selectedQty"
+              @edit="openEdit"
+              @toggle-select="toggleSelect"
+              @qty-change="onQtyChange"
+            />
           </div>
 
         </TabPanel>
 
         <!-- ── COST SUMMARY TAB ── -->
-        <TabPanel value="cost-summary" class="tab-panel-cost">
+        <TabPanel v-if="!auth.isWarehouseAdmin" value="cost-summary" class="tab-panel-cost">
           <CostSummaryTab :stock-items="stockItems" />
         </TabPanel>
 
@@ -193,13 +224,19 @@
       v-model:visible="showEditWarehouse"
       :warehouse="warehouse"
     />
+
+    <CreateSaleModal
+      ref="createSaleModalRef"
+      v-model="showCreateSale"
+      @created="onSaleCreated"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useAuthStore } from '@/stores/auth'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -217,11 +254,13 @@ import StockMovementsTab  from '@/components/warehouse/StockMovementsTab.vue'
 import AddProductModal    from '@/components/warehouse/AddProductModal.vue'
 import EditProductModal   from '@/components/warehouse/EditProductModal.vue'
 import EditWarehouseModal from '@/components/warehouse/EditWarehouseModal.vue'
+import CreateSaleModal, { type SalePrefillItem } from '@/components/sales/CreateSaleModal.vue'
 import type { StockItemDTO } from '@ob-inventory/types'
 
 const route       = useRoute()
 const router      = useRouter()
 const auth        = useAuthStore()
+const queryClient = useQueryClient()
 const warehouseId = computed(() => route.params.id as string)
 
 const { data: allWarehouses } = useQuery({ queryKey: ['warehouses'], queryFn: getWarehouses })
@@ -232,12 +271,85 @@ const { data: stockItems, isLoading, isFetching } = useQuery({
   queryFn:  () => getWarehouseStock(warehouseId.value),
 })
 
+const isMobile   = ref(false)
+const mobileQuery = window.matchMedia('(max-width: 768px)')
+function setMobile() { isMobile.value = mobileQuery.matches }
+onMounted(() => { setMobile(); mobileQuery.addEventListener('change', setMobile) })
+onUnmounted(() => mobileQuery.removeEventListener('change', setMobile))
+
 const activeTab         = ref('stock')
 const search            = ref('')
 const showAddProduct    = ref(false)
 const showEditProduct   = ref(false)
 const showEditWarehouse = ref(false)
 const editItem          = ref<StockItemDTO | null>(null)
+
+// ── New Sale (selection mode) ────────────────────────────────
+const selectionMode      = ref(false)
+const selectedQty        = ref<Map<string, number>>(new Map())
+const selectedCount      = computed(() => selectedQty.value.size)
+const showCreateSale     = ref(false)
+const createSaleModalRef = ref<InstanceType<typeof CreateSaleModal> | null>(null)
+
+function enterSelectionMode() {
+  selectionMode.value = true
+  selectedQty.value   = new Map()
+}
+
+function cancelSelectionMode() {
+  selectionMode.value = false
+  selectedQty.value   = new Map()
+}
+
+function toggleSelect(productId: string) {
+  const next = new Map(selectedQty.value)
+  if (next.has(productId)) next.delete(productId)
+  else next.set(productId, 1)
+  selectedQty.value = next
+}
+
+function onQtyChange({ productId, quantity }: { productId: string; quantity: number }) {
+  const next = new Map(selectedQty.value)
+  next.set(productId, quantity)
+  selectedQty.value = next
+}
+
+function toSalePrefillItem(item: StockItemDTO, quantity: number): SalePrefillItem {
+  return {
+    productId:    item.productId,
+    sku:          item.sku,
+    name:         item.wooTitle ?? item.name ?? item.sku,
+    brandName:    item.brand,
+    categoryName: item.category,
+    availableQty: item.quantity,
+    model:        item.model,
+    size:         item.size,
+    color:        item.color,
+    retailPrice:  item.retailPrice,
+    quantity,
+  }
+}
+
+function openCreateSaleFromSelection() {
+  if (!warehouse.value || selectedQty.value.size === 0) return
+
+  const items = (stockItems.value ?? [])
+    .filter(i => selectedQty.value.has(i.productId))
+    .map(i => toSalePrefillItem(i, selectedQty.value.get(i.productId)!))
+
+  createSaleModalRef.value?.openWithPrefill({
+    warehouseId: warehouse.value.id,
+    saleType:    warehouse.value.type === 'main' ? 'direct' : 'partner',
+    items,
+  })
+
+  cancelSelectionMode()
+}
+
+function onSaleCreated() {
+  queryClient.invalidateQueries({ queryKey: ['warehouse-stock', warehouseId.value] })
+  queryClient.invalidateQueries({ queryKey: ['warehouses'] })
+}
 
 // ── Filter panel ──────────────────────────────────────────
 const filtersOpen      = ref(false)
@@ -336,6 +448,38 @@ const filteredStock = computed(() => {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.header-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.selection-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selection-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.selection-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0369a1;
+  background: #e0f2fe;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .view-title {
@@ -622,7 +766,6 @@ const filteredStock = computed(() => {
 @media (max-width: 768px) {
   .stock-view { gap: 10px; }
   .view-title { font-size: 16px; }
-  .header-right-actions .p-button-label { display: none; }
   .toolbar { gap: 8px; }
   .stock-count-label { font-size: 12px; }
 

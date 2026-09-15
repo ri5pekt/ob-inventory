@@ -161,7 +161,7 @@
       <!-- ── Pricing ── -->
       <SectionLabel>Pricing</SectionLabel>
       <div class="form-grid">
-        <div class="field">
+        <div v-if="!auth.isWarehouseAdmin" class="field">
           <label class="field-label">Cost Price</label>
           <InputNumber
             v-model="form.costPrice"
@@ -217,12 +217,16 @@
             show-buttons
             button-layout="horizontal"
             :step="1"
+            :disabled="auth.isWarehouseAdmin"
             class="w-full"
           />
           <span v-if="quantityDelta !== 0" class="qty-delta" :class="quantityDelta > 0 ? 'delta-pos' : 'delta-neg'">
             {{ quantityDelta > 0 ? '+' : '' }}{{ quantityDelta }} from current
           </span>
-          <p v-if="warehouseType && warehouseType !== 'main'" class="field-hint sync-hint">
+          <p v-if="auth.isWarehouseAdmin" class="field-hint quantity-locked-hint">
+            <i class="pi pi-lock" /> Only main admins can adjust quantity directly. Ask an admin, or move stock with a transfer.
+          </p>
+          <p v-else-if="warehouseType && warehouseType !== 'main'" class="field-hint sync-hint">
             <i class="pi pi-info-circle" /> WooCommerce sync only runs for the <strong>Main</strong> warehouse. Edit the warehouse to change its type.
           </p>
         </div>
@@ -242,7 +246,8 @@
           icon="pi pi-trash"
           text
           severity="danger"
-          :disabled="submitting"
+          :disabled="submitting || auth.isWarehouseAdmin"
+          v-tooltip.top="auth.isWarehouseAdmin ? 'Only main admins can remove a product from a warehouse' : undefined"
           @click="confirmRemove"
         />
         <div class="footer-actions-right">
@@ -275,7 +280,10 @@ import DatePicker from 'primevue/datepicker'
 import { defineComponent, h } from 'vue'
 import { catalogApi } from '@/api/catalog'
 import { updateWarehouseStock, removeWarehouseStock } from '@/api/warehouses'
+import { useAuthStore } from '@/stores/auth'
 import type { StockItemDTO } from '@ob-inventory/types'
+
+const auth = useAuthStore()
 
 const SectionLabel = defineComponent({
   setup(_, { slots }) {
@@ -424,13 +432,13 @@ async function submit() {
       categoryId:    form.value.categoryId    || null,
       boxNumber:     form.value.boxNumber     || null,
       dateAdded:     form.value.dateAdded ? toISODate(form.value.dateAdded) : null,
-      quantity:      form.value.quantity ?? 0,
+      quantity:      auth.isWarehouseAdmin ? props.item.quantity : (form.value.quantity ?? 0),
       model:         form.value.model         || null,
       sizeOptionId:  form.value.sizeOptionId  || null,
       colorOptionId: form.value.colorOptionId || null,
       unitOptionId:  form.value.unitOptionId  || null,
       image:         form.value.image         ?? null,
-      costPrice:     form.value.costPrice     ?? null,
+      costPrice:     auth.isWarehouseAdmin ? undefined : (form.value.costPrice ?? null),
       retailPrice:   form.value.retailPrice   ?? null,
     })
 
@@ -538,6 +546,16 @@ function handleClose() {
   gap: 6px;
 }
 .sync-hint .pi { font-size: 14px; flex-shrink: 0; }
+
+.quantity-locked-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #b45309;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.quantity-locked-hint .pi { font-size: 14px; flex-shrink: 0; }
 
 /* ── Image upload ── */
 .image-section {

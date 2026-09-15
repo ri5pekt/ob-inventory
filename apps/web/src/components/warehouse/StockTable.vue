@@ -18,10 +18,17 @@
       </div>
     </template>
 
-    <!-- Edit icon (frozen) -->
+    <!-- Edit icon / selection checkbox (frozen) -->
     <Column header="" frozen style="width: 40px; text-align: center; padding: 0 4px">
       <template #body="{ data }">
+        <Checkbox
+          v-if="selectionMode"
+          :model-value="selectedQty.has(data.productId)"
+          binary
+          @update:model-value="$emit('toggleSelect', data.productId)"
+        />
         <Button
+          v-else
           icon="pi pi-pencil"
           text rounded size="small" severity="secondary"
           class="edit-btn"
@@ -82,7 +89,7 @@
       <template #body="{ data }"><span class="muted-sm">{{ formatDate(data.dateAdded) }}</span></template>
     </Column>
 
-    <Column field="costPrice" header="Cost" sortable style="width: 82px; text-align: right">
+    <Column v-if="!auth.isWarehouseAdmin" field="costPrice" header="Cost" sortable style="width: 82px; text-align: right">
       <template #body="{ data }">
         <span v-if="data.costPrice != null" class="price-value">{{ parseFloat(data.costPrice).toFixed(2) }}</span>
         <span v-else class="muted">—</span>
@@ -103,10 +110,23 @@
       </template>
     </Column>
 
-    <!-- Frozen right: qty -->
-    <Column field="quantity" header="Qty" frozen align-frozen="right" sortable style="width: 60px; text-align: right">
+    <!-- Frozen right: qty (available, or sale-qty stepper when selected) -->
+    <Column field="quantity" header="Qty" frozen align-frozen="right" sortable :style="qtyColStyle">
       <template #body="{ data }">
-        <span class="qty" :class="{ 'qty-low': data.quantity > 0 && data.quantity <= 3, 'qty-zero': data.quantity === 0 }">
+        <div v-if="selectionMode && selectedQty.has(data.productId)" class="sel-qty-stepper">
+          <button
+            class="sel-qty-btn"
+            :disabled="(selectedQty.get(data.productId) ?? 1) <= 1"
+            @click.stop="$emit('qtyChange', { productId: data.productId, quantity: Math.max(1, (selectedQty.get(data.productId) ?? 1) - 1) })"
+          >−</button>
+          <span class="sel-qty-val">{{ selectedQty.get(data.productId) }}</span>
+          <button
+            class="sel-qty-btn"
+            :disabled="(selectedQty.get(data.productId) ?? 1) >= data.quantity"
+            @click.stop="$emit('qtyChange', { productId: data.productId, quantity: Math.min(data.quantity, (selectedQty.get(data.productId) ?? 1) + 1) })"
+          >+</button>
+        </div>
+        <span v-else class="qty" :class="{ 'qty-low': data.quantity > 0 && data.quantity <= 3, 'qty-zero': data.quantity === 0 }">
           {{ data.quantity }}
         </span>
       </template>
@@ -115,10 +135,31 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import Checkbox from 'primevue/checkbox'
+import { useAuthStore } from '@/stores/auth'
 import type { StockItemDTO } from '@ob-inventory/types'
 
-defineProps<{ items: StockItemDTO[] }>()
-defineEmits<{ edit: [item: StockItemDTO] }>()
+const auth = useAuthStore()
+
+const props = withDefaults(defineProps<{
+  items:          StockItemDTO[]
+  selectionMode?: boolean
+  selectedQty?:   Map<string, number>
+}>(), {
+  selectionMode: false,
+  selectedQty:   () => new Map(),
+})
+
+defineEmits<{
+  edit:         [item: StockItemDTO]
+  toggleSelect: [productId: string]
+  qtyChange:    [payload: { productId: string; quantity: number }]
+}>()
+
+const qtyColStyle = computed(() =>
+  props.selectionMode ? 'width: 96px; text-align: right' : 'width: 60px; text-align: right',
+)
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return '—'
@@ -182,6 +223,35 @@ function formatDate(iso: string | null | undefined): string {
 .qty      { font-weight: 700; font-size: 14px; color: #0f172a; }
 .qty-low  { color: #d97706; }
 .qty-zero { color: #dc2626; }
+
+.sel-qty-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+}
+.sel-qty-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+.sel-qty-btn:hover:not(:disabled) { background: #e0f2fe; border-color: #0891b2; color: #0891b2; }
+.sel-qty-btn:disabled { opacity: 0.4; cursor: default; }
+.sel-qty-val {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: #0891b2;
+}
 
 @media (max-width: 768px) {
   :deep(.stock-datatable .p-datatable-tbody td),

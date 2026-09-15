@@ -98,6 +98,16 @@ export const warehouseProductRoutes: FastifyPluginAsync = async (fastify) => {
     if (!body.success) return reply.status(400).send({ error: 'Invalid input', code: 'VALIDATION_ERROR', details: body.error.flatten() })
     const d = body.data
 
+    // Warehouse-scoped users can register that a SKU lives here, but can't set stock
+    // counts themselves — quantity moves only through admin-set values or transfers.
+    const scopedUser = request.user as { role: string }
+    if (scopedUser.role === 'warehouse_admin' && d.quantity > 0) {
+      return reply.status(403).send({
+        error: 'Only main admins can set an initial quantity. Add the product with 0 and receive stock via a transfer.',
+        code:  'FORBIDDEN_QUANTITY_EDIT',
+      })
+    }
+
     const [warehouse] = await db.select().from(warehouses).where(eq(warehouses.id, warehouseId))
     if (!warehouse) return reply.status(404).send({ error: 'Warehouse not found', code: 'NOT_FOUND' })
 
@@ -161,6 +171,17 @@ export const warehouseProductRoutes: FastifyPluginAsync = async (fastify) => {
       .where(and(eq(inventoryStock.productId, productId), eq(inventoryStock.warehouseId, warehouseId)))
     if (!stockRow) return reply.status(404).send({ error: 'Stock record not found', code: 'NOT_FOUND' })
 
+    // Warehouse-scoped users can edit catalog details (name, brand, price…) but not the
+    // quantity itself — that stays admin-only / transfer-driven to keep stock counts
+    // auditable. Enforced here (not just hidden in the UI) in case of a direct API call.
+    const scopedUser = request.user as { role: string }
+    if (scopedUser.role === 'warehouse_admin' && d.quantity !== stockRow.quantity) {
+      return reply.status(403).send({
+        error: 'Only main admins can adjust quantity directly. Use a transfer to move stock instead.',
+        code:  'FORBIDDEN_QUANTITY_EDIT',
+      })
+    }
+
     const [currentProduct] = await db.select().from(products).where(eq(products.id, productId))
     if (!currentProduct) return reply.status(404).send({ error: 'Product not found', code: 'NOT_FOUND' })
 
@@ -222,6 +243,16 @@ export const warehouseProductRoutes: FastifyPluginAsync = async (fastify) => {
 
     const forbidden = warehouseAccessCheck(request as never, reply as never, warehouseId)
     if (forbidden) return forbidden
+
+    // Removing a product zeroes its quantity via a ledger adjustment — same "no direct
+    // quantity control" rule as the update route above applies here.
+    const scopedUser = request.user as { role: string }
+    if (scopedUser.role === 'warehouse_admin') {
+      return reply.status(403).send({
+        error: 'Only main admins can remove a product from a warehouse.',
+        code:  'FORBIDDEN_QUANTITY_EDIT',
+      })
+    }
 
     const userId = (request.user as { id?: string })?.id ?? null
 

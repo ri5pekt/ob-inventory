@@ -79,6 +79,10 @@ export const warehouseStockRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
 
+      // Cost price reveals margins — hide it from warehouse-scoped (partner) users,
+      // not just in the UI, so it can't be read off the network response either.
+      const hideCost = user.role === 'warehouse_admin'
+
       return stock.map(s => {
         const a = attrMap.get(s.productId) ?? {}
         return {
@@ -102,7 +106,7 @@ export const warehouseStockRoutes: FastifyPluginAsync = async (fastify) => {
           unitOptionId:  a['unit']?.optionId  ?? null,
           quantity:      s.quantity,
           updatedAt:     s.updatedAt,
-          costPrice:     s.costPrice    ?? null,
+          costPrice:     hideCost ? null : (s.costPrice ?? null),
           retailPrice:   s.retailPrice  ?? null,
         }
       })

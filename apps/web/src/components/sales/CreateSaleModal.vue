@@ -357,6 +357,26 @@ import SaleMetaSelect       from './SaleMetaSelect.vue'
 import SaleMetaMultiSelect  from './SaleMetaMultiSelect.vue'
 import CustomerSearchInput  from './CustomerSearchInput.vue'
 
+export interface SalePrefillItem {
+  productId:    string
+  sku:          string
+  name:         string
+  brandName:    string | null
+  categoryName: string | null
+  availableQty: number
+  model:        string | null
+  size:         string | null
+  color:        string | null
+  retailPrice:  string | null
+  quantity:     number
+}
+
+export interface SalePrefill {
+  warehouseId: string
+  saleType:    'direct' | 'partner'
+  items:       SalePrefillItem[]
+}
+
 const props = defineProps<{ modelValue: boolean }>()
 const emit  = defineEmits<{
   (e: 'update:modelValue', v: boolean): void
@@ -397,19 +417,45 @@ function applyDefaultWarehouse() {
   if (target) form.value.warehouseId = target.id
 }
 
+// Set by openWithPrefill() right before opening the modal — consumed once, on open.
+const pendingPrefill = ref<SalePrefill | null>(null)
+
 watch(visible, async (open) => {
   if (!open) return
   if (warehouses.value.length === 0) {
     loadingWarehouses.value = true
-    try { warehouses.value = await getWarehouses(); applyDefaultWarehouse() }
+    try { warehouses.value = await getWarehouses() }
     finally { loadingWarehouses.value = false }
   }
+
+  if (pendingPrefill.value) {
+    const p = pendingPrefill.value
+    pendingPrefill.value = null
+    form.value.saleType    = p.saleType
+    form.value.warehouseId = p.warehouseId
+    form.value.items       = p.items.map(i => ({
+      ...i,
+      unitPrice: i.retailPrice != null ? parseFloat(i.retailPrice) : null,
+    }))
+  } else {
+    applyDefaultWarehouse()
+  }
+
   if (targets.value.length === 0 && invoiceStatuses.value.length === 0 && paymentMethods.value.length === 0) {
     loadingMeta.value = true
     try { [targets.value, invoiceStatuses.value, paymentMethods.value] = await Promise.all([getSaleTargets(), getSaleInvoiceStatuses(), getSalePaymentMethods()]) }
     finally { loadingMeta.value = false }
   }
 })
+
+// Called by parent views (e.g. warehouse stock screen) to open the modal with a
+// warehouse and a set of products already selected.
+function openWithPrefill(prefill: SalePrefill) {
+  pendingPrefill.value = prefill
+  visible.value = true
+}
+
+defineExpose({ openWithPrefill })
 
 // ── Form state ────────────────────────────────────────────────────────────────
 
